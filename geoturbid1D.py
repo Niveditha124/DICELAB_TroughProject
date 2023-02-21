@@ -1,0 +1,143 @@
+# GEOTURBID
+#
+# Shallow-Water code for turbidity currents
+# based on Parker et al 4-eq model
+# two-dimensional, single turbid layer, second-order version
+#
+# Prepared by Benoit Spinewine (spinewine@gmail.com)
+
+# initialisation:
+import numpy as np
+
+import init1D
+import initpar
+import initrun
+from bc_1D import bc_1D
+from fieldplot import fieldplot
+from fluxLHLL import fluxLHLL
+from gradientVL import gradientVL
+from hyperbolic import hyperbolic
+from mirror import mirror
+from relax import relax
+from tag2str import tag2str
+from timestep import timestep
+
+dispflag = 0
+t_end = 3600*1000
+dt_output = 3600
+n = 200
+o = 1
+geostaticflag = 0
+
+par = initpar
+field = init1D.field(n, par)
+
+
+field_0 = field
+field_prev = field
+# disk output and screen display parameters
+# t0 = (par.h0/par.g)^0.5;
+t_output = np.arange(0, t_end + dt_output, dt_output)
+i_output = 1
+# prepare graphics:
+# figure;
+
+# main loop:
+firstTimeStep = 1
+# continue previous run
+# load field_202;
+# i_output = 203;
+# firstTimeStep = 0;
+iter = 1
+
+while 0 < t_end:
+
+    if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
+        dt = timestep(field, par)
+        if firstTimeStep:
+            dt = min(dt, 0.1)
+            firstTimeStep = 0
+        # disp(['t = ' num2str(field.t) ' [sec]']); # time display
+    # empty outflowing pit
+# #trying to set values where -1000 to 0?
+#     print(field.z_r == -1000)
+    field.z_b[field.z_r == - 1000] = field.z_r[field.z_r == - 1000]
+    field.z_m[field.z_r == - 1000] = field.z_r[field.z_r == - 1000]
+    field.u[field.z_r == - 1000] = 0
+    field.v[field.z_r == - 1000] = 0
+    field.c_m[field.z_r == - 1000] = 0
+    field.k_m[field.z_r == - 1000] = 0
+    # screen display:
+    if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
+        if dispflag == 1:
+            fieldplot(field, field_0, field_prev, par, dt)
+            #            pause;
+    # disk output:
+    if np.logical_and((np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1))))),
+                      (np.logical_and((i_output <= len(t_output)), ((field.t + dt) > t_output[i_output])))):
+        eval(np.array(['save field_', tag2str(i_output - 1), ' field field_0 field_prev dt']))
+        fieldplot(field, field_0, field_prev, par, dt)
+        #         eval(['print -djpeg95 view_' tag2str(i_output-1)]);
+        #         saveas(gcf,['view_' tag2str(i_output-1)],'fig');
+        i_output = i_output + 1
+    # book-keeping
+    field_prev = field
+    # half-step relaxation operator:
+    if np.logical_and((o == 2), (iter % 2 == 1)):
+        field = relax(field, par, 0.5 * dt, geostaticflag)
+    # extend field left and right:
+    field_x = mirror(field)
+    #    field_y = mirror(swapfield(field));
+    # computation of in-cell gradients:
+    # note: cell slopes are NOT recomputed for the second step of the predictor-corrector
+    if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
+        grad_x = gradientVL(field_x, par, o)
+        #        grad_y = gradientVL(field_y,par,o);
+
+    # fluxing scheme (LHLL):
+    flux_x = fluxLHLL(field_x, grad_x, par, dt)
+    # impose BC at upstream inflow section
+    flux_x = bc_1D(flux_x, field, par)
+    #    flux_y = swapflux(fluxLHLL(field_y,grad_y,par,dt));
+    # 1D default:
+    flux_y = fluxLHLL(field_x, grad_x, par, dt)
+    print(flux_x == flux_y)
+    print("ln 106 ", flux_x.q_m.shape)
+    flux_y.q_m = np.zeros((2, len(field.x)))
+    print("ln 108 ", flux_x.q_m.shape)
+    flux_y.sig_l = np.zeros((2, len(field.x)))
+    flux_y.sig_r = np.zeros((2, len(field.x)))
+    flux_y.sigCross = np.zeros((2, len(field.x)))
+    flux_y.mu = np.zeros((2, len(field.x)))
+    flux_y.kh = np.zeros((2, len(field.x)))
+    # declare 2,203 array of 1's; multiply whole thing by field.z_m
+            # this doesn't seem to be used anywhere
+    # flux_y.z_ml = np.transpose(np.array([1, 1])) * field.z_m
+    # flux_y.z_mr = np.transpose(np.array([1, 1])) * field.z_m
+    # flux_y.z_bl = np.transpose(np.array([1, 1])) * field.z_b
+    # flux_y.z_br = np.transpose(np.array([1, 1])) * field.z_b
+    # hyperbolic operator:
+
+    if o == 1:
+        # 1st order forward Euler:
+        field = hyperbolic(field, flux_x, flux_y, par, dt)
+        # relaxation operator:
+        field = relax(field, par, dt, geostaticflag)
+        # time update:
+        field.t = field.t + dt
+    else:
+        if o == 2:
+            # 2nd order predictor-corrector (Alcrudo & Garcia-Navarro 1993):
+            if iter % 2 == 1:
+                # book-keeping of previous field:
+                field_prev = field
+                # predictor step:
+                field = hyperbolic(field, flux_x, flux_y, par, 0.5 * dt)
+            else:
+                # corrector step:
+                field = hyperbolic(field_prev, flux_x, flux_y, par, dt)
+                # half-step relaxation operator:
+                field = relax(field, par, 0.5 * dt, geostaticflag)
+                # time update:
+                field.t = field.t + dt
+    iter = iter + 1
