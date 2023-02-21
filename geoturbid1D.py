@@ -30,7 +30,7 @@ o = 1
 geostaticflag = 0
 
 par = initpar
-field = init1D.field(n, par)
+field = init1D.field(n, par) # input file
 
 
 field_0 = field
