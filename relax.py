@@ -1,6 +1,7 @@
 from friction import friction
 from entrainment import entrainment
 from geomorphic import geomorphic
+from knappBagnold import knappBagnold
 def relax(field = None,par = None,dt = None, geostaticflag = None):
     #RELAX relaxation (source) operator
     
