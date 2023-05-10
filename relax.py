@@ -3,6 +3,7 @@ from entrainment import entrainment
 from geomorphic import geomorphic
 from knappBagnold import knappBagnold
 from dissipation import dissipation
+from hemipelagic import hemipelagic
 def relax(field = None,par = None,dt = None, geostaticflag = None):
     #RELAX relaxation (source) operator
     
