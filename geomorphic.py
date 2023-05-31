@@ -20,7 +20,7 @@ def geomorphic(field, par, dt):
     # start with explicit estimate
     denom = ((par.vs * par.Rp * 0.6 * (((par.alpha * field.k_m) ** 0.5) / (par.g / np.maximum(h, par.h_min)))) ** 0.08)
     Ze5 = ((par.alpha * field.k_m) ** 0.5) / 1 # because we have to initialize the array to something that won't shit the bed, so we can reference it's index :)
-    for each in denom:
+    for each in denom:## checking where each 0 value is in the denominator, and where it is 0.0, using 1 as the denom instead so we don't have a division issue
         for index, item in enumerate(each):
             if item == 0.0: # if it was 0 before it remains the same
                 Ze5[0][index] = (par.alpha * field.k_m[0][index]) ** 0.5 / 1
