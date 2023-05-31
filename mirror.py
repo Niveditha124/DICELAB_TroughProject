@@ -14,6 +14,11 @@ class newfield:
     z_r = 0
     u = 0
     v = 0
+    Q_up = 0
+    H_up = 0
+    U_up = 0
+    C_up = 0
+    K_up = 0
 
 
 # this is absolutely shagged :)
@@ -30,7 +35,7 @@ def mirror(field_x):
 
     # newfield.z_m = np.array([field.z_m[0, 0], field.z_m, field.z_m[:, n - 1]], dtype=object)
     newfield.z_m = weedmark_ext(field_x.z_m)
-    # field.z_m values aren't right so newfield.z_m values aren't right
+    # z_m is 1,204 exactly what it should be wrt matlab
 
     # newfield.c_m = np.array([field.c_m[0, 0], field.c_m, field.c_m[:, n - 1]], dtype=object)
     newfield.c_m = weedmark_ext(field_x.c_m)
