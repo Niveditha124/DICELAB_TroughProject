@@ -17,13 +17,13 @@ def initMonterrey(n,par):
     field = init1D.field(n, par) # input file
 
     #x = (x0-0.5*dx):dx:(x0+Lx+0.5*dx)
-    x = np.arange((x0-0.5*dx), (x0+Lx+0.5*dx) + 1, dx) # +1 to match MATLAB resuts
+    x = np.arange((x0-0.5*dx), (x0+Lx+0.5*dx) + 1, dx) # +1 to match MATLAB results
     y = np.ones((1,1))
     field.x = np.ones((1,1)) * x # field.x = np.ones(lengt(y), 1) * x
     field.y = y * np.ones((1, len(x)))
 
     # top of turbid layer:
-    field.z_m = np.ones( field.x.shape )*-1000 #.001
+    field.z_m = np.ones( field.x.shape ) * -1000 #.001
     # field.z_m(field.x<0) = 0.75
 
     # turbid concentration
