@@ -4,12 +4,14 @@ import numpy as np
 def entrainment(field, par, dt):
     # normal and directional vectors
     vel = ((field.u ** 2) + (field.v ** 2)) ** 0.5
-    rs = np.maximum(vel, (par.g * par.h_min) ** 0.5)
-    rs = field.u / rs
-    ls = (vel > ((par.g * par.h_min) ** 0.5)).astype(int)
-    ix = ls * rs
+    # is this ls rs business just for testing?
+    # rs = np.maximum(vel, (par.g * par.h_min) ** 0.5)
+    # rs = field.u / rs
+    # ls = (vel > ((par.g * par.h_min) ** 0.5)).astype(int)
+    # ix = ls * rs
     ix = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.u / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
     iy = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.v / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
+
     # layer depth
     h = field.z_m - field.z_b
 
@@ -49,7 +51,7 @@ def entrainment(field, par, dt):
     u_new = momx / np.maximum(h_new, par.h_min)
     v_new = momy / np.maximum(h_new, par.h_min)
     vel_new = (u_new ** 2 + v_new ** 2)**0.5
-    dhdt_new = (1/dt)*(h_new-h)
+    dhdt_new = (1 / dt) * (h_new - h)
 
      #solve for update K
     kh_new = np.maximum(h * field.k_m + dt * 0.5 * dhdt_new * (vel_new ** 2 - par.R * par.g * SS), 0)

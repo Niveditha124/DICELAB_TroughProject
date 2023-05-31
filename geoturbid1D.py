@@ -37,7 +37,7 @@ field = init1D.field(n, par) # input file
 field_0 = field
 field_prev = field
 # disk output and screen display parameters
-# t0 = (par.h0/par.g)^0.5;
+# t0 = (par.h0/par.g)^0.5;]
 t_output = np.arange(0, t_end + dt_output, dt_output)
 i_output = 1
 # prepare graphics:
@@ -52,7 +52,6 @@ firstTimeStep = 1
 iter = 1
 
 while 0 < t_end:
-
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         dt = timestep(field, par)
         if firstTimeStep:
@@ -97,7 +96,7 @@ while 0 < t_end:
         #        grad_y = gradientVL(field_y,par,o);
 
     # fluxing scheme (LHLL):
-    flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt)
+    flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
     # impose BC at upstream inflow section
     flux_x = bc_1D(flux_x, field_x, par)
     #    flux_y = swapflux(fluxLHLL(field_y,grad_y,par,dt));
@@ -142,4 +141,6 @@ while 0 < t_end:
                 field = relax(field, par, 0.5 * dt, geostaticflag)
                 # time update:
                 field.t = field.t + dt
+    print(iter)
     iter = iter + 1
+

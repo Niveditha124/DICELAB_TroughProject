@@ -33,7 +33,7 @@ class fluxx:
         self.z_br = np.zeros(s)
 
 
-def fluxLHLL_2(name, field=None, grad=None, par=None, dt=None):
+def fluxLHLL_2(name, field, grad, par, dt):
     # FLUXLHLL Approximate Riemann solver of Harten, Lax and Van Leer (1983) with lateralised momentum flux
     # extrapolations left and right (in face-centred variables):
     flux_x = fluxx(name)
@@ -125,6 +125,7 @@ def fluxLHLL_2(name, field=None, grad=None, par=None, dt=None):
     # anti-emptying constraint:
     q_m_star_min = - h_mr * dx / dt
     q_m_star_max = h_ml * dx / dt
+
     q_m_star = np.minimum(np.maximum(q_m_star_min, q_m_star), q_m_star_max)
     # canonical HLL statement for momentum:
     sig_star = np.multiply(
