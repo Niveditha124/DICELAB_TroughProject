@@ -5,20 +5,20 @@ from weedmark_ext import weedmark_ext
 
 # CLEAN UP WHEN FUNCTIONAL
 class newfield:
-    x = 0
-    y = 0
-    z_m = 0
-    c_m = 0
-    k_m = 0
-    z_b = 0
-    z_r = 0
-    u = 0
-    v = 0
-    Q_up = 0
-    H_up = 0
-    U_up = 0
-    C_up = 0
-    K_up = 0
+    x = field.x
+    y = field.y
+    z_m = field.z_m
+    c_m = field.c_m
+    k_m = field.k_m
+    z_b = field.z_b
+    z_r = field.z_r
+    u = field.u
+    v = field.v
+    Q_up = field.Q_up
+    H_up = field.H_up
+    U_up = field.U_up
+    C_up = field.C_up
+    K_up = field.K_up
 
 
 # this is absolutely shagged :)
@@ -55,5 +55,4 @@ def mirror(field_x):
     # newfield.v = np.array([field.v[0, 0], field.v, field.v[:, n - 1]], dtype=object)
     newfield.v = weedmark_ext(field_x.v)
 
-    #newfield.z_r, newfield.u, newfield.v = weedmark_ext(field_x.zr), weedmark_ext(field_x.u), weedmark_ext(field_x.v)
     return newfield
