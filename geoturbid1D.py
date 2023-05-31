@@ -51,7 +51,7 @@ firstTimeStep = 1
 # firstTimeStep = 0;
 iter = 1
 
-while 0 < t_end:
+while field.t < t_end:
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         dt = timestep(field, par)
         if firstTimeStep:
@@ -59,8 +59,6 @@ while 0 < t_end:
             firstTimeStep = 0
         # disp(['t = ' num2str(field.t) ' [sec]']); # time display
     # empty outflowing pit
-# #trying to set values where -1000 to 0?
-#     print(field.z_r == -1000)
     field.z_b[field.z_r == - 1000] = field.z_r[field.z_r == - 1000]
     field.z_m[field.z_r == - 1000] = field.z_r[field.z_r == - 1000]
     field.u[field.z_r == - 1000] = 0
