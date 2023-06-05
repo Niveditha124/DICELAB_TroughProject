@@ -2,7 +2,7 @@
 # solved implicitly with backward Euler scheme (solution obtained
 # interatively from the explicit estimate with a Newton scheme)
 import numpy as np
-
+import sys
 
 def geomorphic(field, par, dt):
     # obtain norm and direction vectors
@@ -10,22 +10,37 @@ def geomorphic(field, par, dt):
     ix = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.u / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
     iy = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.v / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
     h = field.z_m - field.z_b
-
+    
     # moving sediments
     CH = h * field.c_m
     # KH
     KH = h * field.k_m
-
+    
+    print('\n')
+    print('par.alpha:', par.alpha)
+    print('field.k_m:', field.k_m)
+    print('par.vs:', par.vs)
+    print('par.Rp:', par.Rp)
+    print('par.g:', par.g)
+    print('h:', h)
+    Ze5 = ((par.alpha*field.k_m) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * field.k_m) ** 0.5 / par.g / np.maximum(h, par.h_min)) ** 0.08) ** 5;
+    print(Ze5[0][0]) 
+    sys.exit()
+    '''
     # solve for CH
     # start with explicit estimate
     denom = ((par.vs * par.Rp * 0.6 * (((par.alpha * field.k_m) ** 0.5) / (par.g / np.maximum(h, par.h_min)))) ** 0.08)
     Ze5 = ((par.alpha * field.k_m) ** 0.5) / 1 # because we have to initialize the array to something that won't shit the bed, so we can reference it's index :)
+    
     for each in denom:## checking where each 0 value is in the denominator, and where it is 0.0, using 1 as the denom instead so we don't have a division issue
         for index, item in enumerate(each):
             if item == 0.0: # if it was 0 before it remains the same
                 Ze5[0][index] = (par.alpha * field.k_m[0][index]) ** 0.5 / 1
             else: # otherwise it changes to whatever the updated par and field values calculate out to
                 Ze5[0][index] = ((((par.alpha * field.k_m[0][index]) ** 0.5) / (par.vs * par.Rp * 0.6 * ((par.alpha * field.k_m[0][index]) ** 0.5) / (par.g / np.maximum(h, par.h_min)))) ** 0.08) ** 5
+    
+    '''
+    
     E = np.maximum((par.p * (1.3 * 10 ** -7)) * par.vs * Ze5 / (1 + (1.3 * 10 ** -7) / 0.3 * Ze5), 0)
     D = np.maximum(par.vs * par.r0 * field.c_m, 0)
     CH_new = np.maximum(CH + dt * (E - D), 0)
