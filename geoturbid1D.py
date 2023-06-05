@@ -22,6 +22,7 @@ from mirror import mirror
 from relax import relax
 from tag2str import tag2str
 from timestep import timestep
+import os
 
 dispflag = 0
 t_end = 3600*1000
@@ -29,11 +30,8 @@ dt_output = 3600
 n = 200
 o = 1
 geostaticflag = 0
-
 par = initpar
 field = init1D.field(n, par) # input file
-
-
 field_0 = field
 field_prev = field
 # disk output and screen display parameters
@@ -61,6 +59,7 @@ while field.t < t_end:
     # empty outflowing pit
     field.z_b[field.z_r == - 1000] = field.z_r[field.z_r == - 1000]
     field.z_m[field.z_r == - 1000] = field.z_r[field.z_r == - 1000]
+
     field.u[field.z_r == - 1000] = 0
     field.v[field.z_r == - 1000] = 0
     field.c_m[field.z_r == - 1000] = 0
@@ -70,15 +69,17 @@ while field.t < t_end:
         if dispflag == 1:
             fieldplot(field, field_0, field_prev, par, dt)
             #            pause;
+    
     # disk output:
     if np.logical_and((np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1))))),
                       (np.logical_and((i_output <= len(t_output)), ((field.t + dt) > t_output[i_output])))):
         # eval(np.array(['save field_', tag2str(i_output - 1), ' field field_0 field_prev dt']))
-        eval('save field_', tag2str(i_output - 1), np.array['field field_0 field_prev dt'])
+        # eval('save field_', tag2str(i_output - 1), np.array['field field_0 field_prev dt'])
         fieldplot(field, field_0, field_prev, par, dt)
         #         eval(['print -djpeg95 view_' tag2str(i_output-1)]);
         #         saveas(gcf,['view_' tag2str(i_output-1)],'fig');
         i_output = i_output + 1
+    
     # book-keeping
     field_prev = field
     # half-step relaxation operator:
@@ -97,6 +98,7 @@ while field.t < t_end:
     flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
     # impose BC at upstream inflow section
     flux_x = bc_1D(flux_x, field_x, par)
+
     #    flux_y = swapflux(fluxLHLL(field_y,grad_y,par,dt));
     # 1D default:
     flux_y = fluxLHLL_2('y', field_x, grad_x, par, dt) # this is because we have to instantiate flux_y
@@ -115,7 +117,7 @@ while field.t < t_end:
     # flux_y.z_bl = np.transpose(np.array([1, 1])) * field.z_b
     # flux_y.z_br = np.transpose(np.array([1, 1])) * field.z_b
     # hyperbolic operator:
-
+    
     if o == 1:
         # 1st order forward Euler:
         # print("flux_x qm", flux_x.q_m.shape)
@@ -140,5 +142,7 @@ while field.t < t_end:
                 # time update:
                 field.t = field.t + dt
     print(iter)
+    if iter == 3:
+        break
     iter = iter + 1
 
