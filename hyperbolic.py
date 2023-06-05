@@ -1,5 +1,5 @@
 import numpy as np
-
+import sys
 
 def hyperbolic(field, flux_x, flux_y, par, dt):
     # HYPERBOLIC
@@ -28,9 +28,17 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     # f = (flux_y.q_m[np.arange(1, m+1), 1:-1])
     # print("f", f.shape)
 
-    z_m_new = field.z_m + (dt / dx) * flux_x.q_m[:, np.arange(0, n)] - flux_x.q_m[:, np.arange(0, n)] - (dt / dy) * (flux_y.q_m[np.arange(1, m+1), :] - flux_y.q_m[np.arange(1, m + 1), :])
+    # correct line
+    # z_m_new = field.z_m + (dt / dx) * flux_x.q_m[:, np.arange(0, n)] - flux_x.q_m[:, np.arange(0, n)] - (dt / dy) * (flux_y.q_m[np.arange(1, m+1), :] - flux_y.q_m[np.arange(1, m + 1), :])
+    ls = flux_x.q_m[:, 0:n] - flux_x.q_m[:, 1:n+1]
+    rs = flux_y.q_m[0:m, :] - flux_y.q_m[1:m+1, :]
+    z_m_new = field.z_m + (dt / dx) * ls + (dt / dy) * rs
+    #+ (dt/dy) * (flux_y.q_m[0:m, :] - flux_y.q_m[1:m+1, :])
+    
+    
     # z_m_new = field.z_m + ((dt / dx) * (flux_x.q_m[:, (0, n)])) - flux_x.q_m[:, (1, n+1)] + (dt / dy) * flux_y.q_m[(0, m), :] - flux_y.q_m[(1, m+1), :]
     qm_x = np.multiply((field.z_m - field.z_b), field.u)
+
     # qm_x_new = qm_x + (dt / dx) * (flux_x.sig_r(:,np.arange(1,n+1)) - flux_x.sig_l(:,np.arange(2,n + 1+1))) + (dt /
     # dy) * (flux_y.sigCross(np.arange(1,m+1),:) - flux_y.sigCross(np.arange(2,m + 1+1),:)) + np.multiply((dt / dx) *
     # par.R * par.g * (np.multiply(field.c_m,(field.z_m - field.z_b))),(flux_x.z_br(:,np.arange(1,
@@ -39,6 +47,7 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     #         dt / dy) * flux_y.sigCross[(0, m + 1), :] - flux_y.sigCross[(1, m + 2), :] + np.multiply(
     #     (dt / dx) * par.R * par.g * (np.multiply(field.c_m(field.z_m - field.z_b))),
     #     (flux_x.z_br[:, (0, n + 1)] - flux_x.z_bl[:, (1, n + 2)]))
+    '''
     a = np.multiply((dt / dx), (flux_x.sig_r[:, np.arange(1, n + 1)]))
     b = (flux_x.sig_l[:, np.arange(1, n + 1)])
     c = np.multiply((dt / dx), (flux_y.sigCross[np.arange(1, m + 1), :]))
@@ -48,6 +57,11 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     g = (flux_x.z_br[:, np.arange(0, n)] - flux_x.z_bl[:, np.arange(0, n)])
     # print((qm_x + a - b + c - d + np.multiply(e, f) - g).shape)
     qm_x_new = qm_x + a - b + c - d + np.multiply(e, f) - g
+    '''
+    qm_x_new = qm_x + (dt/dx)*(flux_x.sig_r[:, 0:n] - flux_x.sig_l[:, 1:n+1]) \
+            + (dt/dy)*(flux_y.sigCross[0:m, :] - flux_y.sigCross[1:m+1, :]) \
+            + (dt/dx)*par.R*par.g*(field.c_m*(field.z_m-field.z_b))*(flux_x.z_br[:, 0:n] - flux_x.z_bl[:, 1:n+1])
+
     # qm_x_new = qm_x + np.multiply((dt/dx), (flux_x.sig_r[:, np.arange(0, n+1)])) - (flux_x.sig_l[:, np.arange(1, n+2)]) + np.multiply((dt/dx), (flux_y.sigCross[np.arange(0, m+1), :])) - (flux_y.sigCross[np.arange(1, m+2), :]) + ((dt / dx)*par.R*par.g)* (
     # np.multiply(field.c_m(field.z_m - field.z_b)), (flux_x.z_br[:, np.arange(0, n+1)] - flux_x.z_bl[:, np.arange(1, n+2)]))
     qm_y = np.multiply((field.z_m - field.z_b), field.v)
@@ -70,11 +84,14 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     nine = flux_y.z_bl[np.arange(1, m+1), :]
     qm_y_new = two - three + four - five + six * eight - nine
 
+
+
     # qm_y_new = qm_y + (dt / dx) * flux_x.sigCross[:, (0, n + 1)] - flux_x.sigCross[:, (1, n + 2)] + (
     #         dt / dy) * flux_y.sig_r[(0, m + 1), :] - flux_y.sig_l[(1, m + 2), :] + np.multiply(
     #     (dt / dx) * par.R * par.g * (np.multiply(field.c_m(field.z_m - field.z_b))),
     #     (flux_y.z_br[(0, m + 1), :] - flux_y.z_bl[(1, m + 2), :]))
     nu = np.multiply((field.z_m - field.z_b), field.c_m)
+    
     # nu_new = nu + (dt / dx) * (flux_x.mu(:,np.arange(1,n+1)) - flux_x.mu(:,np.arange(2,n + 1+1))) + (dt / dy) * (
     # flux_y.mu(np.arange(1,m+1),:) - flux_y.mu(np.arange(2,m + 1+1),:))
 
@@ -82,6 +99,7 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     #         flux_y.mu[(1, m + 1), :] - flux_y.mu[(1, m + 2), :])
 
     nu_new = nu + (dt / dx) * flux_x.mu[:, np.arange(0, n)] - flux_x.mu[:, np.arange(1, n+1)] + (dt / dy) * (flux_y.mu[np.arange(0, m), :] - flux_y.mu[np.arange(1, m+1), :])
+
     kh = np.multiply((field.z_m - field.z_b), field.k_m)
     # kh_new = kh + (dt / dx) * (flux_x.kh(:,np.arange(1,n+1)) - flux_x.kh(:,np.arange(2,n + 1+1))) + (dt / dy) * (
     # flux_y.kh(np.arange(1,m+1),:) - flux_y.kh(np.arange(2,m + 1+1),:))
@@ -89,17 +107,27 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     #         flux_y.kh[(0, m + 1), :] - flux_y.kh[(1, m + 2), :])
 
     kh_new = kh + (dt / dx) * flux_x.kh[:, np.arange(0, n)] - flux_x.kh[:, np.arange(1, n+1)] + (dt / dy) * (flux_y.kh[np.arange(0, m), :] - flux_y.kh[np.arange(1, m+1), :])
-
     # z-ordering condition:
     z_m_new = np.maximum(z_m_new, field.z_b)
     # concentration update:
     c_m_new = np.multiply(((z_m_new - field.z_b) > par.h_min), nu_new) / np.maximum((z_m_new - field.z_b), par.h_min) + np.multiply(((z_m_new - field.z_b) <= par.h_min), field.c_m)
     # positivity condition
-    c_m_new = np.maximum(c_m_new, 0)
+    c_m_new = np.maximum(c_m_new, 0) 
+    # print("z_m_new:", z_m_new)
+    # print("field.z_b:", field.z_b)
+    # print("par.h_min:", par.h_min)
+    # print("nu_new:", nu_new)
+    # print("z_m_new:", z_m_new)
+    # print("field.z_b:", field.z_b)
+    # print("par.h_min:", par.h_min)
+    # print("field.c_m:", field.c_m)
+    
+    
     # turb kin energy update:
     k_m_new = np.multiply(((z_m_new - field.z_b) > par.h_min), kh_new) / np.maximum((z_m_new - field.z_b), par.h_min) + np.multiply(((z_m_new - field.z_b) <= par.h_min), field.k_m)
     # positivity condition
     k_m_new = np.maximum(k_m_new, 0)
+
     # velocity update
     u_new = np.multiply(((z_m_new - field.z_b) >= par.h_min), qm_x_new) / np.maximum((z_m_new - field.z_b), par.h_min)
     v_new = np.multiply(((z_m_new - field.z_b) >= par.h_min), qm_y_new) / np.maximum((z_m_new - field.z_b), par.h_min)
