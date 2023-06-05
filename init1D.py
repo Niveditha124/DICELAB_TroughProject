@@ -9,12 +9,16 @@ class field:
     p2 = 0
     p1 = 0
     L3 = 5000
-    L2 = 6000
-    L1 = 6000
+    # L2 = 6000
+    L2 = 15000
+    # L1 = 6000
+    L1 = 15000
     Lx = L1 + L2 + L3
     S3 = 0
-    S2 = 0.006
-    S1 = 0.013
+    # S2 = 0.006
+    S2 = 0.003
+    # S1 = 0.013
+    S1 = 0.003
     x0 = - L1
     n = 200
     dx = Lx / n
@@ -36,9 +40,10 @@ class field:
     xx = np.array([- L1, 0, L2, L2 + L3])
     zz = np.array([L1 * S1, 0, - L2 * S2, - L2 * S2 - L3 * S3])
     set_interp = interp1d(xx, zz, kind='linear', fill_value='extrapolate')
-    # z_b = set_interp(x)
-    z_b[-1, -1 - 2] = -1000
-    z_r[-1, -1] = 1000
+    z_b = set_interp(x)
+    # z_b[-1, -1 - 2] = -1000
+    z_b[0][-3:] = -1000
+    z_r[0][-1] = 1000
     isX1 = np.argwhere(np.logical_and((x[0] > -L1), (x[0] < 0)))
     isX2 = np.argwhere(np.logical_and((x[0] > 0), (x[0] < L2)))
     isX3 = np.argwhere(np.logical_and((x[0] > L2), (x[0] < (L2 + L3))))
@@ -59,7 +64,7 @@ class field:
     z_m = np.maximum(z_m, z_b)
     t = 0
     H_up = 60
-    C_up = 0.0015
+    C_up = 0.333
     U_up = 1
     Q_up = H_up * U_up
     K_up = 0
@@ -93,6 +98,7 @@ class field:
         self.K_up = field.K_up
 
     def init1D(self, n, par):
+
         S1 = field.S1
         S2 = field.S2
         S3 = field.S3
@@ -169,3 +175,4 @@ class field:
         # time:
         # -----
         # field.t = 0
+

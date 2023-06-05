@@ -21,7 +21,7 @@ class newfield:
     K_up = field.K_up
 
 
-# this is absolutely shagged :)
+# this is absolutely shagged :) <-- bruh
 def mirror(field_x):
     # MIRROR extend field left and right using mirror symmetry
     m, n = field_x.x.shape
@@ -54,5 +54,10 @@ def mirror(field_x):
 
     # newfield.v = np.array([field.v[0, 0], field.v, field.v[:, n - 1]], dtype=object)
     newfield.v = weedmark_ext(field_x.v)
+    
+    # Not sure but screw it lets hard code it
+    # Might need to change it later
+    newfield.K_up = 0.05
+    newfield.C_up = 0.0015
 
     return newfield

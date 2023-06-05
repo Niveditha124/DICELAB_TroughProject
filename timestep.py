@@ -1,12 +1,11 @@
 import numpy as np
 
-
 def timestep(field, par):
     # TIMESTEP compute time step according to the Courant condition
     # cel = ( par.g * max( field.z_m - field.z_b , par.h_min ) ).^0.5;
     cel = (np.multiply(par.R * par.g * field.c_m, np.maximum(field.z_m - field.z_b, par.h_min)) ** 0.5)
     vel = (field.u ** 2 + field.v ** 2) ** 0.5
-    print("vel", vel)
+    # print("vel", vel)
 
 
     # print(cel)
