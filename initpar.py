@@ -12,6 +12,12 @@ c_b = 0.7  # % [m^3/m^3] sediment concentration in static bed [0.50]
 rho_w = rho_W  #
 # %   R = (rho_S/rho_W)-1# % excess weight coefficient for the sediments = (rho_S-rho_w)/rho_w [-]
 R = (rho_S - rho_WS) / rho_W  #
+print('The value of par.rho_S is: ', rho_S)
+print('The value of par.rho_WS is: ', rho_WS)
+print('The value of par.W is: ', rho_w)
+print('The value of par.R is: ', R)
+
+
 rPrime = R * c_b  # % excess weight coefficient for the bed load layer
 r = 1 + rPrime  # % mult. coefficient accounting for bulk excess weight of the bed load layer
 CfStar = 0.005  # % friction parameter
@@ -26,8 +32,20 @@ x = math.log10(math.pow(Rp, 2))
 y = -3.76715 + 1.92944 * x - math.pow(0.09815 * x, 2) - math.pow(0.00575 * x, 3) + math.pow(0.00056 * x, 4)
 # Rf = ((10^y)/Rp)^(1/3)
 Rf = math.pow(((math.pow(10, y)) / Rp), 1 / 3)
+Rf = ((10 ** y)/Rp) ** (1/3)
+print('\n\nValue of Rf: ', Rf, '\n\n')
+print('Value of Rp: ', Rp)
 # vs = Rf*(R*g*D)^0.5# % particle fall velocity
-vs = Rf * math.pow((R * g * D), 0.5)
+# vs = Rf * math.pow((R * g * D), 0.5)
+
+vs = ((R * g * D) ** 0.5)
+print('before: vs: ', vs)
+vs = vs * Rf
+print('after: vs: ', vs)
+print('par.R: ', R)
+print('par.g: ', g)
+print('par.D: ', D)
+print('par.vs: ', vs)
 v_hemi = 0 * 90e-6  # % rate of aggradation from hemipelagic sediments in-between turbidity current events 1e-5
 # %   numerical parameters:
 h0 = 300  # % typical depth [m] [10]

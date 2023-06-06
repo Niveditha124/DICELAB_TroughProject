@@ -15,16 +15,38 @@ def geomorphic(field, par, dt):
     CH = h * field.c_m
     # KH
     KH = h * field.k_m
-    
+    '''
     print('\n')
     print('par.alpha:', par.alpha)
-    print('field.k_m:', field.k_m)
+    print('field.k_m:', field.k_m[0][0])
     print('par.vs:', par.vs)
     print('par.Rp:', par.Rp)
     print('par.g:', par.g)
-    print('h:', h)
-    Ze5 = ((par.alpha*field.k_m) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * field.k_m) ** 0.5 / par.g / np.maximum(h, par.h_min)) ** 0.08) ** 5;
-    print(Ze5[0][0]) 
+    print('h: {:.6e}'.format(h[0][0]))
+    '''
+    # Ze5 = ((par.alpha*field.k_m) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * field.k_m) ** 0.5 / par.g / np.maximum(h, par.h_min)) ** 0.08) ** 5
+    # print('Ze5: ', Ze5[0][0])
+    # print('Ze5: {:.3e}'.format(Ze5[0][0]))
+
+    temp = (par.alpha*field.k_m[0][0]) ** 0.5
+    print('temp: ', temp)
+    Ze5 = temp/par.vs * (par.Rp ** 0.6)
+    print('par.vs: ', par.vs)
+
+    print('Ze5: ', Ze5)
+    '''
+    inside = temp / par.g
+    print('inside: %f\n', inside[0][0])
+    inside = inside / np.maximum(h[0][0],par.h_min)
+    print('inside: %f\n', inside[0][0])
+    Ze5 = Ze5 * (inside ** 0.08)
+    print('Ze5: %f\n', Ze5[0][0])
+    Ze5 = Ze5 ** 5
+    print('Ze5: %f\n', Ze5[0][0])
+'''
+
+
+
     sys.exit()
     '''
     # solve for CH
