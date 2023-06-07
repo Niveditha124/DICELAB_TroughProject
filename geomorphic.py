@@ -24,30 +24,38 @@ def geomorphic(field, par, dt):
     print('par.g:', par.g)
     print('h: {:.6e}'.format(h[0][0]))
     '''
+    
     # Ze5 = ((par.alpha*field.k_m) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * field.k_m) ** 0.5 / par.g / np.maximum(h, par.h_min)) ** 0.08) ** 5
-    # print('Ze5: ', Ze5[0][0])
-    # print('Ze5: {:.3e}'.format(Ze5[0][0]))
-
-    temp = (par.alpha*field.k_m[0][0]) ** 0.5
-    print('temp: ', temp)
-    Ze5 = temp/par.vs * (par.Rp ** 0.6)
+    temp = (par.alpha * field.k_m) ** 0.5
+    
+    Ze5 = temp / par.vs
+    print('temp: ', temp[0][0])
     print('par.vs: ', par.vs)
-
-    print('Ze5: ', Ze5)
-    '''
-    inside = temp / par.g
-    print('inside: %f\n', inside[0][0])
-    inside = inside / np.maximum(h[0][0],par.h_min)
-    print('inside: %f\n', inside[0][0])
-    Ze5 = Ze5 * (inside ** 0.08)
-    print('Ze5: %f\n', Ze5[0][0])
+    print('Ze5: {:.3e}'.format(Ze5[0][0]))
+    Ze5 = Ze5 * (par.Rp ** 0.6)
+    temp2 = temp / par.g
+    temp2 = temp2 / np.maximum(h, par.h_min)
+    temp2 = temp2 ** 0.08
+    Ze5 = Ze5 * temp2
     Ze5 = Ze5 ** 5
-    print('Ze5: %f\n', Ze5[0][0])
-'''
 
-
+    
 
     sys.exit()
+    '''
+        inside = temp / par.g
+        print('inside: %f\n', inside)
+        inside = inside / max(h[0][0],par.h_min)
+        print('inside: %f\n', inside)
+        Ze5 = Ze5 * (inside ** 0.08)
+        print('Ze5: %f\n', Ze5)
+        Ze5 = Ze5 ** 5
+        print('Ze5: %f\n', Ze5)
+    '''
+
+
+
+    
     '''
     # solve for CH
     # start with explicit estimate
