@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 
 class fluxx:
@@ -32,6 +33,21 @@ class fluxx:
         self.z_bl = np.zeros(s)
         self.z_br = np.zeros(s)
 
+def createFlux (self, field):
+    s = (2,202)
+    self.q_m = np.zeros(s)
+    self.sig_l = np.zeros(s)
+
+    self.sig_r = np.zeros(s)
+    self.sigCross = np.zeros(s)
+    self.mu = np.zeros(s)
+    self.kh = np.zeros(s)
+    self.z_ml = np.array([[1], [1]]) * field.z_m
+    self.z_mr = np.array([[1], [1]]) * field.z_m
+    self.z_bl = np.array([[1], [1]]) * field.z_b
+    self.z_br = np.array([[1], [1]]) * field.z_b
+    
+    return self
 
 def fluxLHLL_2(name, field, grad, par, dt):
     # FLUXLHLL Approximate Riemann solver of Harten, Lax and Van Leer (1983) with lateralised momentum flux
@@ -99,32 +115,33 @@ def fluxLHLL_2(name, field, grad, par, dt):
     u_r = np.multiply((h_mr >= par.h_min), q_mr) / np.maximum(h_mr, par.h_min)
     v_l = np.multiply((h_ml >= par.h_min), qy_ml) / np.maximum(h_ml, par.h_min)
     v_r = np.multiply((h_mr >= par.h_min), qy_mr) / np.maximum(h_mr, par.h_min)
+    
+    print('h_ml: ', h_ml)
+    print('mu_l: ', mu_l)
+    
     c_ml = np.multiply((h_ml >= par.h_min), mu_l) / np.maximum(h_ml, par.h_min)
+    
     c_mr = np.multiply((h_mr >= par.h_min), mu_r) / np.maximum(h_mr, par.h_min)
     k_ml = np.multiply((h_ml >= par.h_min), kh_l) / np.maximum(h_ml, par.h_min)
     k_mr = np.multiply((h_mr >= par.h_min), kh_r) / np.maximum(h_mr, par.h_min)
 
-    print('Printing...\n\n')
-    print('h_ml: ', h_ml.shape, h_ml)
-    print('u_l: ', u_l.shape, u_l)
-    print('c_ml: ', c_ml.shape, c_ml)
-
     temp_u_l = u_l ** 2
     temp_h_ml = h_ml ** 2
-    np.seterr(all='ignore')
 
     # left and right fluxes:
-    # sig_l = np.multiply(h_ml, u_l ** 2) + 0.5 * par.g * par.R * (np.multiply(c_ml, h_ml ** 2))
+    np.seterr(over='ignore')
+    test = np.multiply(c_ml, np.power(h_ml, 2))
+    
+    sig_l = np.multiply(h_ml, np.power(u_l, 2)) + ((0.5 * par.g * par.R) * np.multiply(c_ml, np.power(h_ml, 2)))
     # sig_l = (h_ml * (u_l ** 2)) + 0.5 * par.g * par.R * (c_ml * (h_ml ** 2))
-    print('Printing shit: \n')
-    print('dt: ', dt)
-    print('c_ml: ', c_ml[0][0])
-    print('temp_h_ml: ', temp_h_ml[0][0])
-    test = np.multiply(c_ml[0][0], temp_h_ml[0][0])
-    print('test is: ', test)
-    
-    sig_l = (c_ml * temp_h_ml)
-    
+
+    '''
+    if name == 'x':
+        print('X sig_l: ', sig_l)   
+    else:
+        print('Y sig_l: ', sig_l)
+    '''
+
     sig_r = np.multiply(h_mr, u_r ** 2) + 0.5 * par.g * par.R * (np.multiply(c_mr, h_mr ** 2))
     # wavespeeds:
     h_l = np.amax(z_ml - z_bl, 0)

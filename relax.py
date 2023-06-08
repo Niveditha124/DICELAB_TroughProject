@@ -11,7 +11,6 @@ def relax(field = None,par = None,dt = None, geostaticflag = None):
     #RELAX relaxation (source) operator
     
     field = friction(field,par,dt)
-
     field = entrainment(field,par,dt)
     field = geomorphic(field,par,dt)
     field = knappBagnold(field,par,dt)

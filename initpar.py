@@ -12,11 +12,6 @@ c_b = 0.7  # % [m^3/m^3] sediment concentration in static bed [0.50]
 rho_w = rho_W  #
 # %   R = (rho_S/rho_W)-1# % excess weight coefficient for the sediments = (rho_S-rho_w)/rho_w [-]
 R = (rho_S - rho_WS) / rho_W  #
-print('The value of par.rho_S is: ', rho_S)
-print('The value of par.rho_WS is: ', rho_WS)
-print('The value of par.W is: ', rho_w)
-print('The value of par.R is: ', R)
-
 
 rPrime = R * c_b  # % excess weight coefficient for the bed load layer
 r = 1 + rPrime  # % mult. coefficient accounting for bulk excess weight of the bed load layer

@@ -4,8 +4,6 @@ import sys
 def hyperbolic(field, flux_x, flux_y, par, dt):
     # HYPERBOLIC
     m, n = field.x.shape
-    print(m)
-    print(n)
     dx = field.x[0, 1] - field.x[0, 0]
     # dy = field.y(2,1) - field.y(1,1);
     dy = dx
@@ -82,9 +80,11 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     seven = np.multiply(field.c_m, six_1)
     eight = np.multiply(seven, flux_y.z_br[np.arange(0, m), :])
     nine = flux_y.z_bl[np.arange(1, m+1), :]
-    qm_y_new = two - three + four - five + six * eight - nine
+    # qm_y_new = two - three + four - five + six * eight - nine
 
-
+    qm_y_new = qm_y + (dt / dx) * (flux_x.sigCross[:, 0:n] - flux_x.sigCross[:, 1:n+1]) \
+            + (dt / dy) * (flux_y.sig_r[0:m, :] - flux_y.sig_l[1:m+1, :]) \
+            + (dt / dy) * par.R * par.g * (field.c_m * (field.z_m - field.z_b)) * (flux_y.z_br[0:m, :] - flux_y.z_bl[1:m+1, :])
 
     # qm_y_new = qm_y + (dt / dx) * flux_x.sigCross[:, (0, n + 1)] - flux_x.sigCross[:, (1, n + 2)] + (
     #         dt / dy) * flux_y.sig_r[(0, m + 1), :] - flux_y.sig_l[(1, m + 2), :] + np.multiply(

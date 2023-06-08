@@ -8,7 +8,9 @@
 
 # initialisation:
 import numpy as np
-
+import os
+from createFluxY import createFluxY
+os.system('clear')
 import init1D
 import initpar
 import initrun
@@ -22,7 +24,7 @@ from mirror import mirror
 from relax import relax
 from tag2str import tag2str
 from timestep import timestep
-import os
+
 import sys
 
 dispflag = 0
@@ -51,6 +53,10 @@ firstTimeStep = 1
 iter = 1
 
 while field.t < t_end:
+    
+    print('Iteration ', iter, ': ')
+    if iter == 10:
+        break
     
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         dt = timestep(field, par)
@@ -97,7 +103,6 @@ while field.t < t_end:
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         grad_x = gradientVL(field_x, par, o)
         #        grad_y = gradientVL(field_y,par,o);
-    print('dt1: ',dt)
     # fluxing scheme (LHLL):
     flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
     # impose BC at upstream inflow section
@@ -105,7 +110,10 @@ while field.t < t_end:
 
     #    flux_y = swapflux(fluxLHLL(field_y,grad_y,par,dt));
     # 1D default:
-    flux_y = fluxLHLL_2('y', field_x, grad_x, par, dt) # this is because we have to instantiate flux_y
+    # Original flux_y line of code
+    # flux_y = fluxLHLL_2('y', field_x, grad_x, par, dt) # this is because we have to instantiate flux_y
+    flux_y = createFluxY(field)
+
     # print("ln 106 ", flux_x.q_m.shape)
     # flux_y.q_m = np.zeros((2, field_x.x.shape[1]))
     # # print("ln 108 ", flux_x.q_m.shape)
@@ -121,18 +129,13 @@ while field.t < t_end:
     # flux_y.z_bl = np.transpose(np.array([1, 1])) * field.z_b
     # flux_y.z_br = np.transpose(np.array([1, 1])) * field.z_b
     # hyperbolic operator:
-    print('dt2: ',dt)
+
     if o == 1:
         # 1st order forward Euler:
         # print("flux_x qm", flux_x.q_m.shape)
-        print('dt2: ',dt)
-        field = hyperbolic(field, flux_x, flux_y, par, dt)
-        print('dt3: ',dt)
-        
+        field = hyperbolic(field, flux_x, flux_y, par, dt)        
         # relaxation operator:
         field = relax(field, par, dt, geostaticflag)
-        
-        print('dt4: ',dt)
         # time update:
         field.t = field.t + dt
 
@@ -151,7 +154,5 @@ while field.t < t_end:
                 field = relax(field, par, 0.5 * dt, geostaticflag)
                 # time update:
                 field.t = field.t + dt
-    print(iter)
     iter = iter + 1
-    print('hi')
 

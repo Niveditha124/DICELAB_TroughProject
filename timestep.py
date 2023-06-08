@@ -5,21 +5,7 @@ def timestep(field, par):
     # TIMESTEP compute time step according to the Courant condition
     # cel = ( par.g * max( field.z_m - field.z_b , par.h_min ) ).^0.5;
     cel = (np.multiply(par.R * par.g * field.c_m, np.maximum(field.z_m - field.z_b, par.h_min)) ** 0.5)
-    print('Printing field values: ')
-    if (np.any(np.isnan(field.c_m))):
-        print('field.c_m: ', field.c_m)
-        sys.exit()
-    if (np.any(np.isnan(field.z_m))):
-        print('field.z_m: ', field.z_m)
-        sys.exit()
-    if (np.any(np.isnan(field.z_b))):
-        print('field.c_m: ', field.z_b)
-        sys.exit()
-
     vel = (field.u ** 2 + field.v ** 2) ** 0.5
-    print("vel: ", vel)
-    print('cel: ', cel)
-
 
     # print(cel)
     # print(vel)
@@ -39,8 +25,7 @@ def timestep(field, par):
         dt = (par.courant * dl) / speed_max
         print(par.courant)
         print(dl)
-        print('MS: ', speed_max)
-        print('New DT value: ', dt)
-            # speed max is zero, then all the arrays shit the bed.
+
+        # speed max is zero, then all the arrays shit the bed.
 
     return dt
