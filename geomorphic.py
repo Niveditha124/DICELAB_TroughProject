@@ -25,23 +25,15 @@ def geomorphic(field, par, dt):
     print('h: {:.6e}'.format(h[0][0]))
     '''
     
-    # Ze5 = ((par.alpha*field.k_m) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * field.k_m) ** 0.5 / par.g / np.maximum(h, par.h_min)) ** 0.08) ** 5
-    temp = (par.alpha * field.k_m) ** 0.5
-    
-    Ze5 = temp / par.vs
-    print('temp: ', temp[0][0])
-    print('par.vs: ', par.vs)
-    print('Ze5: {:.3e}'.format(Ze5[0][0]))
-    Ze5 = Ze5 * (par.Rp ** 0.6)
-    temp2 = temp / par.g
-    temp2 = temp2 / np.maximum(h, par.h_min)
-    temp2 = temp2 ** 0.08
-    Ze5 = Ze5 * temp2
-    Ze5 = Ze5 ** 5
+    # temp = (par.alpha * field.k_m) ** 0.5
+    # Ze5 = temp / par.vs
+    # Ze5 = Ze5 * (par.Rp ** 0.6)
+    # temp2 = temp / par.g
+    # temp2 = temp2 / np.maximum(h, par.h_min)
+    # temp2 = temp2 ** 0.08
+    # Ze5 = Ze5 * temp2
+    # Ze5 = Ze5 ** 5
 
-    
-
-    sys.exit()
     '''
         inside = temp / par.g
         print('inside: %f\n', inside)
@@ -53,9 +45,6 @@ def geomorphic(field, par, dt):
         print('Ze5: %f\n', Ze5)
     '''
 
-
-
-    
     '''
     # solve for CH
     # start with explicit estimate
@@ -69,16 +58,6 @@ def geomorphic(field, par, dt):
             else: # otherwise it changes to whatever the updated par and field values calculate out to
                 Ze5[0][index] = ((((par.alpha * field.k_m[0][index]) ** 0.5) / (par.vs * par.Rp * 0.6 * ((par.alpha * field.k_m[0][index]) ** 0.5) / (par.g / np.maximum(h, par.h_min)))) ** 0.08) ** 5
     
-    '''
-    
-    E = np.maximum((par.p * (1.3 * 10 ** -7)) * par.vs * Ze5 / (1 + (1.3 * 10 ** -7) / 0.3 * Ze5), 0)
-    D = np.maximum(par.vs * par.r0 * field.c_m, 0)
-    CH_new = np.maximum(CH + dt * (E - D), 0)
-    h_new = np.maximum(h + dt / par.c_b * (E - D), 0)
-    C_new = np.maximum(CH_new / np.maximum(h_new, par.h_min), 0)
-    KH_new = KH - dt * 0.5 * par.R * par.g * h_new * (E - D)
-    K_new = np.maximum(0, KH_new / np.maximum(h_new, par.h_min))
-
     # iterate 10 times with Newton Scheme
     for x in range(10):
         denom2 = (par.vs * par.Rp * 0.6 * ((par.alpha * K_new) ** 0.5) / (par.g / np.maximum(h_new, par.h_min)) ** 0.08) ** 5
@@ -98,6 +77,40 @@ def geomorphic(field, par, dt):
 
     # ensure dissipation of K (should we do that? -- watf)
     K_new = np.minimum(field.k_m, K_new)
+    
+    
+    
+    '''
+    Ze5 = ((par.alpha*field.k_m) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * field.k_m) ** 0.5 / par.g / np.maximum(h, par.h_min)) ** 0.08) ** 5
+    # print('Ze5: {:.10e}'.format(Ze5[0][0]))
+    E = np.maximum((par.p * (1.3 * 10 ** -7)) * par.vs * Ze5 / (1 + (1.3 * 10 ** -7) / 0.3 * Ze5), 0)
+    D = np.maximum(par.vs * par.r0 * field.c_m, 0)
+    CH_new = np.maximum(CH + dt * (E - D), 0)
+    h_new = np.maximum(h + dt / par.c_b * (E - D), 0)
+    C_new = np.maximum(CH_new / np.maximum(h_new, par.h_min), 0)
+    KH_new = KH - dt * 0.5 * par.R * par.g * h_new * (E - D)
+    K_new = np.maximum(0, KH_new / np.maximum(h_new, par.h_min))
+
+    for i in range(10):
+        # Ze5 = ((par.alpha*K_new).^0.5/par.vs.*par.Rp^0.6.*((par.alpha*K_new).^0.5./par.g./max(h_new,par.h_min)).^0.08).^5;
+        Ze5 = ((par.alpha*K_new) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * K_new) ** 0.5 / par.g / np.maximum(h_new, par.h_min)) ** 0.08) ** 5
+        # E = max( par.p*1.3e-7*par.vs*Ze5./(1+1.3e-7/0.3*Ze5) , 0 );
+        E = np.maximum((par.p * (1.3 * 10 ** -7)) * par.vs * Ze5 / (1 + (1.3 * 10 ** -7) / 0.3 * Ze5), 0)
+        # D = max( par.vs*par.r0*C_new , 0 );
+        D = np.maximum(par.vs * par.r0 * C_new, 0)
+        # CH_new = max(CH + dt*(E-D) , 0);
+        CH_new = np.maximum(CH + dt * (E - D), 0)
+        # h_new = max (h + dt/par.c_b*(E-D) , 0);
+        h_new = np.maximum(h + dt / par.c_b * (E - D), 0)
+        # C_new = max(CH_new./max(h_new,par.h_min) , 0);
+        C_new = np.maximum(CH_new / np.maximum(h_new, par.h_min), 0)
+        # KH_new = KH - dt*0.5*par.R*par.g.*h_new.*(E-D);
+        KH_new = KH - dt * 0.5 * par.R * par.g * h_new * (E - D)
+        # K_new = max(0 , KH_new./max(h_new,par.h_min));
+        K_new = np.maximum(0, KH_new / np.maximum(h_new, par.h_min))
+
+    
+    
 
     # retrieve bed level change and impose limit. dzb is positive in case of deposition
     dzb = np.minimum((dt * (D - E) / par.c_b), ((field.z_m - field.z_b) * field.c_m / par.c_b))
@@ -108,6 +121,7 @@ def geomorphic(field, par, dt):
     CH_new = np.minimum(np.maximum(CH - dzb * par.c_b, 0), h_new)
     KH_new = np.maximum(KH + 0.5 * par.R * par.g * h_new * par.c_b * dzb, 0)
 
+
     # note 1: implication of erosion/deposition on momentum transfer to/form the bed is neglected
     # note 2: should we forbid a net gain in K in case of deposition
     # K factor is an empirical measure of soil erodibility as affected by intrinsic soil properties
@@ -116,10 +130,18 @@ def geomorphic(field, par, dt):
     # final update
     newfield = field
     newfield.z_b = field.z_b + dzb
-    if h_new.all() < par.h_min:
-        newfield.c_m = field.c_m
-    else:
-        newfield.c_m = np.minimum(np.maximum(CH_new / np.maximum(h_new, par.h_min), 0), 1)
+    newfield.c_m = np.minimum(np.maximum(CH_new / np.maximum(h_new, par.h_min), 0), 1)
+    if (np.any(np.isnan(h_new))):
+        print('h_new after has nans')
+        sys.exit()
+    indices = np.where(h_new < par.h_min)
+    newfield.c_m[indices] = field.c_m[indices]
     newfield.k_m = np.maximum(KH_new / np.maximum(h_new, par.h_min), 0)
 
+    # if h_new.all() < par.h_min:
+    #     newfield.c_m = field.c_m
+    # else:
+    #     newfield.c_m = np.minimum(np.maximum(CH_new / np.maximum(h_new, par.h_min), 0), 1)
+    # newfield.k_m = np.maximum(KH_new / np.maximum(h_new, par.h_min), 0)
     return newfield
+    

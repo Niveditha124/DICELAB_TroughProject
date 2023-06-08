@@ -23,6 +23,7 @@ from relax import relax
 from tag2str import tag2str
 from timestep import timestep
 import os
+import sys
 
 dispflag = 0
 t_end = 3600*1000
@@ -50,6 +51,7 @@ firstTimeStep = 1
 iter = 1
 
 while field.t < t_end:
+    
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         dt = timestep(field, par)
         if firstTimeStep:
@@ -64,6 +66,7 @@ while field.t < t_end:
     field.v[field.z_r == - 1000] = 0
     field.c_m[field.z_r == - 1000] = 0
     field.k_m[field.z_r == - 1000] = 0
+    
     # screen display:
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         if dispflag == 1:
@@ -80,6 +83,7 @@ while field.t < t_end:
         #         saveas(gcf,['view_' tag2str(i_output-1)],'fig');
         i_output = i_output + 1
     
+    
     # book-keeping
     field_prev = field
     # half-step relaxation operator:
@@ -93,7 +97,7 @@ while field.t < t_end:
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         grad_x = gradientVL(field_x, par, o)
         #        grad_y = gradientVL(field_y,par,o);
-
+    print('dt1: ',dt)
     # fluxing scheme (LHLL):
     flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
     # impose BC at upstream inflow section
@@ -117,15 +121,21 @@ while field.t < t_end:
     # flux_y.z_bl = np.transpose(np.array([1, 1])) * field.z_b
     # flux_y.z_br = np.transpose(np.array([1, 1])) * field.z_b
     # hyperbolic operator:
-    
+    print('dt2: ',dt)
     if o == 1:
         # 1st order forward Euler:
         # print("flux_x qm", flux_x.q_m.shape)
+        print('dt2: ',dt)
         field = hyperbolic(field, flux_x, flux_y, par, dt)
+        print('dt3: ',dt)
+        
         # relaxation operator:
         field = relax(field, par, dt, geostaticflag)
+        
+        print('dt4: ',dt)
         # time update:
         field.t = field.t + dt
+
     else:
         if o == 2:
             # 2nd order predictor-corrector (Alcrudo & Garcia-Navarro 1993):
@@ -142,7 +152,6 @@ while field.t < t_end:
                 # time update:
                 field.t = field.t + dt
     print(iter)
-    if iter == 3:
-        break
     iter = iter + 1
+    print('hi')
 

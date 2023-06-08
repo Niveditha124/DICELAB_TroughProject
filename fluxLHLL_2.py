@@ -104,11 +104,31 @@ def fluxLHLL_2(name, field, grad, par, dt):
     k_ml = np.multiply((h_ml >= par.h_min), kh_l) / np.maximum(h_ml, par.h_min)
     k_mr = np.multiply((h_mr >= par.h_min), kh_r) / np.maximum(h_mr, par.h_min)
 
+    print('Printing...\n\n')
+    print('h_ml: ', h_ml.shape, h_ml)
+    print('u_l: ', u_l.shape, u_l)
+    print('c_ml: ', c_ml.shape, c_ml)
+
+    temp_u_l = u_l ** 2
+    temp_h_ml = h_ml ** 2
+    np.seterr(all='ignore')
+
     # left and right fluxes:
-    sig_l = np.multiply(h_ml, u_l ** 2) + 0.5 * par.g * par.R * (np.multiply(c_ml, h_ml ** 2))
+    # sig_l = np.multiply(h_ml, u_l ** 2) + 0.5 * par.g * par.R * (np.multiply(c_ml, h_ml ** 2))
+    # sig_l = (h_ml * (u_l ** 2)) + 0.5 * par.g * par.R * (c_ml * (h_ml ** 2))
+    print('Printing shit: \n')
+    print('dt: ', dt)
+    print('c_ml: ', c_ml[0][0])
+    print('temp_h_ml: ', temp_h_ml[0][0])
+    test = np.multiply(c_ml[0][0], temp_h_ml[0][0])
+    print('test is: ', test)
+    
+    sig_l = (c_ml * temp_h_ml)
+    
     sig_r = np.multiply(h_mr, u_r ** 2) + 0.5 * par.g * par.R * (np.multiply(c_mr, h_mr ** 2))
     # wavespeeds:
     h_l = np.amax(z_ml - z_bl, 0)
+
     SLl = np.amin(u_l - (np.multiply(par.g * par.R * h_l, c_ml)) ** 0.5, 0)
     SRl = np.amax(u_l + (np.multiply(par.g * par.R * h_l, c_ml)) ** 0.5, 0)
     h_r = np.amax(z_mr - z_br, 0)
