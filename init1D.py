@@ -36,7 +36,9 @@ class field:
     c_m = np.ones((x.shape[0], x.shape[1])) * 0
     v = np.zeros((x.shape[0], x.shape[1]))
     u = np.zeros((x.shape[0], x.shape[1]))
-    z_r[-1, -1 - 2] = -1000
+    # z_r[-1, -1 - 2] = -1000
+    z_r[0][-3:] = -1000 
+
     xx = np.array([- L1, 0, L2, L2 + L3])
     zz = np.array([L1 * S1, 0, - L2 * S2, - L2 * S2 - L3 * S3])
     set_interp = interp1d(xx, zz, kind='linear', fill_value='extrapolate')
