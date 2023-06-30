@@ -115,12 +115,7 @@ def fluxLHLL_2(name, field, grad, par, dt):
     u_r = np.multiply((h_mr >= par.h_min), q_mr) / np.maximum(h_mr, par.h_min)
     v_l = np.multiply((h_ml >= par.h_min), qy_ml) / np.maximum(h_ml, par.h_min)
     v_r = np.multiply((h_mr >= par.h_min), qy_mr) / np.maximum(h_mr, par.h_min)
-    
-    print('h_ml: ', h_ml)
-    print('mu_l: ', mu_l)
-    
     c_ml = np.multiply((h_ml >= par.h_min), mu_l) / np.maximum(h_ml, par.h_min)
-    
     c_mr = np.multiply((h_mr >= par.h_min), mu_r) / np.maximum(h_mr, par.h_min)
     k_ml = np.multiply((h_ml >= par.h_min), kh_l) / np.maximum(h_ml, par.h_min)
     k_mr = np.multiply((h_mr >= par.h_min), kh_r) / np.maximum(h_mr, par.h_min)
@@ -128,20 +123,14 @@ def fluxLHLL_2(name, field, grad, par, dt):
     temp_u_l = u_l ** 2
     temp_h_ml = h_ml ** 2
 
-    # left and right fluxes:
-    np.seterr(over='ignore')
-    test = np.multiply(c_ml, np.power(h_ml, 2))
-    
+    # left and right fluxes:    
     sig_l = np.multiply(h_ml, np.power(u_l, 2)) + ((0.5 * par.g * par.R) * np.multiply(c_ml, np.power(h_ml, 2)))
-    # sig_l = (h_ml * (u_l ** 2)) + 0.5 * par.g * par.R * (c_ml * (h_ml ** 2))
-
     '''
     if name == 'x':
         print('X sig_l: ', sig_l)   
     else:
         print('Y sig_l: ', sig_l)
     '''
-
     sig_r = np.multiply(h_mr, u_r ** 2) + 0.5 * par.g * par.R * (np.multiply(c_mr, h_mr ** 2))
     # wavespeeds:
     h_l = np.amax(z_ml - z_bl, 0)
