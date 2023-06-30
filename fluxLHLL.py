@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 
 class fluxx:
@@ -19,6 +20,8 @@ class fluxx:
 def fluxLHLL(field=None, grad=None, par=None, dt=None):
     # FLUXLHLL Approximate Riemann solver of Harten, Lax and Van Leer (1983) with lateralised momentum flux
     # extrapolations left and right (in face-centred variables):
+
+
     m, n = field.x.shape
     dx = field.x[0, 1] - field.x[0, 0]
     h_m = field.z_m - field.z_b
@@ -39,35 +42,47 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     kh_l = ((kh_l[:, np.arange(0, n - 1)] + kh[:, np.arange(0, n - 1)]) * grad.dkh[:, np.arange(0, n - 1)])
     kh_r = (kh[:, np.arange(1, n)] - (kh_r[:, np.arange(0, n - 1)]) * grad.dkh[:, np.arange(1, n)])
 
-    z_bl = np.full((1, 203), 0.5)
+    # z_bl = np.full((1, 203), 0.5)
+    s = (1, 203)
+    z_bl = np.zeros(s)
     z_br = np.full((1, 203), 0.5)
-    z_bl = ((z_bl[:, np.arange(0, n - 1)] + field.z_b[:, np.arange(0, n - 1)]) * grad.dz_b[:, np.arange(0, n - 1)])
-    z_br = (field.z_b[:, np.arange(1, n)] - (z_br[:, np.arange(0, n - 1)]) * grad.dz_b[:, np.arange(1, n)])
+    np.set_printoptions(suppress=True, formatter={'float': '{:0.6f}'.format})
+    # z_bl = ((z_bl[:, np.arange(0, n - 1)] + field.z_b[:, np.arange(0, n - 1)]) * grad.dz_b[:, np.arange(0, n - 1)])
+    z_bl = field.z_b[:, 0:n-1] + 0.5 * grad.dz_b[:, 0:n-1]
+    
+    # z_br = (field.z_b[:, np.arange(1, n)] - (z_br[:, np.arange(0, n - 1)]) * grad.dz_b[:, np.arange(1, n)])
+    z_br = field.z_b[:, 1:] - 0.5 * grad.dz_b[:, 1:]
 
     q_m = np.multiply(h_m, field.u)
-    q_ml = np.full((1, 203), 0.5)
-    q_mr = np.full((1, 203), 0.5)
-    q_ml = ((q_ml[:, np.arange(0, n - 1)] + q_m[:, np.arange(0, n - 1)]) * grad.dqx_m[:, np.arange(0, n - 1)])
-    q_mr = (q_m[:, np.arange(1, n)] - (q_mr[:, np.arange(0, n - 1)]) * grad.dqx_m[:, np.arange(1, n)])
+    # q_ml = np.full((1, 203), 0.5)
+    # q_mr = np.full((1, 203), 0.5)
+    # q_ml = ((q_ml[:, np.arange(0, n - 1)] + q_m[:, np.arange(0, n - 1)]) * grad.dqx_m[:, np.arange(0, n - 1)])
+    # q_mr = (q_m[:, np.arange(1, n)] - (q_mr[:, np.arange(0, n - 1)]) * grad.dqx_m[:, np.arange(1, n)])
 
+    q_ml = q_m[:, :n-1] + 0.5 * grad.dqx_m[:, :n-1]
+    q_mr = q_m[:, 1:n] - 0.5 * grad.dqx_m[:, 1:n]
     qy_m = np.multiply(h_m, field.v)
+
     qy_ml = np.full((1, 203), 0.5)
     qy_mr = np.full((1, 203), 0.5)
     qy_ml = ((qy_ml[:, np.arange(0, n - 1)] + qy_m[:, np.arange(0, n - 1)]) * grad.dqy_m[:, np.arange(0, n - 1)])
     qy_mr = (qy_m[:, np.arange(1, n)] - (qy_mr[:, np.arange(0, n - 1)]) * grad.dqy_m[:, np.arange(1, n)])
 
+    # ------------------------------ Idk it seems to work until here ------------------------------ #
+
     # positivity constraint on mu and kh
-    mu_l = np.amax(mu_l, 0)
-    mu_r = np.amax(mu_r, 0)
-    kh_l = np.amax(kh_l, 0)
-    kh_r = np.amax(kh_r, 0)
+    # mu_l = np.amax(mu_l, 0)
+    mu_l = np.maximum(mu_l, 0)
+    # mu_r = np.amax(mu_r, 0)
+    mu_r = np.maximum(mu_r, 0)
+    # kh_l = np.amax(kh_l, 0)
+    kh_l = np.maximum(kh_l, 0)
+    # kh_r = np.amax(kh_r, 0)
+    kh_r = np.maximum(kh_r, 0)
+
     # retrieve primitive variables:
-    # print("z_bl ", z_bl)
-    # print("h_ml", h_ml)
     z_ml = z_bl + h_ml
     z_mr = z_br + h_mr
-
-    # print(type(par.h_min))
     u_l = np.multiply((h_ml >= par.h_min), q_ml)
     u_l = np.divide(u_l, np.maximum(h_ml, par.h_min))
     u_r = np.multiply((h_mr >= par.h_min), q_mr) / np.maximum(h_mr, par.h_min)
