@@ -1,12 +1,11 @@
 import numpy as np
+import sys
 
 def timestep(field, par):
     # TIMESTEP compute time step according to the Courant condition
     # cel = ( par.g * max( field.z_m - field.z_b , par.h_min ) ).^0.5;
     cel = (np.multiply(par.R * par.g * field.c_m, np.maximum(field.z_m - field.z_b, par.h_min)) ** 0.5)
     vel = (field.u ** 2 + field.v ** 2) ** 0.5
-    # print("vel", vel)
-
 
     # print(cel)
     # print(vel)
@@ -24,7 +23,9 @@ def timestep(field, par):
         dt = 1
     else:
         dt = (par.courant * dl) / speed_max
-    # print(dt)
-            # speed max is zero, then all the arrays shit the bed.
+        # print(par.courant)
+        # print(dl)
+
+        # speed max is zero, then all the arrays shit the bed.
 
     return dt

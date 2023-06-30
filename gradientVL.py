@@ -1,16 +1,16 @@
 import numpy as np
-
+import sys
 from init1D import field
 from weedmark_ext import weedmark_ext
 
 
 class grad:
-    dh_m = np.zeros((field.x.shape[0], field.x.shape[1]))
-    dmu = np.zeros((field.x.shape[0], field.x.shape[1]))
-    dkh = np.zeros((field.x.shape[0], field.x.shape[1]))
-    dz_b = np.zeros((field.x.shape[0], field.x.shape[1]))
-    dqx_m = np.zeros((field.x.shape[0], field.x.shape[1]))
-    dqy_m = np.zeros((field.x.shape[0], field.x.shape[1]))
+    dh_m = np.zeros(field.x.shape)
+    dmu = np.zeros(field.x.shape)
+    dkh = np.zeros(field.x.shape)
+    dz_b = np.zeros(field.x.shape)
+    dqx_m = np.zeros(field.x.shape)
+    dqy_m = np.zeros(field.x.shape)
 
 
 def minmod(a, b):
@@ -19,15 +19,26 @@ def minmod(a, b):
     return c
 
 
-def gradientVL(field=None, par=None, o=None):
-    o = 0
+def gradientVL(field=None, par=None, o=0):
+    # o = 0
     if o == 1:
+
+        grad.dh_m = np.zeros(field.x.shape)
+        grad.dmu = np.zeros(field.x.shape)
+        grad.dkh = np.zeros(field.x.shape)
+        grad.dz_b = np.zeros(field.x.shape)
+        grad.dqx_m = np.zeros(field.x.shape)
+        grad.dqy_m = np.zeros(field.x.shape)
+
+        '''
         dh_m = grad.dh_m
         dmu = grad.dmu
         dkh = grad.dkh
         dz_b = grad.dz_b
         dqx_m = grad.dqx_m
         dqy_m = grad.dqy_m
+        '''
+
     else:
         m, n = field.x.shape
         # obtain gradient variables:

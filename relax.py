@@ -4,6 +4,9 @@ from geomorphic import geomorphic
 from knappBagnold import knappBagnold
 from dissipation import dissipation
 from hemipelagic import hemipelagic
+import sys
+import numpy as np
+
 def relax(field = None,par = None,dt = None, geostaticflag = None):
     #RELAX relaxation (source) operator
     

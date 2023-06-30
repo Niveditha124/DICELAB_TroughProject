@@ -8,8 +8,13 @@
 
 # initialisation:
 import numpy as np
+import os
+from createFluxY import createFluxY
+
+
 
 import init1D
+from initMonterrey import initMonterrey
 import initpar
 import initrun
 from bc_1D import bc_1D
@@ -22,7 +27,8 @@ from mirror import mirror
 from relax import relax
 from tag2str import tag2str
 from timestep import timestep
-import os
+
+import sys
 
 dispflag = 0
 t_end = 3600*1000
@@ -31,7 +37,8 @@ n = 200
 o = 1
 geostaticflag = 0
 par = initpar
-field = init1D.field(n, par) # input file
+# field = init1D.field(n, par) # input file
+field = initMonterrey(n, par)
 field_0 = field
 field_prev = field
 # disk output and screen display parameters
@@ -49,7 +56,14 @@ firstTimeStep = 1
 # firstTimeStep = 0;
 iter = 1
 
+os.system('cls')
+
 while field.t < t_end:
+    
+    print('Iteration ', iter, ': ')
+    #    if iter == 10:
+        #        break
+    
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         dt = timestep(field, par)
         if firstTimeStep:
@@ -64,9 +78,11 @@ while field.t < t_end:
     field.v[field.z_r == - 1000] = 0
     field.c_m[field.z_r == - 1000] = 0
     field.k_m[field.z_r == - 1000] = 0
+    
     # screen display:
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         if dispflag == 1:
+            print('im in the insane if')
             fieldplot(field, field_0, field_prev, par, dt)
             #            pause;
     
@@ -80,28 +96,38 @@ while field.t < t_end:
         #         saveas(gcf,['view_' tag2str(i_output-1)],'fig');
         i_output = i_output + 1
     
+    
     # book-keeping
     field_prev = field
     # half-step relaxation operator:
     if np.logical_and((o == 2), (iter % 2 == 1)):
         field = relax(field, par, 0.5 * dt, geostaticflag)
-    # extend field left and right:
+    # extend field left and right:    
     field_x = mirror(field)
+
     #    field_y = mirror(swapfield(field));
     # computation of in-cell gradients:
     # note: cell slopes are NOT recomputed for the second step of the predictor-corrector
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         grad_x = gradientVL(field_x, par, o)
         #        grad_y = gradientVL(field_y,par,o);
-
     # fluxing scheme (LHLL):
-    flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
+    # Original --> flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
+    flux_x = fluxLHLL(field_x, grad_x, par, dt)
+
+    print('\n', flux_x.sig_l[0][0], flux_x.sig_l[0][1])
+
+
     # impose BC at upstream inflow section
     flux_x = bc_1D(flux_x, field_x, par)
 
     #    flux_y = swapflux(fluxLHLL(field_y,grad_y,par,dt));
     # 1D default:
-    flux_y = fluxLHLL_2('y', field_x, grad_x, par, dt) # this is because we have to instantiate flux_y
+    # Original flux_y line of code
+    # flux_y = fluxLHLL_2('y', field_x, grad_x, par, dt) # this is because we have to instantiate flux_y
+    
+    flux_y = createFluxY(field)
+
     # print("ln 106 ", flux_x.q_m.shape)
     # flux_y.q_m = np.zeros((2, field_x.x.shape[1]))
     # # print("ln 108 ", flux_x.q_m.shape)
@@ -117,15 +143,16 @@ while field.t < t_end:
     # flux_y.z_bl = np.transpose(np.array([1, 1])) * field.z_b
     # flux_y.z_br = np.transpose(np.array([1, 1])) * field.z_b
     # hyperbolic operator:
-    
+
     if o == 1:
         # 1st order forward Euler:
         # print("flux_x qm", flux_x.q_m.shape)
-        field = hyperbolic(field, flux_x, flux_y, par, dt)
+        field = hyperbolic(field, flux_x, flux_y, par, dt)        
         # relaxation operator:
         field = relax(field, par, dt, geostaticflag)
         # time update:
         field.t = field.t + dt
+
     else:
         if o == 2:
             # 2nd order predictor-corrector (Alcrudo & Garcia-Navarro 1993):
@@ -141,8 +168,6 @@ while field.t < t_end:
                 field = relax(field, par, 0.5 * dt, geostaticflag)
                 # time update:
                 field.t = field.t + dt
-    print(iter)
-    if iter == 3:
-        break
     iter = iter + 1
+
 

@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 
 class fluxx:
@@ -32,6 +33,21 @@ class fluxx:
         self.z_bl = np.zeros(s)
         self.z_br = np.zeros(s)
 
+def createFlux (self, field):
+    s = (2,202)
+    self.q_m = np.zeros(s)
+    self.sig_l = np.zeros(s)
+
+    self.sig_r = np.zeros(s)
+    self.sigCross = np.zeros(s)
+    self.mu = np.zeros(s)
+    self.kh = np.zeros(s)
+    self.z_ml = np.array([[1], [1]]) * field.z_m
+    self.z_mr = np.array([[1], [1]]) * field.z_m
+    self.z_bl = np.array([[1], [1]]) * field.z_b
+    self.z_br = np.array([[1], [1]]) * field.z_b
+    
+    return self
 
 def fluxLHLL_2(name, field, grad, par, dt):
     # FLUXLHLL Approximate Riemann solver of Harten, Lax and Van Leer (1983) with lateralised momentum flux
@@ -104,11 +120,21 @@ def fluxLHLL_2(name, field, grad, par, dt):
     k_ml = np.multiply((h_ml >= par.h_min), kh_l) / np.maximum(h_ml, par.h_min)
     k_mr = np.multiply((h_mr >= par.h_min), kh_r) / np.maximum(h_mr, par.h_min)
 
-    # left and right fluxes:
-    sig_l = np.multiply(h_ml, u_l ** 2) + 0.5 * par.g * par.R * (np.multiply(c_ml, h_ml ** 2))
+    temp_u_l = u_l ** 2
+    temp_h_ml = h_ml ** 2
+
+    # left and right fluxes:    
+    sig_l = np.multiply(h_ml, np.power(u_l, 2)) + ((0.5 * par.g * par.R) * np.multiply(c_ml, np.power(h_ml, 2)))
+    '''
+    if name == 'x':
+        print('X sig_l: ', sig_l)   
+    else:
+        print('Y sig_l: ', sig_l)
+    '''
     sig_r = np.multiply(h_mr, u_r ** 2) + 0.5 * par.g * par.R * (np.multiply(c_mr, h_mr ** 2))
     # wavespeeds:
     h_l = np.amax(z_ml - z_bl, 0)
+
     SLl = np.amin(u_l - (np.multiply(par.g * par.R * h_l, c_ml)) ** 0.5, 0)
     SRl = np.amax(u_l + (np.multiply(par.g * par.R * h_l, c_ml)) ** 0.5, 0)
     h_r = np.amax(z_mr - z_br, 0)

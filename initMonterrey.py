@@ -50,7 +50,6 @@ def initMonterrey(n,par):
     # z-ordering condition:
     field.z_b = np.maximum(field.z_b , field.z_r)
     field.z_m = np.maximum(field.z_m , field.z_b)
-    print(field.z_m)
 
     # velocities:
     field.u = np.zeros(field.x.shape)
