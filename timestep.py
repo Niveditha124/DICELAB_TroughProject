@@ -23,8 +23,8 @@ def timestep(field, par):
         dt = 1
     else:
         dt = (par.courant * dl) / speed_max
-        print(par.courant)
-        print(dl)
+        # print(par.courant)
+        # print(dl)
 
         # speed max is zero, then all the arrays shit the bed.
 
