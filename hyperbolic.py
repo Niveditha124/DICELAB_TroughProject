@@ -30,7 +30,32 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     # z_m_new = field.z_m + (dt / dx) * flux_x.q_m[:, np.arange(0, n)] - flux_x.q_m[:, np.arange(0, n)] - (dt / dy) * (flux_y.q_m[np.arange(1, m+1), :] - flux_y.q_m[np.arange(1, m + 1), :])
     ls = flux_x.q_m[:, 0:n] - flux_x.q_m[:, 1:n+1]
     rs = flux_y.q_m[0:m, :] - flux_y.q_m[1:m+1, :]
-    z_m_new = field.z_m + (dt / dx) * ls + (dt / dy) * rs
+    z_m_new = field.z_m + ((dt / dx) * ls) + ((dt / dy) * rs)
+    '''
+    print('Field Values:')
+    print('dt/dx')
+    print(dt/dx)
+    print('dt/dy')
+    print(dt/dy)
+
+    # Print flux_x.q_m(:,1:n)
+    print('flux_x.q_m[:,1:n]')
+    print(flux_x.q_m[:, 0:n])
+
+    # Print flux_x.q_m(:,2:n+1)
+    print('flux_x.q_m[:,2:n+1]')
+    print(flux_x.q_m[:, 1:n+1])
+
+    # Print flux_y.q_m(1:m,:)
+    print('flux_y.q_m[0:m, :]')
+    print(flux_y.q_m[0:m, :])
+
+    # Print flux_y.q_m(2:m+1,:)
+    print('flux_y.q_m[1:m+1, :]')
+    print(flux_y.q_m[1:m+1, :])
+
+    '''
+    
     #+ (dt/dy) * (flux_y.q_m[0:m, :] - flux_y.q_m[1:m+1, :])
     
     
@@ -108,7 +133,9 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
 
     kh_new = kh + (dt / dx) * flux_x.kh[:, np.arange(0, n)] - flux_x.kh[:, np.arange(1, n+1)] + (dt / dy) * (flux_y.kh[np.arange(0, m), :] - flux_y.kh[np.arange(1, m+1), :])
     # z-ordering condition:
+
     z_m_new = np.maximum(z_m_new, field.z_b)
+
     # concentration update:
     c_m_new = np.multiply(((z_m_new - field.z_b) > par.h_min), nu_new) / np.maximum((z_m_new - field.z_b), par.h_min) + np.multiply(((z_m_new - field.z_b) <= par.h_min), field.c_m)
     # positivity condition
