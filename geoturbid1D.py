@@ -48,6 +48,8 @@ i_output = 1
 # prepare graphics:
 # figure;
 
+os.system('cls')
+
 # main loop:
 firstTimeStep = 1
 # continue previous run
@@ -56,13 +58,12 @@ firstTimeStep = 1
 # firstTimeStep = 0;
 iter = 1
 
-os.system('cls')
 
 while field.t < t_end:
     
     print('Iteration ', iter, ': ')
-    #    if iter == 10:
-        #        break
+    if iter == 5:
+        break
     
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         dt = timestep(field, par)
@@ -102,7 +103,8 @@ while field.t < t_end:
     # half-step relaxation operator:
     if np.logical_and((o == 2), (iter % 2 == 1)):
         field = relax(field, par, 0.5 * dt, geostaticflag)
-    # extend field left and right:    
+    # extend field left and right:   
+    
     field_x = mirror(field)
 
     #    field_y = mirror(swapfield(field));
@@ -115,7 +117,8 @@ while field.t < t_end:
     # Original --> flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
     flux_x = fluxLHLL(field_x, grad_x, par, dt)
 
-    print('\n', flux_x.sig_l[0][0], flux_x.sig_l[0][1])
+
+    # print('\n', flux_x.sig_l[0][0], flux_x.sig_l[0][1])
 
 
     # impose BC at upstream inflow section
@@ -147,7 +150,7 @@ while field.t < t_end:
     if o == 1:
         # 1st order forward Euler:
         # print("flux_x qm", flux_x.q_m.shape)
-        field = hyperbolic(field, flux_x, flux_y, par, dt)        
+        field = hyperbolic(field, flux_x, flux_y, par, dt)  
         # relaxation operator:
         field = relax(field, par, dt, geostaticflag)
         # time update:
@@ -168,6 +171,8 @@ while field.t < t_end:
                 field = relax(field, par, 0.5 * dt, geostaticflag)
                 # time update:
                 field.t = field.t + dt
+    
     iter = iter + 1
+
 
 
