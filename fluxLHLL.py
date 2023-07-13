@@ -27,7 +27,12 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     h_m = field.z_m - field.z_b
     h_ml = np.full((1, 203), 0.5)
     h_mr = np.full((1, 203), 0.5)
-    h_ml = ((h_ml[:, np.arange(0, n - 1)] + h_m[:, np.arange(0, n - 1)]) * grad.dh_m[:, np.arange(0, n - 1)])
+    h_ml = h_m[:, :n-1] + 0.5 * grad.dh_m[:, :n-1]
+    # h_ml = ((h_ml[:, np.arange(0, n - 1)] + h_m[:, np.arange(0, n - 1)]) * grad.dh_m[:, np.arange(0, n - 1)])
+    # print('h_ml')
+    # print(h_ml)
+    print('field.z_m')
+    print(field.z_m[0][:5])
     h_mr = (h_m[:, np.arange(1, n)] - (h_mr[:, np.arange(0, n - 1)]) * grad.dh_m[:, np.arange(1, n)])
 
     mu_l = np.full((1, 203), 0.5)
@@ -83,8 +88,11 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     # retrieve primitive variables:
     z_ml = z_bl + h_ml
     z_mr = z_br + h_mr
-    u_l = np.multiply((h_ml >= par.h_min), q_ml)
-    u_l = np.divide(u_l, np.maximum(h_ml, par.h_min))
+    
+    # u_l = np.multiply((h_ml >= par.h_min), q_ml)
+    # u_l = np.divide(u_l, np.maximum(h_ml, par.h_min))
+    
+    u_l = np.where(h_ml >= par.h_min, q_ml / np.maximum(h_ml, par.h_min), 0)
     u_r = np.multiply((h_mr >= par.h_min), q_mr) / np.maximum(h_mr, par.h_min)
     v_l = np.multiply((h_ml >= par.h_min), qy_ml) / np.maximum(h_ml, par.h_min)
     v_r = np.multiply((h_mr >= par.h_min), qy_mr) / np.maximum(h_mr, par.h_min)
@@ -99,17 +107,49 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     # wavespeeds:
     h_l = np.amax(z_ml - z_bl, 0)
     SLl = np.amin(u_l - (np.multiply(par.g * par.R * h_l, c_ml)) ** 0.5, 0)
-    SRl = np.amax(u_l + (np.multiply(par.g * par.R * h_l, c_ml)) ** 0.5, 0)
+    SRl = np.maximum(u_l + (np.multiply(par.g * par.R * h_l, c_ml)) ** 0.5, 0)
+    '''
+    print('Values that make up SRl')
+    print('u_l')
+    print(u_l)
+    print('h_l')
+    print(h_l)
+    print('c_ml')
+    print(c_ml)
+    '''
     h_r = np.amax(z_mr - z_br, 0)
     SLr = np.amin(u_r - (np.multiply(par.g * par.R * h_r, c_mr)) ** 0.5, 0)
     SRr = np.amax(u_r + (np.multiply(par.g * par.R * h_r, c_mr)) ** 0.5, 0)
     # extreme wave speeds:
-    SL = np.amin(np.minimum(SLl, SLr), 0)
-    SR = np.amax(np.maximum(SRl, SRr), 0)
+    SL = np.minimum(np.minimum(SLl, SLr), 0)
+    SR = np.maximum(np.maximum(SRl, SRr), 0)
     prod = 1.0 / np.maximum(SR - SL, (par.g * par.h_min) ** 0.5)
     # canonical HLL statement for discharge:
     q_m_star = np.multiply(
         (np.multiply(SR, q_ml) - np.multiply(SL, q_mr) + np.multiply(np.multiply(SL, SR), (z_mr - z_ml))), prod)
+    '''
+    print('SRl')
+    print(SRl)
+    print('SRr')
+    print(SRr)
+
+    print('Flux Values: ')
+    print("SR:")
+    print(SR)
+    print("SL:")
+    print(SL)
+    print("q_ml:")
+    print(q_ml)
+    print("q_mr:")
+    print(q_mr)
+    print("z_ml:")
+    print(z_ml)
+    print("z_mr:")
+    print(z_mr)
+    print("prod:")
+    print(prod)
+    '''
+
     # anti-emptying constraint:
     q_m_star_min = - h_mr * dx / dt
     q_m_star_max = h_ml * dx / dt
