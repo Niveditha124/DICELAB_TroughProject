@@ -25,27 +25,32 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     m, n = field.x.shape
     dx = field.x[0, 1] - field.x[0, 0]
     h_m = field.z_m - field.z_b
+
     h_ml = np.full((1, 203), 0.5)
     h_mr = np.full((1, 203), 0.5)
-    h_ml = h_m[:, :n-1] + 0.5 * grad.dh_m[:, :n-1]
     # h_ml = ((h_ml[:, np.arange(0, n - 1)] + h_m[:, np.arange(0, n - 1)]) * grad.dh_m[:, np.arange(0, n - 1)])
+    h_ml = h_m[:, :n-1] + 0.5 * grad.dh_m[:, :n-1]
     # print('h_ml')
     # print(h_ml)
-    print('field.z_m')
-    print(field.z_m[0][:5])
-    h_mr = (h_m[:, np.arange(1, n)] - (h_mr[:, np.arange(0, n - 1)]) * grad.dh_m[:, np.arange(1, n)])
+
+    # h_mr = (h_m[:, np.arange(1, n)] - (h_mr[:, np.arange(0, n - 1)]) * grad.dh_m[:, np.arange(1, n)])
+    h_mr = h_m[:, 1:] - 0.5 * grad.dh_m[:, 1:]
 
     mu_l = np.full((1, 203), 0.5)
     mu_r = np.full((1, 203), 0.5)
     mu = np.multiply(h_m, field.c_m)  # shape is 1,204
-    mu_l = ((mu_l[:, np.arange(0, n - 1)] + mu[:, np.arange(0, n - 1)]) * grad.dmu[:, np.arange(0, n - 1)])
-    mu_r = (mu[:, np.arange(1, n)] - (mu_r[:, np.arange(0, n - 1)]) * grad.dmu[:, np.arange(1, n)])
-
-    kh = np.multiply(h_m, field.k_m)
+    # mu_l = ((mu_l[:, np.arange(0, n - 1)] + mu[:, np.arange(0, n - 1)]) * grad.dmu[:, np.arange(0, n - 1)])
+    mu_l = mu[:, :n-1] + 0.5 * grad.dmu[:, :n-1]
+    # mu_r = (mu[:, np.arange(1, n)] - (mu_r[:, np.arange(0, n - 1)]) * grad.dmu[:, np.arange(1, n)])
+    mu_r = mu[:, 1:n] - 0.5 * grad.dmu[:, 1:n]
+    kh = h_m * field.k_m
     kh_l = np.full((1, 203), 0.5)
     kh_r = np.full((1, 203), 0.5)
-    kh_l = ((kh_l[:, np.arange(0, n - 1)] + kh[:, np.arange(0, n - 1)]) * grad.dkh[:, np.arange(0, n - 1)])
-    kh_r = (kh[:, np.arange(1, n)] - (kh_r[:, np.arange(0, n - 1)]) * grad.dkh[:, np.arange(1, n)])
+    # kh_l = ((kh_l[:, np.arange(0, n - 1)] + kh[:, np.arange(0, n - 1)]) * grad.dkh[:, np.arange(0, n - 1)])
+    kh_l = kh[:, :n-1] + 0.5 * grad.dkh[:, :n-1]
+
+    # kh_r = (kh[:, np.arange(1, n)] - (kh_r[:, np.arange(0, n - 1)]) * grad.dkh[:, np.arange(1, n)])
+    kh_r = kh[:, 1:n] - 0.5 * grad.dkh[:, 1:n]
 
     # z_bl = np.full((1, 203), 0.5)
     s = (1, 203)
@@ -70,8 +75,10 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
 
     qy_ml = np.full((1, 203), 0.5)
     qy_mr = np.full((1, 203), 0.5)
-    qy_ml = ((qy_ml[:, np.arange(0, n - 1)] + qy_m[:, np.arange(0, n - 1)]) * grad.dqy_m[:, np.arange(0, n - 1)])
+    # qy_ml = ((qy_ml[:, np.arange(0, n - 1)] + qy_m[:, np.arange(0, n - 1)]) * grad.dqy_m[:, np.arange(0, n - 1)])
+    qy_ml = qy_m[:, :n-1] + 0.5 * grad.dqy_m[:, :n-1]
     qy_mr = (qy_m[:, np.arange(1, n)] - (qy_mr[:, np.arange(0, n - 1)]) * grad.dqy_m[:, np.arange(1, n)])
+    qy_mr = qy_m[:, 1:n] - 0.5 * grad.dqy_m[:, 1:n]
 
     # ------------------------------ Idk it seems to work until here ------------------------------ #
 

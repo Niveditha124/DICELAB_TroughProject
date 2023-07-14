@@ -124,6 +124,8 @@ while field.t < t_end:
     # impose BC at upstream inflow section
     flux_x = bc_1D(flux_x, field_x, par)
 
+
+
     #    flux_y = swapflux(fluxLHLL(field_y,grad_y,par,dt));
     # 1D default:
     # Original flux_y line of code
@@ -150,9 +152,18 @@ while field.t < t_end:
     if o == 1:
         # 1st order forward Euler:
         # print("flux_x qm", flux_x.q_m.shape)
+        print('Before Hyperbolic')
+        print(field.z_m[0][:5])
         field = hyperbolic(field, flux_x, flux_y, par, dt)  
+        print('After Hyperbolic')
+        print(field.z_m[0][:5])
         # relaxation operator:
+        print('Before Relax')
+        print(field.z_m[0][:5])
         field = relax(field, par, dt, geostaticflag)
+        print('After Relax')
+        print(field.z_m[0][:5])
+        print('\n')
         # time update:
         field.t = field.t + dt
 
