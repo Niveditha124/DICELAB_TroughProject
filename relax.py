@@ -12,6 +12,9 @@ def relax(field = None,par = None,dt = None, geostaticflag = None):
     
     field = friction(field,par,dt)
     field = entrainment(field,par,dt)
+    # print('After entrainment')
+    # print(field.z_m[0][:5])
+    # print('\n')
     field = geomorphic(field,par,dt)
     field = knappBagnold(field,par,dt)
     field = dissipation(field,par,dt)
