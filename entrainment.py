@@ -23,6 +23,8 @@ def entrainment(field, par, dt):
 
     # explicit Richardson number
     Ri = par.R * par.g * field.c_m * h / np.maximum(vel**2, (par.g*par.h_min))
+    Ri = par.R * par.g * field.c_m * h / np.maximum(vel**2, par.g * par.h_min)
+    # VEL is fine, so it must be c_m
     Ri = np.maximum(Ri, 0)
     # acc derp af way of finding this
     for x in Ri:
@@ -35,6 +37,15 @@ def entrainment(field, par, dt):
     # start with explicit estimate
     # WHY IS THIS HARDCODED
     h_new = h + dt * (0.00153/(0.0204 + Ri)) * vel
+    # print('h:')
+    # print(h)
+    # print('dt:')
+    # print(dt)
+    # print('Ri:')
+    # print(Ri)
+    # print('vel:')
+    # print(vel)
+
     C1 = 0.00153 * MOM ** 3
     C2 = 0.0204 * MOM ** 2
     C3 = par.R * par.g * SS
@@ -64,7 +75,6 @@ def entrainment(field, par, dt):
     newfield.u = u_new
     newfield.v = v_new
     newfield.z_m = field.z_b + h_new
-    
     newfield.c_m = c_new
     newfield.k_m = k_new
     return newfield
