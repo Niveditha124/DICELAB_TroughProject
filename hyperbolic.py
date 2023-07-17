@@ -117,7 +117,23 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     #         dt / dy) * flux_y.sig_r[(0, m + 1), :] - flux_y.sig_l[(1, m + 2), :] + np.multiply(
     #     (dt / dx) * par.R * par.g * (np.multiply(field.c_m(field.z_m - field.z_b))),
     #     (flux_y.z_br[(0, m + 1), :] - flux_y.z_bl[(1, m + 2), :]))
+#     print('Making nu\n')
+#     print('field.z_m')
+#     print(field.z_m)
+#     print('field.c_m')
+#     print(field.c_m)
     nu = np.multiply((field.z_m - field.z_b), field.c_m)
+#     print('nu')
+#     print(nu)
+
+#     print('field.z_m')
+#     print(field.z_m[0][:5])
+#     print('field.z_b')
+#     print(field.z_b[0][:5])
+#     print('field.c_m')
+#     print(field.c_m[0][:5])
+#     print('nu')
+#     print(nu[0][:5])
     
     # nu_new = nu + (dt / dx) * (flux_x.mu(:,np.arange(1,n+1)) - flux_x.mu(:,np.arange(2,n + 1+1))) + (dt / dy) * (
     # flux_y.mu(np.arange(1,m+1),:) - flux_y.mu(np.arange(2,m + 1+1),:))
@@ -126,8 +142,15 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     #         flux_y.mu[(1, m + 1), :] - flux_y.mu[(1, m + 2), :])
 
     # nu_new = nu + (dt / dx) * flux_x.mu[:, np.arange(0, n)] - flux_x.mu[:, np.arange(1, n+1)] + (dt / dy) * (flux_y.mu[np.arange(0, m), :] - flux_y.mu[np.arange(1, m+1), :])
+    
+#     print('Making nu_new\n')
+#     print('flux_x.mu')
+#     print(flux_x.mu)
+#     print('flux_y.mu')
+#     print(flux_y.mu)
     nu_new = nu + (dt/dx) * (flux_x.mu[:, :n] - flux_x.mu[:, 1:n+1]) \
             + (dt/dy) * (flux_y.mu[:m, :] - flux_y.mu[1:m+1, :])
+    
 
     kh = np.multiply((field.z_m - field.z_b), field.k_m)
     # kh_new = kh + (dt / dx) * (flux_x.kh(:,np.arange(1,n+1)) - flux_x.kh(:,np.arange(2,n + 1+1))) + (dt / dy) * (
@@ -143,9 +166,22 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     z_m_new = np.maximum(z_m_new, field.z_b)
 
     # concentration update:
-    c_m_new = np.multiply(((z_m_new - field.z_b) > par.h_min), nu_new) / np.maximum((z_m_new - field.z_b), par.h_min) + np.multiply(((z_m_new - field.z_b) <= par.h_min), field.c_m)
+    # c_m_new = np.multiply(((z_m_new - field.z_b) > par.h_min), nu_new) / np.maximum((z_m_new - field.z_b), par.h_min) + np.multiply(((z_m_new - field.z_b) <= par.h_min), field.c_m)
+#     print('Making c_m_new\n')
+#     print('z_m_new')
+#     print(z_m_new[0][:5])
+#     print('field.z_b')
+#     print(field.z_b[0][:5])
+#     print('nu_new')
+#     print(nu_new[0][:5])
+    c_m_new = np.where((z_m_new - field.z_b) > par.h_min, nu_new / np.maximum((z_m_new - field.z_b), par.h_min), field.c_m)
+
     # positivity condition
-    c_m_new = np.maximum(c_m_new, 0) 
+    c_m_new = np.maximum(c_m_new, 0)
+
+#     print('c_m_new')
+#     print(c_m_new[0][:5])
+
     # print("z_m_new:", z_m_new)
     # print("field.z_b:", field.z_b)
     # print("par.h_min:", par.h_min)
@@ -177,4 +213,40 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     newfield.v = v_new
     newfield.c_m = c_m_new
     newfield.k_m = k_m_new
+
+#     print('newfield.z_m:')
+#     print(newfield.z_m)
+#     print('newfield.u:')
+#     print(newfield.u)
+#     print('newfield.v:')
+#     print(newfield.v)
+#     print('newfield.c_m:')
+#     print(newfield.c_m)
+#     print('newfield.k_m:')
+#     print(newfield.k_m)
+
+    # f.write('Hello, world!')
+    # f.write("\n")
+    # f.write("\n")
+    # f.write('newfield.z_m:')
+    # f.write(str(newfield.z_m))
+    # f.write("\n")
+    # f.write("\n")
+    # f.write('newfield.u:')
+    # f.write(str(newfield.u))
+    # f.write("\n")
+    # f.write("\n")
+    # f.write('newfield.v:')
+    # f.write(str(newfield.v))
+    # f.write("\n")
+    # f.write('newfield.c_m:')
+    # f.write(str(newfield.c_m))
+    # f.write("\n")
+    # f.write("\n")
+    # f.write('newfield.k_m:')
+    # f.write(str(newfield.k_m))
+    # f.write("\n")
+    # f.write("\n")
+
+
     return newfield
