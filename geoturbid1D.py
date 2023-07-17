@@ -49,6 +49,19 @@ i_output = 1
 # figure;
 
 os.system('cls')
+file_path = "hyperbolicOutput.txt"
+if os.path.exists(file_path):
+    os.remove(file_path)
+    print("File deleted successfully.")
+else:
+    print("File does not exist.")
+
+file_path = "fluxLHLLOutput.txt"
+if os.path.exists(file_path):
+    os.remove(file_path)
+    print("File deleted successfully.")
+else:
+    print("File does not exist.")
 
 # main loop:
 firstTimeStep = 1
@@ -57,13 +70,22 @@ firstTimeStep = 1
 # i_output = 203;
 # firstTimeStep = 0;
 iter = 1
+flux_x = None
 
 
 while field.t < t_end:
     
-    print('Iteration ', iter, ': ')
-    if iter == 5:
-        break
+    print("\n\n", 'Iteration ', iter, ': ')
+    iterStr = "Iteration " + str(iter) + ": \n\n"
+    f = open("hyperbolicOutput.txt", "a")
+    f.write(iterStr)
+    f.close()
+
+    f = open("fluxLHLLOutput.txt", "a")
+    f.write(iterStr)
+    f.close()
+
+    
     
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         dt = timestep(field, par)
@@ -107,6 +129,7 @@ while field.t < t_end:
     
     field_x = mirror(field)
 
+
     #    field_y = mirror(swapfield(field));
     # computation of in-cell gradients:
     # note: cell slopes are NOT recomputed for the second step of the predictor-corrector
@@ -115,13 +138,15 @@ while field.t < t_end:
         #        grad_y = gradientVL(field_y,par,o);
     # fluxing scheme (LHLL):
     # Original --> flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
+
+    # WORKS
     flux_x = fluxLHLL(field_x, grad_x, par, dt)
 
 
     # print('\n', flux_x.sig_l[0][0], flux_x.sig_l[0][1])
 
-
     # impose BC at upstream inflow section
+    # WORKS
     flux_x = bc_1D(flux_x, field_x, par)
 
 
@@ -152,18 +177,15 @@ while field.t < t_end:
     if o == 1:
         # 1st order forward Euler:
         # print("flux_x qm", flux_x.q_m.shape)
-        print('Before Hyperbolic')
-        print(field.z_m[0][:5])
+        # print('Before Hyperbolic')
+        # print(field.z_m[0][:5])
+        # WORKS - if we comment out relax, everything in hyperbolic 
+        # (and subsequently everything else used by hyperbolic) works as it should
         field = hyperbolic(field, flux_x, flux_y, par, dt)  
-        print('After Hyperbolic')
-        print(field.z_m[0][:5])
         # relaxation operator:
-        print('Before Relax')
-        print(field.z_m[0][:5])
-        field = relax(field, par, dt, geostaticflag)
-        print('After Relax')
-        print(field.z_m[0][:5])
-        print('\n')
+        # field = relax(field, par, dt, geostaticflag)
+        print('Midway - z_m')
+        print(field.z_m[0][:20])
         # time update:
         field.t = field.t + dt
 
@@ -184,6 +206,7 @@ while field.t < t_end:
                 field.t = field.t + dt
     
     iter = iter + 1
-
+    if iter == 20:
+        break
 
 
