@@ -7,6 +7,7 @@
 # Prepared by Benoit Spinewine (spinewine@gmail.com)
 
 # initialisation:
+import math
 import queue
 import time
 import numpy as np
@@ -15,8 +16,6 @@ from createFluxY import createFluxY
 import copy
 from fieldplot_2 import fieldplot_2
 import threading
-
-
 
 import init1D
 from initMonterrey import initMonterrey
@@ -39,6 +38,8 @@ from matplotlib.animation import FuncAnimation
 
 import sys
 
+titleCounter = 0
+
 dispflag = 0
 t_end = 3600*1000
 dt_output = 3600
@@ -48,8 +49,11 @@ geostaticflag = 0
 par = initpar
 # field = init1D.field(n, par) # input file
 field = initMonterrey(n, par)
-field_0 = field
-field_prev = field
+# field_0 = field
+field_0 = initMonterrey(n, par)
+# field_prev = field
+field_prev = initMonterrey(n, par)
+
 # disk output and screen display parameters
 # t0 = (par.h0/par.g)^0.5;]
 t_output = np.arange(0, t_end + dt_output, dt_output)
@@ -132,22 +136,57 @@ while field.t < t_end:
         # Generate data for the plot
         field.x[field.z_b == 1000] = np.nan
         field.x[field.z_b == -1000] = np.nan
-        x = field.x[0]
-        y = field.z_b[0]
+        x1 = field.x[0]
+        y1 = field_0.z_b[0]
+        
+        x2 = field.x[0]
+        y2 = field.z_b[0]
+        
+        x3 = field.x[0]
+        y3 = field.z_m[0]
 
         # Create the plot
-        plt.plot(x, y)
+        plt.plot(x1, y1, color=(0.7, 0.7, 0.7))
+        plt.plot(x2, y2, color='r')
+        plt.plot(x3, y3, color='b')
         plt.xlabel('x')
         plt.ylabel('y')
-        plt.title('Plot shit')
+        title = 'flow profile, t = ' + str(math.floor(field.t/3600))
+        plt.title(title)
 
         # Save the plot as a PNG image
-        filename = "plot" + str(iter) + ".png"
+        
+        titleCounter = titleCounter + 1
+        filename = "timeprofile/plot" + str(titleCounter) + ".png"
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
 
         #         eval(['print -djpeg95 view_' tag2str(i_output-1)]);
         #         saveas(gcf,['view_' tag2str(i_output-1)],'fig');
+        
+        
+        
+        fig, ax1 = plt.subplots()
+
+        # Plot the first dataset on the left y-axis
+        ax1.plot(field.x[0], field.u[0], color='blue')
+        ax1.set_yticks([0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4])
+        ax1.set_xlabel('x')
+        ax1.set_ylabel('u', color='blue')
+
+        # Create a secondary y-axis
+        ax2 = ax1.twinx()
+
+        # Plot the second dataset on the right y-axis
+        ax2.plot(field.x[0], field.c_m[0], color='red')
+        ax2.set_yticks([0, 0.002, 0.004, 0.006, 0.008, 0.01, 0.012, 0.014, 0.016])
+        ax2.set_ylabel('c_m', color='red')
+
+        filename = "ucprofile/plot" + str(titleCounter) + ".png"
+        plt.savefig(filename)
+        plt.close()  # Close the figure to clear it for the next run
+
+
         i_output = i_output + 1
     
     
@@ -219,9 +258,8 @@ while field.t < t_end:
         # print('field.c_m before: {:.16f}'.format(field.c_m[0][0]))
         # print('{:.16f}'.format(field.z_m[0][0]))
         # relaxation operator:
-        print('field_0.z_b before: {:.16f}'.format(field_0.z_b[0][0]))
         field = relax(field, par, dt, geostaticflag)
-        print('field_0.z_b after: {:.16f}'.format(field_0.z_b[0][0]))
+        # print('field_0.z_b after: {:.16f}'.format(field_0.z_b[0][0]))
         # print('field.z_b: ', field.z_b[0][:20])
         
         # print('field.c_m after: {:.16f}'.format(field.c_m[0][0]))
@@ -244,7 +282,11 @@ while field.t < t_end:
                 # time update:
                 field.t = field.t + dt
     
+    
     iter = iter + 1
+    
+    if iter == 100001:
+        break
     
 
 
