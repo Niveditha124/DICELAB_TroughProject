@@ -10,6 +10,7 @@ def geomorphic(field, par, dt):
     ix = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.u / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
     iy = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.v / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
     h = field.z_m - field.z_b
+
     
     # moving sediments
     CH = h * field.c_m
@@ -82,6 +83,7 @@ def geomorphic(field, par, dt):
     
     '''
     Ze5 = ((par.alpha*field.k_m) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * field.k_m) ** 0.5 / par.g / np.maximum(h, par.h_min)) ** 0.08) ** 5
+
     # print('Ze5: {:.10e}'.format(Ze5[0][0]))
     E = np.maximum((par.p * (1.3 * 10 ** -7)) * par.vs * Ze5 / (1 + (1.3 * 10 ** -7) / 0.3 * Ze5), 0)
     D = np.maximum(par.vs * par.r0 * field.c_m, 0)
@@ -90,6 +92,10 @@ def geomorphic(field, par, dt):
     C_new = np.maximum(CH_new / np.maximum(h_new, par.h_min), 0)
     KH_new = KH - dt * 0.5 * par.R * par.g * h_new * (E - D)
     K_new = np.maximum(0, KH_new / np.maximum(h_new, par.h_min))
+
+
+
+
 
     for i in range(10):
         # Ze5 = ((par.alpha*K_new).^0.5/par.vs.*par.Rp^0.6.*((par.alpha*K_new).^0.5./par.g./max(h_new,par.h_min)).^0.08).^5;
@@ -110,6 +116,34 @@ def geomorphic(field, par, dt):
         K_new = np.maximum(0, KH_new / np.maximum(h_new, par.h_min))
 
     
+    # print('Values: ')
+    # print('CH: {:.16f}'.format(CH[0][0]))
+
+    # print('KH: {:.16f}'.format(KH[0][0]))
+
+    # print('par.alpha:', par.alpha)
+    # print('field.k_m:', field.k_m)
+    # print('par.vs:', par.vs)
+    # print('par.Rp:', par.Rp)
+    # print('par.g:', par.g)
+    # print('h:', h)
+    # print('par.h_min:', par.h_min)
+
+    # print('Ze5: {:.16f}'.format(Ze5[0][0]))
+
+    # print('E: {:.16f}'.format(E[0][0]))
+
+    # print('D: {:.16f}'.format(D[0][0]))
+
+    # print('CH_new: {:.16f}'.format(CH_new[0][0]))
+
+    # print('h_new: {:.16f}'.format(h_new[0][0]))
+
+    # print('C_new: {:.16f}'.format(C_new[0][0]))
+
+    # print('KH_new: {:.16f}'.format(KH_new[0][0]))
+
+    # print('K_new: {:.16f}'.format(K_new[0][0]))
     
 
     # retrieve bed level change and impose limit. dzb is positive in case of deposition
@@ -127,6 +161,7 @@ def geomorphic(field, par, dt):
     # K factor is an empirical measure of soil erodibility as affected by intrinsic soil properties
     # https://www.sciencedirect.com/topics/earth-and-planetary-sciences/revised-universal-soil-loss-equation\
 
+
     # final update
     newfield = field
     newfield.z_b = field.z_b + dzb
@@ -136,6 +171,7 @@ def geomorphic(field, par, dt):
         sys.exit()
     indices = np.where(h_new < par.h_min)
     newfield.c_m[indices] = field.c_m[indices]
+
     newfield.k_m = np.maximum(KH_new / np.maximum(h_new, par.h_min), 0)
 
     # if h_new.all() < par.h_min:

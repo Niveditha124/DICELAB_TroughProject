@@ -7,9 +7,14 @@
 # Prepared by Benoit Spinewine (spinewine@gmail.com)
 
 # initialisation:
+import queue
+import time
 import numpy as np
 import os
 from createFluxY import createFluxY
+import copy
+from fieldplot_2 import fieldplot_2
+import threading
 
 
 
@@ -27,6 +32,10 @@ from mirror import mirror
 from relax import relax
 from tag2str import tag2str
 from timestep import timestep
+
+import threading
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 import sys
 
@@ -48,6 +57,22 @@ i_output = 1
 # prepare graphics:
 # figure;
 
+os.system('cls')
+
+file_path = "hyperbolicOutput.txt"
+if os.path.exists(file_path):
+    os.remove(file_path)
+    print("File deleted successfully.")
+else:
+    print("File does not exist.")
+
+file_path = "fluxLHLLOutput.txt"
+if os.path.exists(file_path):
+    os.remove(file_path)
+    print("File deleted successfully.")
+else:
+    print("File does not exist.")
+
 # main loop:
 firstTimeStep = 1
 # continue previous run
@@ -55,16 +80,24 @@ firstTimeStep = 1
 # i_output = 203;
 # firstTimeStep = 0;
 iter = 1
+flux_x = None
 
-os.system('cls')
 
 while field.t < t_end:
-    
-    print('Iteration ', iter, ': ')
-    #    if iter == 10:
-        #        break
+
+    print("\n\n", 'Iteration ', iter, ': ')
+    iterStr = "Iteration " + str(iter) + ": \n\n"
+    f = open("hyperbolicOutput.txt", "a")
+    f.write(iterStr)
+    f.close()
+
+    f = open("fluxLHLLOutput.txt", "a")
+    f.write(iterStr)
+    f.close()
+
     
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
+
         dt = timestep(field, par)
         if firstTimeStep:
             dt = min(dt, 0.1)
@@ -79,6 +112,8 @@ while field.t < t_end:
     field.c_m[field.z_r == - 1000] = 0
     field.k_m[field.z_r == - 1000] = 0
     
+
+
     # screen display:
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         if dispflag == 1:
@@ -91,7 +126,26 @@ while field.t < t_end:
                       (np.logical_and((i_output <= len(t_output)), ((field.t + dt) > t_output[i_output])))):
         # eval(np.array(['save field_', tag2str(i_output - 1), ' field field_0 field_prev dt']))
         # eval('save field_', tag2str(i_output - 1), np.array['field field_0 field_prev dt'])
-        fieldplot(field, field_0, field_prev, par, dt)
+        print('field.x: ', field.x[0][:5])
+        # fieldplot_2(field, field_0, field_prev, par, dt)
+    
+        # Generate data for the plot
+        field.x[field.z_b == 1000] = np.nan
+        field.x[field.z_b == -1000] = np.nan
+        x = field.x[0]
+        y = field.z_b[0]
+
+        # Create the plot
+        plt.plot(x, y)
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.title('Plot shit')
+
+        # Save the plot as a PNG image
+        filename = "plot" + str(iter) + ".png"
+        plt.savefig(filename)
+        plt.close()  # Close the figure to clear it for the next run
+
         #         eval(['print -djpeg95 view_' tag2str(i_output-1)]);
         #         saveas(gcf,['view_' tag2str(i_output-1)],'fig');
         i_output = i_output + 1
@@ -102,8 +156,10 @@ while field.t < t_end:
     # half-step relaxation operator:
     if np.logical_and((o == 2), (iter % 2 == 1)):
         field = relax(field, par, 0.5 * dt, geostaticflag)
-    # extend field left and right:    
+    # extend field left and right:   
+    
     field_x = mirror(field)
+
 
     #    field_y = mirror(swapfield(field));
     # computation of in-cell gradients:
@@ -113,13 +169,18 @@ while field.t < t_end:
         #        grad_y = gradientVL(field_y,par,o);
     # fluxing scheme (LHLL):
     # Original --> flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
+
+    # WORKS
     flux_x = fluxLHLL(field_x, grad_x, par, dt)
 
-    print('\n', flux_x.sig_l[0][0], flux_x.sig_l[0][1])
 
+    # print('\n', flux_x.sig_l[0][0], flux_x.sig_l[0][1])
 
     # impose BC at upstream inflow section
+    # WORKS
     flux_x = bc_1D(flux_x, field_x, par)
+
+
 
     #    flux_y = swapflux(fluxLHLL(field_y,grad_y,par,dt));
     # 1D default:
@@ -144,12 +205,26 @@ while field.t < t_end:
     # flux_y.z_br = np.transpose(np.array([1, 1])) * field.z_b
     # hyperbolic operator:
 
+    
+    
+
     if o == 1:
         # 1st order forward Euler:
         # print("flux_x qm", flux_x.q_m.shape)
-        field = hyperbolic(field, flux_x, flux_y, par, dt)        
+        # print('Before Hyperbolic')
+        # print(field.z_m[0][:5])
+        # WORKS - if we comment out relax, everything in hyperbolic 
+        # (and subsequently everything else used by hyperbolic) works as it should
+        field = hyperbolic(field, flux_x, flux_y, par, dt)
+        # print('field.c_m before: {:.16f}'.format(field.c_m[0][0]))
+        # print('{:.16f}'.format(field.z_m[0][0]))
         # relaxation operator:
+        print('field_0.z_b before: {:.16f}'.format(field_0.z_b[0][0]))
         field = relax(field, par, dt, geostaticflag)
+        print('field_0.z_b after: {:.16f}'.format(field_0.z_b[0][0]))
+        # print('field.z_b: ', field.z_b[0][:20])
+        
+        # print('field.c_m after: {:.16f}'.format(field.c_m[0][0]))
         # time update:
         field.t = field.t + dt
 
@@ -168,6 +243,8 @@ while field.t < t_end:
                 field = relax(field, par, 0.5 * dt, geostaticflag)
                 # time update:
                 field.t = field.t + dt
+    
     iter = iter + 1
+    
 
 

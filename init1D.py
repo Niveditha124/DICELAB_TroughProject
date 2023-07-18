@@ -98,6 +98,7 @@ class field:
         self.C_up = field.C_up
         self.U_up = field.U_up
         self.K_up = field.K_up
+        self.t = field.t
 
     def init1D(self, n, par):
 
@@ -176,5 +177,5 @@ class field:
         # field.v = np.zeros((field.x.shape[0], field.x.shape[1]))
         # time:
         # -----
-        # field.t = 0
+        field.t = 0
 

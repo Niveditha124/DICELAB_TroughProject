@@ -30,11 +30,38 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     # z_m_new = field.z_m + (dt / dx) * flux_x.q_m[:, np.arange(0, n)] - flux_x.q_m[:, np.arange(0, n)] - (dt / dy) * (flux_y.q_m[np.arange(1, m+1), :] - flux_y.q_m[np.arange(1, m + 1), :])
     ls = flux_x.q_m[:, 0:n] - flux_x.q_m[:, 1:n+1]
     rs = flux_y.q_m[0:m, :] - flux_y.q_m[1:m+1, :]
-    z_m_new = field.z_m + (dt / dx) * ls + (dt / dy) * rs
+    z_m_new = field.z_m + ((dt / dx) * ls) + ((dt / dy) * rs)
+    
+    z_m_new = field.z_m + (dt/dx) * (flux_x.q_m[:, :n] - flux_x.q_m[:, 1:n+1]) + (dt/dy) * (flux_y.q_m[:m, :] - flux_y.q_m[1:m+1, :])
+
+    '''
+    print('Field Values:')
+    print('dt/dx')
+    print(dt/dx)
+    print('dt/dy')
+    print(dt/dy)
+
+    # Print flux_x.q_m(:,1:n)
+    print('flux_x.q_m[:,1:n]')
+    print(flux_x.q_m[:, 0:n])
+
+    # Print flux_x.q_m(:,2:n+1)
+    print('flux_x.q_m[:,2:n+1]')
+    print(flux_x.q_m[:, 1:n+1])
+
+    # Print flux_y.q_m(1:m,:)
+    print('flux_y.q_m[0:m, :]')
+    print(flux_y.q_m[0:m, :])
+
+    # Print flux_y.q_m(2:m+1,:)
+    print('flux_y.q_m[1:m+1, :]')
+    print(flux_y.q_m[1:m+1, :])
+
+    '''
+    
     #+ (dt/dy) * (flux_y.q_m[0:m, :] - flux_y.q_m[1:m+1, :])
     
     
-    # z_m_new = field.z_m + ((dt / dx) * (flux_x.q_m[:, (0, n)])) - flux_x.q_m[:, (1, n+1)] + (dt / dy) * flux_y.q_m[(0, m), :] - flux_y.q_m[(1, m+1), :]
     qm_x = np.multiply((field.z_m - field.z_b), field.u)
 
     # qm_x_new = qm_x + (dt / dx) * (flux_x.sig_r(:,np.arange(1,n+1)) - flux_x.sig_l(:,np.arange(2,n + 1+1))) + (dt /
@@ -56,9 +83,9 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     # print((qm_x + a - b + c - d + np.multiply(e, f) - g).shape)
     qm_x_new = qm_x + a - b + c - d + np.multiply(e, f) - g
     '''
-    qm_x_new = qm_x + (dt/dx)*(flux_x.sig_r[:, 0:n] - flux_x.sig_l[:, 1:n+1]) \
-            + (dt/dy)*(flux_y.sigCross[0:m, :] - flux_y.sigCross[1:m+1, :]) \
-            + (dt/dx)*par.R*par.g*(field.c_m*(field.z_m-field.z_b))*(flux_x.z_br[:, 0:n] - flux_x.z_bl[:, 1:n+1])
+    qm_x_new = qm_x + (dt/dx) * (flux_x.sig_r[:, :n] - flux_x.sig_l[:, 1:n+1]) \
+                + (dt/dy) * (flux_y.sigCross[:m, :] - flux_y.sigCross[1:m+1, :]) \
+                + (dt/dx) * par.R * par.g * (field.c_m * (field.z_m - field.z_b)) * (flux_x.z_br[:, :n] - flux_x.z_bl[:, 1:n+1])
 
     # qm_x_new = qm_x + np.multiply((dt/dx), (flux_x.sig_r[:, np.arange(0, n+1)])) - (flux_x.sig_l[:, np.arange(1, n+2)]) + np.multiply((dt/dx), (flux_y.sigCross[np.arange(0, m+1), :])) - (flux_y.sigCross[np.arange(1, m+2), :]) + ((dt / dx)*par.R*par.g)* (
     # np.multiply(field.c_m(field.z_m - field.z_b)), (flux_x.z_br[:, np.arange(0, n+1)] - flux_x.z_bl[:, np.arange(1, n+2)]))
@@ -90,7 +117,23 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     #         dt / dy) * flux_y.sig_r[(0, m + 1), :] - flux_y.sig_l[(1, m + 2), :] + np.multiply(
     #     (dt / dx) * par.R * par.g * (np.multiply(field.c_m(field.z_m - field.z_b))),
     #     (flux_y.z_br[(0, m + 1), :] - flux_y.z_bl[(1, m + 2), :]))
+#     print('Making nu\n')
+#     print('field.z_m')
+#     print(field.z_m)
+#     print('field.c_m')
+#     print(field.c_m)
     nu = np.multiply((field.z_m - field.z_b), field.c_m)
+#     print('nu')
+#     print(nu)
+
+#     print('field.z_m')
+#     print(field.z_m[0][:5])
+#     print('field.z_b')
+#     print(field.z_b[0][:5])
+#     print('field.c_m')
+#     print(field.c_m[0][:5])
+#     print('nu')
+#     print(nu[0][:5])
     
     # nu_new = nu + (dt / dx) * (flux_x.mu(:,np.arange(1,n+1)) - flux_x.mu(:,np.arange(2,n + 1+1))) + (dt / dy) * (
     # flux_y.mu(np.arange(1,m+1),:) - flux_y.mu(np.arange(2,m + 1+1),:))
@@ -98,7 +141,16 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     # nu_new = nu + (dt / dx) * flux_x.mu[:, (0, n + 1)] - flux_x.mu[:, (1, n + 2)] + (dt / dy) * (
     #         flux_y.mu[(1, m + 1), :] - flux_y.mu[(1, m + 2), :])
 
-    nu_new = nu + (dt / dx) * flux_x.mu[:, np.arange(0, n)] - flux_x.mu[:, np.arange(1, n+1)] + (dt / dy) * (flux_y.mu[np.arange(0, m), :] - flux_y.mu[np.arange(1, m+1), :])
+    # nu_new = nu + (dt / dx) * flux_x.mu[:, np.arange(0, n)] - flux_x.mu[:, np.arange(1, n+1)] + (dt / dy) * (flux_y.mu[np.arange(0, m), :] - flux_y.mu[np.arange(1, m+1), :])
+    
+#     print('Making nu_new\n')
+#     print('flux_x.mu')
+#     print(flux_x.mu)
+#     print('flux_y.mu')
+#     print(flux_y.mu)
+    nu_new = nu + (dt/dx) * (flux_x.mu[:, :n] - flux_x.mu[:, 1:n+1]) \
+            + (dt/dy) * (flux_y.mu[:m, :] - flux_y.mu[1:m+1, :])
+    
 
     kh = np.multiply((field.z_m - field.z_b), field.k_m)
     # kh_new = kh + (dt / dx) * (flux_x.kh(:,np.arange(1,n+1)) - flux_x.kh(:,np.arange(2,n + 1+1))) + (dt / dy) * (
@@ -106,13 +158,30 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     # kh_new = kh + (dt / dx) * (flux_x.kh[:, (0, n + 1)] - flux_x.kh[:, (1, n + 2)]) + (dt / dy) * (
     #         flux_y.kh[(0, m + 1), :] - flux_y.kh[(1, m + 2), :])
 
-    kh_new = kh + (dt / dx) * flux_x.kh[:, np.arange(0, n)] - flux_x.kh[:, np.arange(1, n+1)] + (dt / dy) * (flux_y.kh[np.arange(0, m), :] - flux_y.kh[np.arange(1, m+1), :])
+    # kh_new = kh + (dt / dx) * flux_x.kh[:, np.arange(0, n)] - flux_x.kh[:, np.arange(1, n+1)] + (dt / dy) * (flux_y.kh[np.arange(0, m), :] - flux_y.kh[np.arange(1, m+1), :])
+    kh_new = kh + (dt/dx) * (flux_x.kh[:, :n] - flux_x.kh[:, 1:n+1]) \
+            + (dt/dy) * (flux_y.kh[:m, :] - flux_y.kh[1:m+1, :])
+    
     # z-ordering condition:
     z_m_new = np.maximum(z_m_new, field.z_b)
+
     # concentration update:
-    c_m_new = np.multiply(((z_m_new - field.z_b) > par.h_min), nu_new) / np.maximum((z_m_new - field.z_b), par.h_min) + np.multiply(((z_m_new - field.z_b) <= par.h_min), field.c_m)
+    # c_m_new = np.multiply(((z_m_new - field.z_b) > par.h_min), nu_new) / np.maximum((z_m_new - field.z_b), par.h_min) + np.multiply(((z_m_new - field.z_b) <= par.h_min), field.c_m)
+#     print('Making c_m_new\n')
+#     print('z_m_new')
+#     print(z_m_new[0][:5])
+#     print('field.z_b')
+#     print(field.z_b[0][:5])
+#     print('nu_new')
+#     print(nu_new[0][:5])
+    c_m_new = np.where((z_m_new - field.z_b) > par.h_min, nu_new / np.maximum((z_m_new - field.z_b), par.h_min), field.c_m)
+
     # positivity condition
-    c_m_new = np.maximum(c_m_new, 0) 
+    c_m_new = np.maximum(c_m_new, 0)
+
+#     print('c_m_new')
+#     print(c_m_new[0][:5])
+
     # print("z_m_new:", z_m_new)
     # print("field.z_b:", field.z_b)
     # print("par.h_min:", par.h_min)
@@ -124,13 +193,18 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     
     
     # turb kin energy update:
-    k_m_new = np.multiply(((z_m_new - field.z_b) > par.h_min), kh_new) / np.maximum((z_m_new - field.z_b), par.h_min) + np.multiply(((z_m_new - field.z_b) <= par.h_min), field.k_m)
+    # k_m_new = np.multiply(((z_m_new - field.z_b) > par.h_min), kh_new) / np.maximum((z_m_new - field.z_b), par.h_min) + np.multiply(((z_m_new - field.z_b) <= par.h_min), field.k_m)
+    k_m_new = ((z_m_new - field.z_b) > par.h_min) * kh_new / np.maximum((z_m_new - field.z_b), par.h_min) + ((z_m_new - field.z_b) <= par.h_min) * field.k_m
+
     # positivity condition
     k_m_new = np.maximum(k_m_new, 0)
 
     # velocity update
-    u_new = np.multiply(((z_m_new - field.z_b) >= par.h_min), qm_x_new) / np.maximum((z_m_new - field.z_b), par.h_min)
-    v_new = np.multiply(((z_m_new - field.z_b) >= par.h_min), qm_y_new) / np.maximum((z_m_new - field.z_b), par.h_min)
+    # u_new = np.multiply(((z_m_new - field.z_b) >= par.h_min), qm_x_new) / np.maximum((z_m_new - field.z_b), par.h_min)
+    u_new = ((z_m_new - field.z_b) >= par.h_min) * qm_x_new / np.maximum((z_m_new - field.z_b), par.h_min)
+
+    # v_new = np.multiply(((z_m_new - field.z_b) >= par.h_min), qm_y_new) / np.maximum((z_m_new - field.z_b), par.h_min)
+    v_new = ((z_m_new - field.z_b) >= par.h_min) * qm_y_new / np.maximum((z_m_new - field.z_b), par.h_min)
 
     # final update
     newfield = field
@@ -139,4 +213,40 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     newfield.v = v_new
     newfield.c_m = c_m_new
     newfield.k_m = k_m_new
+
+#     print('newfield.z_m:')
+#     print(newfield.z_m)
+#     print('newfield.u:')
+#     print(newfield.u)
+#     print('newfield.v:')
+#     print(newfield.v)
+#     print('newfield.c_m:')
+#     print(newfield.c_m)
+#     print('newfield.k_m:')
+#     print(newfield.k_m)
+
+    # f.write('Hello, world!')
+    # f.write("\n")
+    # f.write("\n")
+    # f.write('newfield.z_m:')
+    # f.write(str(newfield.z_m))
+    # f.write("\n")
+    # f.write("\n")
+    # f.write('newfield.u:')
+    # f.write(str(newfield.u))
+    # f.write("\n")
+    # f.write("\n")
+    # f.write('newfield.v:')
+    # f.write(str(newfield.v))
+    # f.write("\n")
+    # f.write('newfield.c_m:')
+    # f.write(str(newfield.c_m))
+    # f.write("\n")
+    # f.write("\n")
+    # f.write('newfield.k_m:')
+    # f.write(str(newfield.k_m))
+    # f.write("\n")
+    # f.write("\n")
+
+
     return newfield

@@ -5,3 +5,8 @@ geoTest.py
 __pycache__/
 .vscode/launch.json
 outputViewer.txt
+fluxLHLLOutput.txt
+hyperbolicOutput.txt
+*.png
+deepCopier.py
+*.txt
