@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import time
 
 
@@ -14,9 +15,11 @@ def fieldplot_2(figure, ax, line1, test, field=None, field_0=None, field_prev=No
     # crop out-of-domain regions of the field:
     # field = cropfield(field);
     # set rim to NaN
-    field.x[field.z_b == 1000] = float("nan")
+    # field.x[field.z_b == 1000] = float("nan")
+    field.x[field.z_b == 1000] = np.nan
     # set pits to NaN
-    field.x[field.z_b == - 1000] = float("nan")
+    # field.x[field.z_b == - 1000] = float("nan")
+    field.x[field.z_b == -1000] = np.nan
     # set flow with negligible concentration to NaN;
     # field.z_m(field.c_m<0.0001)=NaN;
 
