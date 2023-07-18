@@ -7,3 +7,4 @@ __pycache__/
 outputViewer.txt
 fluxLHLLOutput.txt
 hyperbolicOutput.txt
+*.png
