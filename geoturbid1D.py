@@ -136,6 +136,9 @@ while field.t < t_end:
         # Generate data for the plot
         field.x[field.z_b == 1000] = np.nan
         field.x[field.z_b == -1000] = np.nan
+
+        
+
         x1 = field.x[0]
         y1 = field_0.z_b[0]
         
@@ -149,23 +152,21 @@ while field.t < t_end:
         plt.plot(x1, y1, color=(0.7, 0.7, 0.7))
         plt.plot(x2, y2, color='r')
         plt.plot(x3, y3, color='b')
-        plt.xlabel('x')
-        plt.ylabel('y')
+        plt.grid(color='gray', linestyle='--', linewidth=0.5)
+        plt.xlabel('field.x')
+        plt.ylabel('')
         title = 'flow profile, t = ' + str(math.floor(field.t/3600))
         plt.title(title)
 
         # Save the plot as a PNG image
         
-        titleCounter = titleCounter + 1
-        filename = "timeprofile/plot" + str(titleCounter) + ".png"
+        filename = "images/python/flowprofile/plot" + str(titleCounter) + ".png"
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
-
-        #         eval(['print -djpeg95 view_' tag2str(i_output-1)]);
-        #         saveas(gcf,['view_' tag2str(i_output-1)],'fig');
         
         
         
+        '''
         fig, ax1 = plt.subplots()
 
         # Plot the first dataset on the left y-axis
@@ -179,19 +180,104 @@ while field.t < t_end:
 
         # Plot the second dataset on the right y-axis
         ax2.plot(field.x[0], field.c_m[0], color='red')
-        ax2.set_yticks([0, 0.002, 0.004, 0.006, 0.008, 0.01, 0.012, 0.014, 0.016])
+        # ax2.set_yticks([0, 0.002, 0.004, 0.006, 0.008, 0.01, 0.012, 0.014, 0.016])
         ax2.set_ylabel('c_m', color='red')
 
-        filename = "ucprofile/plot" + str(titleCounter) + ".png"
+        filename = "images/testing/plot" + str(titleCounter) + ".png"
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
 
+        '''
+        '''
+        plt.title('U and C profiles')
 
+        plt.plot(field.x[0], field.u[0], color='blue', label='Left Y-axis')
+        plt.xlabel('field.x')
+        plt.ylabel('field.u', color='blue')
+        plt.tick_params(axis='y', colors='blue')
+
+        ax2 = plt.twinx()
+        ax2.plot(field.x[0], field.c_m[0], color='red', label='Right Y-axis')
+        ax2.set_ylabel('field.c_m', color='red')
+        ax2.tick_params(axis='y', colors='red')
+
+
+        # plt.grid(True)  # Enable vertical grid lines
+        # plt.grid(which='both', axis='both')  # Enable both x-axis and y-axis grid lines
+        # plt.grid(color='gray', linestyle='--', linewidth=0.5)
+
+
+        filename = "images/python/ucprofile/plot" + str(titleCounter) + ".png"
+        plt.savefig(filename)
+        plt.close()  # Close the figure to clear it for the next run
+
+        '''
+
+        '''
+        plt.title('K and Fr profiles')
+
+        plt.plot(field.x[0], field.k_m[0], color='blue', label='Left Y-axis')
+        plt.xlabel('field.x')
+        plt.ylabel('field.u', color='blue')
+        plt.tick_params(axis='y', colors='blue')
+
+        ax2 = plt.twinx()
+        h = field.z_m - field.z_b
+        Ri = par.R * par.g * field.c_m * h / np.maximum(field.u**2, (par.g * par.h_min))
+        Fr = np.sqrt(1.0 / np.maximum(Ri, 1e-10))
+
+        ax2.plot(field.x[0], Fr[0], color='red', label='Right Y-axis')
+        ax2.set_ylabel('Fr', color='red')
+        ax2.tick_params(axis='y', colors='red')
+
+
+        # plt.grid(True)  # Enable vertical grid lines
+        # plt.grid(which='both', axis='both')  # Enable both x-axis and y-axis grid lines
+        # plt.grid(color='gray', linestyle='--', linewidth=0.5)
+
+
+        filename = "images/python/kfrprofile/plot" + str(titleCounter) + ".png"
+        plt.savefig(filename)
+        plt.close()  # Close the figure to clear it for the next run
+        
+        '''
+
+        '''
+
+        plt.title('Instant and cumul. bed changes')
+
+        plot1 = (field.z_b - field_prev.z_b) / dt
+        plot2 = field.z_b - field_0.z_b
+
+        plt.plot(field.x[0], plot1[0], color='blue', label='Left Y-axis')
+        plt.xlabel('field.x')
+        # plt.ylabel('field.u', color='blue')
+        plt.tick_params(axis='y', colors='blue')
+
+        ax2 = plt.twinx()
+        ax2.plot(field.x[0], plot2[0], color='red', label='Right Y-axis')
+        ax2.set_ylabel('', color='red')
+        ax2.tick_params(axis='y', colors='red')
+
+
+        # plt.grid(True)  # Enable vertical grid lines
+        # plt.grid(which='both', axis='both')  # Enable both x-axis and y-axis grid lines
+        # plt.grid(color='gray', linestyle='--', linewidth=0.5)
+
+
+        filename = "images/python/iacbchanges/plot" + str(titleCounter) + ".png"
+        plt.savefig(filename)
+        plt.close()  # Close the figure to clear it for the next run
+        
+        '''
+
+        titleCounter = titleCounter + 1
         i_output = i_output + 1
     
     
     # book-keeping
-    field_prev = field
+    # TEMPORARY CHANGE LATER
+    # field_prev = field
     # half-step relaxation operator:
     if np.logical_and((o == 2), (iter % 2 == 1)):
         field = relax(field, par, 0.5 * dt, geostaticflag)
@@ -254,6 +340,7 @@ while field.t < t_end:
         # print(field.z_m[0][:5])
         # WORKS - if we comment out relax, everything in hyperbolic 
         # (and subsequently everything else used by hyperbolic) works as it should
+       
         field = hyperbolic(field, flux_x, flux_y, par, dt)
         # print('field.c_m before: {:.16f}'.format(field.c_m[0][0]))
         # print('{:.16f}'.format(field.z_m[0][0]))
@@ -285,8 +372,11 @@ while field.t < t_end:
     
     iter = iter + 1
     
-    if iter == 100001:
+    # 206516
+    if iter == 206516:
         break
+
+    
     
 
 
