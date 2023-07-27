@@ -14,6 +14,7 @@ import numpy as np
 import os
 from createFluxY import createFluxY
 import copy
+from deepCopier import deep_copy
 from fieldplot_2 import fieldplot_2
 import threading
 
@@ -148,6 +149,7 @@ while field.t < t_end:
         x3 = field.x[0]
         y3 = field.z_m[0]
 
+        '''
         # Create the plot
         plt.plot(x1, y1, color=(0.7, 0.7, 0.7))
         plt.plot(x2, y2, color='r')
@@ -164,7 +166,7 @@ while field.t < t_end:
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
         
-        
+        '''
         
         '''
         fig, ax1 = plt.subplots()
@@ -242,7 +244,7 @@ while field.t < t_end:
         
         '''
 
-        '''
+        
 
         plt.title('Instant and cumul. bed changes')
 
@@ -268,8 +270,6 @@ while field.t < t_end:
         filename = "images/python/iacbchanges/plot" + str(titleCounter) + ".png"
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
-        
-        '''
 
         titleCounter = titleCounter + 1
         i_output = i_output + 1
@@ -278,6 +278,8 @@ while field.t < t_end:
     # book-keeping
     # TEMPORARY CHANGE LATER
     # field_prev = field
+    field_prev = deep_copy(field, field_prev)
+    
     # half-step relaxation operator:
     if np.logical_and((o == 2), (iter % 2 == 1)):
         field = relax(field, par, 0.5 * dt, geostaticflag)
@@ -358,7 +360,8 @@ while field.t < t_end:
             # 2nd order predictor-corrector (Alcrudo & Garcia-Navarro 1993):
             if iter % 2 == 1:
                 # book-keeping of previous field:
-                field_prev = field
+                # field_prev = field
+                field_prev = deep_copy(field, field_prev)
                 # predictor step:
                 field = hyperbolic(field, flux_x, flux_y, par, 0.5 * dt)
             else:
