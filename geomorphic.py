@@ -16,15 +16,7 @@ def geomorphic(field, par, dt):
     CH = h * field.c_m
     # KH
     KH = h * field.k_m
-    '''
-    print('\n')
-    print('par.alpha:', par.alpha)
-    print('field.k_m:', field.k_m[0][0])
-    print('par.vs:', par.vs)
-    print('par.Rp:', par.Rp)
-    print('par.g:', par.g)
-    print('h: {:.6e}'.format(h[0][0]))
-    '''
+
     
     # temp = (par.alpha * field.k_m) ** 0.5
     # Ze5 = temp / par.vs

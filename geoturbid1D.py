@@ -370,11 +370,6 @@ while field.t < t_end:
 
     if o == 1:
         # 1st order forward Euler:
-        # print("flux_x qm", flux_x.q_m.shape)
-        # print('Before Hyperbolic')
-        # print(field.z_m[0][:5])
-        # WORKS - if we comment out relax, everything in hyperbolic 
-        # (and subsequently everything else used by hyperbolic) works as it should
        
         field = hyperbolic(field, flux_x, flux_y, par, dt)
         # print('field.c_m before: {:.16f}'.format(field.c_m[0][0]))
