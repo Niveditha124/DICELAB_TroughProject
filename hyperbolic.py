@@ -214,39 +214,5 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     newfield.c_m = c_m_new
     newfield.k_m = k_m_new
 
-#     print('newfield.z_m:')
-#     print(newfield.z_m)
-#     print('newfield.u:')
-#     print(newfield.u)
-#     print('newfield.v:')
-#     print(newfield.v)
-#     print('newfield.c_m:')
-#     print(newfield.c_m)
-#     print('newfield.k_m:')
-#     print(newfield.k_m)
-
-    # f.write('Hello, world!')
-    # f.write("\n")
-    # f.write("\n")
-    # f.write('newfield.z_m:')
-    # f.write(str(newfield.z_m))
-    # f.write("\n")
-    # f.write("\n")
-    # f.write('newfield.u:')
-    # f.write(str(newfield.u))
-    # f.write("\n")
-    # f.write("\n")
-    # f.write('newfield.v:')
-    # f.write(str(newfield.v))
-    # f.write("\n")
-    # f.write('newfield.c_m:')
-    # f.write(str(newfield.c_m))
-    # f.write("\n")
-    # f.write("\n")
-    # f.write('newfield.k_m:')
-    # f.write(str(newfield.k_m))
-    # f.write("\n")
-    # f.write("\n")
-
 
     return newfield
