@@ -167,7 +167,7 @@ while field.t < t_end:
         
         
         
-        '''
+        
         fig, ax1 = plt.subplots()
 
         # Plot the first dataset on the left y-axis
@@ -188,8 +188,9 @@ while field.t < t_end:
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
 
-        '''
-        '''
+
+
+
         plt.title('U and C profiles')
 
         plt.plot(field.x[0], field.u[0], color='blue', label='Left Y-axis')
@@ -212,9 +213,11 @@ while field.t < t_end:
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
 
-        '''
 
-        '''
+
+
+
+
         plt.title('K and Fr profiles')
 
         plt.plot(field.x[0], field.k_m[0], color='blue', label='Left Y-axis')
@@ -241,9 +244,9 @@ while field.t < t_end:
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
         
-        '''
+        
 
-        '''
+        
 
         plt.title('Instant and cumul. bed changes')
 
@@ -270,7 +273,7 @@ while field.t < t_end:
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
         
-        '''
+        
 
         # Data Output to file
         filename = 'data/field' + str(titleCounter) + '.txt'
@@ -312,7 +315,7 @@ while field.t < t_end:
     
     # book-keeping
     # TEMPORARY CHANGE LATER
-    # field_prev = field
+    field_prev = deep_copy(field, field_prev)
     # half-step relaxation operator:
     if np.logical_and((o == 2), (iter % 2 == 1)):
         field = relax(field, par, 0.5 * dt, geostaticflag)
