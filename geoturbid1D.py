@@ -15,8 +15,6 @@ import os
 from createFluxY import createFluxY
 import copy
 from deepCopier import deep_copy
-from fieldplot_2 import fieldplot_2
-import threading
 
 import init1D
 from initMonterrey import initMonterrey
@@ -30,12 +28,11 @@ from gradientVL import gradientVL
 from hyperbolic import hyperbolic
 from mirror import mirror
 from relax import relax
+from fieldIO import stringify_field, parse_field
 from tag2str import tag2str
 from timestep import timestep
 
-import threading
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 
 import sys
 
@@ -138,8 +135,6 @@ while field.t < t_end:
         field.x[field.z_b == 1000] = np.nan
         field.x[field.z_b == -1000] = np.nan
 
-        
-
         x1 = field.x[0]
         y1 = field_0.z_b[0]
         
@@ -164,10 +159,7 @@ while field.t < t_end:
         filename = "images/python/flowprofile/plot" + str(titleCounter) + ".png"
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
-        
-        
-        
-        
+
         fig, ax1 = plt.subplots()
 
         # Plot the first dataset on the left y-axis
@@ -221,13 +213,14 @@ while field.t < t_end:
         plt.title('K and Fr profiles')
 
         plt.plot(field.x[0], field.k_m[0], color='blue', label='Left Y-axis')
-        plt.xlabel('field.x')
-        plt.ylabel('field.u', color='blue')
+        plt.xlabel('field.x (m)')
+        plt.ylabel('K (J/Kg)', color='blue')
         plt.tick_params(axis='y', colors='blue')
 
         ax2 = plt.twinx()
         h = field.z_m - field.z_b
         Ri = par.R * par.g * field.c_m * h / np.maximum(field.u**2, (par.g * par.h_min))
+        # Froude Number?
         Fr = np.sqrt(1.0 / np.maximum(Ri, 1e-10))
 
         ax2.plot(field.x[0], Fr[0], color='red', label='Right Y-axis')
@@ -273,41 +266,9 @@ while field.t < t_end:
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
         
-        
-
-        # Data Output to file
+        # Writing field data to file
         filename = 'data/field' + str(titleCounter) + '.txt'
-        f = open(filename, 'w')
-        output = 'field.x: ' + str(field.x) + '\n\n'
-        output += 'field.y: '+ str(field.y) + '\n\n'
-        output += 'field.z_m: ' + str(field.z_m) + '\n\n'
-        output += 'field.c_m: ' + str(field.c_m) + '\n\n'
-        output += 'field.k_m: ' + str(field.k_m) + '\n\n'
-        output += 'field.z_r: ' + str(field.z_r) + '\n\n'
-        output += 'field.z_b:' + str(field.z_b) + '\n\n'
-        output += 'field.u: ' + str(field.u) + '\n\n'
-        output += 'field.v: ' + str(field.v) + '\n\n'
-        output += 'L1: ' + str(field.L1) + '\n'
-        output += 'S1: ' + str(field.S1) + '\n'
-        output += 'p1: ' + str(field.p1) + '\n'
-        output += 'L2: ' + str(field.L2) + '\n'
-        output += 'S2: ' + str(field.S2) + '\n'
-        output += 'p2: ' + str(field.p2) + '\n'
-        output += 'L3: ' + str(field.L3) + '\n'
-        output += 'S3: ' + str(field.S3) + '\n'
-        output += 'p3: ' + str(field.p3) + '\n'
-        output += 'n: ' + str(field.n) + '\n'
-        output += 'U_up: ' + str(field.U_up) + '\n'
-        output += 'H_up: ' + str(field.H_up) + '\n'
-        output += 'C_up: ' + str(field.C_up) + '\n'
-        output += 'Q_up: ' + str(field.Q_up) + '\n'
-        output += 'K_up: ' + str(field.K_up) + '\n'
-        output += 't: ' + str(field.t) + '\n\n'
-        f.write(output)
-
-
-
-        f.close()
+        stringify_field(filename, field)
 
         titleCounter = titleCounter + 1
         i_output = i_output + 1
