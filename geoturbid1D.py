@@ -6,6 +6,8 @@
 #
 # Prepared by Benoit Spinewine (spinewine@gmail.com)
 
+# field.x might be position, and not distance
+
 # initialisation:
 import math
 import queue
@@ -149,7 +151,7 @@ while field.t < t_end:
         plt.plot(x2, y2, color='r')
         plt.plot(x3, y3, color='b')
         plt.grid(color='gray', linestyle='--', linewidth=0.5)
-        plt.xlabel('field.x')
+        plt.xlabel('field.x (m)')
         plt.ylabel('')
         title = 'flow profile, t = ' + str(math.floor(field.t/3600))
         plt.title(title)
@@ -160,25 +162,25 @@ while field.t < t_end:
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
 
-        fig, ax1 = plt.subplots()
+        # fig, ax1 = plt.subplots()
 
-        # Plot the first dataset on the left y-axis
-        ax1.plot(field.x[0], field.u[0], color='blue')
-        ax1.set_yticks([0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4])
-        ax1.set_xlabel('x')
-        ax1.set_ylabel('u', color='blue')
+        # # Plot the first dataset on the left y-axis
+        # ax1.plot(field.x[0], field.u[0], color='blue')
+        # ax1.set_yticks([0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4])
+        # ax1.set_xlabel('x')
+        # ax1.set_ylabel('u', color='blue')
 
-        # Create a secondary y-axis
-        ax2 = ax1.twinx()
+        # # Create a secondary y-axis
+        # ax2 = ax1.twinx()
 
-        # Plot the second dataset on the right y-axis
-        ax2.plot(field.x[0], field.c_m[0], color='red')
-        # ax2.set_yticks([0, 0.002, 0.004, 0.006, 0.008, 0.01, 0.012, 0.014, 0.016])
-        ax2.set_ylabel('c_m', color='red')
+        # # Plot the second dataset on the right y-axis
+        # ax2.plot(field.x[0], field.c_m[0], color='red')
+        # # ax2.set_yticks([0, 0.002, 0.004, 0.006, 0.008, 0.01, 0.012, 0.014, 0.016])
+        # ax2.set_ylabel('c_m', color='red')
 
-        filename = "images/testing/plot" + str(titleCounter) + ".png"
-        plt.savefig(filename)
-        plt.close()  # Close the figure to clear it for the next run
+        # filename = "images/testing/plot" + str(titleCounter) + ".png"
+        # plt.savefig(filename)
+        # plt.close()  # Close the figure to clear it for the next run
 
 
 
@@ -186,8 +188,8 @@ while field.t < t_end:
         plt.title('U and C profiles')
 
         plt.plot(field.x[0], field.u[0], color='blue', label='Left Y-axis')
-        plt.xlabel('field.x')
-        plt.ylabel('field.u', color='blue')
+        plt.xlabel('field.x (m)')
+        plt.ylabel('field.u (m/s)', color='blue')
         plt.tick_params(axis='y', colors='blue')
 
         ax2 = plt.twinx()
@@ -247,13 +249,13 @@ while field.t < t_end:
         plot2 = field.z_b - field_0.z_b
 
         plt.plot(field.x[0], plot1[0], color='blue', label='Left Y-axis')
-        plt.xlabel('field.x')
-        # plt.ylabel('field.u', color='blue')
+        plt.xlabel('field.x (m)')
+        plt.ylabel('time (s)', color='blue')
         plt.tick_params(axis='y', colors='blue')
 
         ax2 = plt.twinx()
         ax2.plot(field.x[0], plot2[0], color='red', label='Right Y-axis')
-        ax2.set_ylabel('', color='red')
+        ax2.set_ylabel('time (s)', color='red')
         ax2.tick_params(axis='y', colors='red')
 
 
