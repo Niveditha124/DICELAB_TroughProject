@@ -227,9 +227,6 @@ while field.t < t_end:
         print('t: ', str(math.floor(field.t/3600)))
         print('Fr: ', Fr)
 
-        if ((math.floor(field.t/3600)) == 100):
-            break
-
         ax2.plot(field.x[0], Fr[0], color='red', label='Right Y-axis')
         ax2.set_ylabel('Fr', color='red')
         ax2.tick_params(axis='y', colors='red')
