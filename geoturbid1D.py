@@ -148,7 +148,7 @@ while field.t < t_end:
         plt.plot(x3, y3, color='b')
         plt.grid(color='gray', linestyle='--', linewidth=0.5)
         plt.xlabel('field.x (m)')
-        plt.ylabel('')
+        plt.ylabel('(m)')
         title = 'flow profile, t = ' + str(math.floor(field.t/3600))
         plt.title(title)
 
@@ -222,6 +222,9 @@ while field.t < t_end:
         Fr = np.sqrt(1.0 / np.maximum(Ri, 1e-10))
         
 
+        print('t: ', str(math.floor(field.t/3600)))
+        print('Fr: ', Fr)
+
         ax2.plot(field.x[0], Fr[0], color='red', label='Right Y-axis')
         ax2.set_ylabel('Fr', color='red')
         ax2.tick_params(axis='y', colors='red')
@@ -247,12 +250,12 @@ while field.t < t_end:
 
         plt.plot(field.x[0], plot1[0], color='blue', label='Left Y-axis')
         plt.xlabel('field.x (m)')
-        plt.ylabel('time (s)', color='blue')
+        plt.ylabel('', color='blue')
         plt.tick_params(axis='y', colors='blue')
 
         ax2 = plt.twinx()
         ax2.plot(field.x[0], plot2[0], color='red', label='Right Y-axis')
-        ax2.set_ylabel('time (s)', color='red')
+        ax2.set_ylabel('', color='red')
         ax2.tick_params(axis='y', colors='red')
 
 
@@ -368,6 +371,8 @@ while field.t < t_end:
     
     # 206516
     if iter == 206516:
+        break
+    if titleCounter == 102:
         break
 
     
