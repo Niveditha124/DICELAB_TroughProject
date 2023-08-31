@@ -220,10 +220,6 @@ while field.t < t_end:
         Ri = par.R * par.g * field.c_m * h / np.maximum(field.u**2, (par.g * par.h_min))
         # Froude Number?
         Fr = np.sqrt(1.0 / np.maximum(Ri, 1e-10))
-        
-
-        print('t: ', str(math.floor(field.t/3600)))
-        print('Fr: ', Fr)
 
         ax2.plot(field.x[0], Fr[0], color='red', label='Right Y-axis')
         ax2.set_ylabel('Fr', color='red')
