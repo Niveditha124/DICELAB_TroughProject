@@ -32,19 +32,8 @@ def entrainment(field, par, dt):
             if i < 0:
                 print('negative Ri')
 
-
-    # solve for h_new (iterative newton scheme, loop 10 times)
-    # start with explicit estimate
-    # WHY IS THIS HARDCODED
     h_new = h + dt * (0.00153/(0.0204 + Ri)) * vel
-    # print('h:')
-    # print(h)
-    # print('dt:')
-    # print(dt)
-    # print('Ri:')
-    # print(Ri)
-    # print('vel:')
-    # print(vel)
+
 
     C1 = 0.00153 * MOM ** 3
     C2 = 0.0204 * MOM ** 2
@@ -78,4 +67,3 @@ def entrainment(field, par, dt):
     newfield.c_m = c_new
     newfield.k_m = k_new
     return newfield
-
