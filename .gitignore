@@ -10,3 +10,4 @@ hyperbolicOutput.txt
 *.png
 deepCopier.py
 *.txt
+*.gif
