@@ -7,7 +7,7 @@
 # Prepared by Benoit Spinewine (spinewine@gmail.com)
 
 # field.x might be position, and not distance
-
+# hello this is a test
 # initialisation:
 import math
 import numpy as np
