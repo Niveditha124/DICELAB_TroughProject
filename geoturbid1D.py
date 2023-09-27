@@ -7,7 +7,7 @@
 # Prepared by Benoit Spinewine (spinewine@gmail.com)
 
 # field.x might be position, and not distance
-# hello this is a test
+
 # initialisation:
 import math
 import numpy as np
@@ -59,15 +59,15 @@ i_output = 1
 
 os.system('cls')
 
-file_path = "hyperbolicOutput.txt"
-if os.path.exists(file_path):
-    os.remove(file_path)
+file_path = "hyperbolicOutput.txt"  # Identifies the file path for the Hyperbolic output 
+if os.path.exists(file_path):       # Finds the file and if it exists then removes the file and print to console that file has deleted, otherwise file DNE
+    os.remove(file_path)        
     print("File deleted successfully.")
 else:
     print("File does not exist.")
 
-file_path = "fluxLHLLOutput.txt"
-if os.path.exists(file_path):
+file_path = "fluxLHLLOutput.txt"    # Identifies the file path for the flux LHLL output 
+if os.path.exists(file_path):       # Removes file if exists
     os.remove(file_path)
     print("File deleted successfully.")
 else:
@@ -83,15 +83,15 @@ iter = 1
 flux_x = None
 
 
-while field.t < t_end:
+while field.t < t_end:          # Loops from begginning of field to end (usually 0-101)
 
-    print("\n\n", 'Iteration ', iter, ': ')
+    print("\n\n", 'Iteration ', iter, ': ')             # Prints which iteration of the loop it is
     iterStr = "Iteration " + str(iter) + ": \n\n"
-    f = open("hyperbolicOutput.txt", "a")
+    f = open("hyperbolicOutput.txt", "a")               # Opens the Hpyerbolic output txt file and writes the iteration to the file then closes it
     f.write(iterStr)
     f.close()
 
-    f = open("fluxLHLLOutput.txt", "a")
+    f = open("fluxLHLLOutput.txt", "a") # Opens the flux output txt file and writes the iteration to the file then closes it
     f.write(iterStr)
     f.close()
 
