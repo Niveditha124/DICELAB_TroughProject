@@ -86,7 +86,7 @@ flux_x = None
 while field.t < t_end:          # Loops from begginning of field to end (usually 0-101)
 
     print("\n\n", 'Iteration ', iter, ': ')             # Prints which iteration of the loop it is
-    iterStr = "Iteration " + str(iter) + ": \n\n"
+    iterStr = "Iteration " + str(iter) + ": \n\n"       
     f = open("hyperbolicOutput.txt", "a")               # Opens the Hpyerbolic output txt file and writes the iteration to the file then closes it
     f.write(iterStr)
     f.close()
@@ -98,9 +98,9 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
     
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
 
-        dt = timestep(field, par)
+        dt = timestep(field, par)           # timestep evaluation
         if firstTimeStep:
-            dt = min(dt, 0.1)
+            dt = min(dt, 0.1)           
             firstTimeStep = 0
         # disp(['t = ' num2str(field.t) ' [sec]']); # time display
     # empty outflowing pit
@@ -180,7 +180,7 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
 
 
 
-
+        # U and C profiles plotting
         plt.title('U and C profiles')
 
         plt.plot(field.x[0], field.u[0], color='blue', label='Left Y-axis')
@@ -207,7 +207,7 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
 
 
 
-
+        # K and Fr profiles plotting data and making graph
         plt.title('K and Fr profiles')
 
         plt.plot(field.x[0], field.k_m[0], color='blue', label='Left Y-axis')
@@ -216,9 +216,13 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
         plt.tick_params(axis='y', colors='blue')
 
         ax2 = plt.twinx()
+        # ("h") This equation computes the depth of the fluid layer 
+        # calculates the depth of each layer ("h") by subtracting the bottom elevation ("z_b") from the midpoint elevation ("z_m").
         h = field.z_m - field.z_b
+        #The Richardson number (Ri) is a dimensionless number used to predict the likelihood of turbulence within the fluid flow of these turbidity currents.
+        #The ()"np.maximum") function is used to ensure that the denominator is never zero, which could lead to undefined behavior.
         Ri = par.R * par.g * field.c_m * h / np.maximum(field.u**2, (par.g * par.h_min))
-        # Froude Number?
+        # Froude Number, perdicts the transition from supercritical (Fr>1) to subcritical(Fr<1)
         Fr = np.sqrt(1.0 / np.maximum(Ri, 1e-10))
 
         ax2.plot(field.x[0], Fr[0], color='red', label='Right Y-axis')
@@ -234,7 +238,6 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
         filename = "images/python/kfrprofile/plot" + str(titleCounter) + ".png"
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
-        
         
 
         
@@ -292,7 +295,7 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
     # fluxing scheme (LHLL):
     # Original --> flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
 
-    # WORKS
+    # WORKS(flux of H2O across the Hydraulic jump in horizontal direction of the flow)
     flux_x = fluxLHLL(field_x, grad_x, par, dt)
 
 
@@ -370,8 +373,3 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
         break
     if titleCounter == 102:
         break
-
-    
-    
-
-
