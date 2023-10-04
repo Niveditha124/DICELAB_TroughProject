@@ -4,13 +4,9 @@ def friction(field, par, dt):
 
     # ix = (vel>(par.g*par.h_min)^0.5) .* (field.u./max(vel,(par.g*par.h_min)^0.5));
     vel = (( field.u ** 2 ) + (field.v ** 2)) ** 0.5
-    # rs = max(vel,(par.g*par.h_min)^0.5)
     rs = np.maximum(vel, (par.g * par.h_min) ** 0.5)
-    # rs = (field.u./max(vel,(par.g*par.h_min)^0.5)) OR (field.u ./ vel)
     rs = field.u / rs
-    # vel = (vel>(par.g*par.h_min)^0.5)
     ls = (vel > ((par.g * par.h_min) ** 0.5)).astype(int)
-    # ix = ls .* rs
     ix = ls * rs
     ix = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.u / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
     iy = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.v / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))

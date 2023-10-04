@@ -7,7 +7,6 @@ def deep_copy(field: init1D.field, newfield: init1D.field):
     
     newfield = init1D.field(n, par)
     
-    
     newfield.x = copy.deepcopy(field.x)
     newfield.y = copy.deepcopy(field.y)
     newfield.z_m = copy.deepcopy(field.z_m)
@@ -37,12 +36,5 @@ def deep_copy(field: init1D.field, newfield: init1D.field):
     newfield.t = copy.deepcopy(field.t)
     
     return newfield
-    
-    
-    '''
-    Integers:
-    
-    '''
-    
-    
-    
+
+ 
