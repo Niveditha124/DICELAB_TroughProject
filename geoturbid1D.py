@@ -9,11 +9,10 @@
 # field.x might be position, and not distance
 
 # initialisation:
-import math
 import numpy as np
-import os
 from createFluxY import createFluxY
 from deepCopier import deep_copy
+import plotGenerator
 
 import init1D
 from initMonterrey import initMonterrey
@@ -25,11 +24,9 @@ from gradientVL import gradientVL
 from hyperbolic import hyperbolic
 from mirror import mirror
 from relax import relax
-from fieldIO import stringify_field, parse_field
-from tag2str import tag2str
+from fieldIO import stringify_field, parse_field # parse_field implement later to parse in field text files
 from timestep import timestep
 
-import matplotlib.pyplot as plt
 
 titleCounter = 0
 
@@ -61,8 +58,9 @@ firstTimeStep = 1
 iter = 1
 flux_x = None
 
-
 while field.t < t_end:          # Loops from begginning of field to end (usually 0-101)
+
+    print(f'Iteration: {iter}')
 
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
 
@@ -80,8 +78,6 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
     field.c_m[field.z_r == - 1000] = 0
     field.k_m[field.z_r == - 1000] = 0
     
-
-
     # screen display:
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         if dispflag == 1:
@@ -96,119 +92,27 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
         # eval('save field_', tag2str(i_output - 1), np.array['field field_0 field_prev dt'])
         # fieldplot_2(field, field_0, field_prev, par, dt)
     
+        # ---------------------------------------     Plots/Graphs and data file generation       --------------------------------------- #
         # Generate data for the plot - Data Trimming for graphs
+        # For graph generation. I just don't want to outsource it as I am not sure if its pass by reference or by value
         field.x[field.z_b == 1000] = np.nan
         field.x[field.z_b == -1000] = np.nan
 
-        x1 = field.x[0]
-        y1 = field_0.z_b[0]
-        x2 = field.x[0]
-        y2 = field.z_b[0]
-        x3 = field.x[0]
-        y3 = field.z_m[0]
-
-        # Create the plot
-        # -------------------------------------------------     FLOW PROFILE GRAPH       ------------------------------------------------- #
-        plt.plot(x1, y1, color=(0.7, 0.7, 0.7))
-        plt.plot(x2, y2, color='r')
-        plt.plot(x3, y3, color='b')
-        plt.grid(color='gray', linestyle='--', linewidth=0.5)
-        plt.xlabel('field.x (m)')
-        plt.ylabel('(m)')
-        title = 'flow profile, t = ' + str(math.floor(field.t/3600))
-        plt.title(title)
-        # Save the plot as a PNG image
-        filename = "images/python/flowprofile/plot" + str(titleCounter) + ".png"
-        plt.savefig(filename)
-        plt.close()  # Close the figure to clear it for the next run
-
-        # -------------------------------------------------     U and C PROFILES GRAPH       ------------------------------------------------- #
-
-
-        # fig, ax1 = plt.subplots()
-
-        # # Plot the first dataset on the left y-axis
-        # ax1.plot(field.x[0], field.u[0], color='blue')
-        # ax1.set_yticks([0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4])
-        # ax1.set_xlabel('x')
-        # ax1.set_ylabel('u', color='blue')
-
-        # # Create a secondary y-axis
-        # ax2 = ax1.twinx()
-
-        # # Plot the second dataset on the right y-axis
-        # ax2.plot(field.x[0], field.c_m[0], color='red')
-        # # ax2.set_yticks([0, 0.002, 0.004, 0.006, 0.008, 0.01, 0.012, 0.014, 0.016])
-        # ax2.set_ylabel('c_m', color='red')
-
-        # filename = "images/testing/plot" + str(titleCounter) + ".png"
-        # plt.savefig(filename)
-        # plt.close()  # Close the figure to clear it for the next run
-
-
-
-        # U and C profiles plotting
-        plt.title('U and C profiles')
-        plt.plot(field.x[0], field.u[0], color='blue', label='Left Y-axis')
-        plt.xlabel('field.x (m)')
-        plt.ylabel('field.u (m/s)', color='blue')
-        plt.tick_params(axis='y', colors='blue')
-        ax2 = plt.twinx()
-        ax2.plot(field.x[0], field.c_m[0], color='red', label='Right Y-axis')
-        ax2.set_ylabel('field.c_m', color='red')
-        ax2.tick_params(axis='y', colors='red')
-        filename = "images/python/ucprofile/plot" + str(titleCounter) + ".png"
-        plt.savefig(filename)
-        plt.close()  # Close the figure to clear it for the next run
-
-        
-        # -------------------------------------------------     K and Fr PROFILES GRAPH       ------------------------------------------------- #
-
-        # K and Fr profiles plotting data and making graph
-        plt.title('K and Fr profiles')
-        plt.plot(field.x[0], field.k_m[0], color='blue', label='Left Y-axis')
-        plt.xlabel('field.x (m)')
-        plt.ylabel('K (J/Kg)', color='blue')
-        plt.tick_params(axis='y', colors='blue')
-        ax2 = plt.twinx()
-        # ("h") This equation computes the depth of the fluid layer 
-        # calculates the depth of each layer ("h") by subtracting the bottom elevation ("z_b") from the midpoint elevation ("z_m").
-        h = field.z_m - field.z_b
-        #The Richardson number (Ri) is a dimensionless number used to predict the likelihood of turbulence within the fluid flow of these turbidity currents.
-        #The ()"np.maximum") function is used to ensure that the denominator is never zero, which could lead to undefined behavior.
-        Ri = par.R * par.g * field.c_m * h / np.maximum(field.u**2, (par.g * par.h_min))
-        # Froude Number, perdicts the transition from supercritical (Fr>1) to subcritical(Fr<1)
-        Fr = np.sqrt(1.0 / np.maximum(Ri, 1e-10))
-        ax2.plot(field.x[0], Fr[0], color='red', label='Right Y-axis')
-        ax2.set_ylabel('Fr', color='red')
-        ax2.tick_params(axis='y', colors='red')
-        filename = "images/python/kfrprofile/plot" + str(titleCounter) + ".png"
-        plt.savefig(filename)
-        plt.close()  # Close the figure to clear it for the next run
-        
-        # -------------------------------------------------     INSTANT AND CUMUL BED CHANGES GRAPH       ------------------------------------------------- #
-        plt.title('Instant and cumul. bed changes')
-        plot1 = (field.z_b - field_prev.z_b) / dt
-        plot2 = field.z_b - field_0.z_b
-        plt.plot(field.x[0], plot1[0], color='blue', label='Left Y-axis')
-        plt.xlabel('field.x (m)')
-        plt.ylabel('', color='blue')
-        plt.tick_params(axis='y', colors='blue')
-        ax2 = plt.twinx()
-        ax2.plot(field.x[0], plot2[0], color='red', label='Right Y-axis')
-        ax2.set_ylabel('', color='red')
-        ax2.tick_params(axis='y', colors='red')
-        filename = "images/python/iacbchanges/plot" + str(titleCounter) + ".png"
-        plt.savefig(filename)
-        plt.close()  # Close the figure to clear it for the next run
+        plotGenerator.generate_flowprofile(field, field_0, titleCounter)
+        plotGenerator.generate_ucprofile(field, titleCounter)
+        plotGenerator.generate_kfrprofile(field, par, titleCounter)
         # Writing field data to file
         filename = 'data/field' + str(titleCounter) + '.txt'
+        plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, titleCounter)
+
+        # Output to data files
         stringify_field(filename, field)
 
         # Incrementing title counter
         titleCounter = titleCounter + 1
         i_output = i_output + 1
     
+
     # book-keeping
     field_prev = deep_copy(field, field_prev)
     # half-step relaxation operator:
@@ -262,12 +166,12 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
                 # time update:
                 field.t = field.t + dt
     
-    
     iter = iter + 1
     
-
     # 206516
     if iter == 206516:
         break
     if titleCounter == 102:
         break
+
+
