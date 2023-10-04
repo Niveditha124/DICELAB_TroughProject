@@ -62,15 +62,13 @@ iter = 1
 flux_x = None
 
 
-while field.t < t_end:
-
-    print("\n\n", 'Iteration ', iter, ': ')
+while field.t < t_end:          # Loops from begginning of field to end (usually 0-101)
 
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
 
-        dt = timestep(field, par)
+        dt = timestep(field, par)           # timestep evaluation
         if firstTimeStep:
-            dt = min(dt, 0.1)
+            dt = min(dt, 0.1)           
             firstTimeStep = 0
         # disp(['t = ' num2str(field.t) ' [sec]']); # time display
     # empty outflowing pit
@@ -126,6 +124,30 @@ while field.t < t_end:
 
         # -------------------------------------------------     U and C PROFILES GRAPH       ------------------------------------------------- #
 
+
+        # fig, ax1 = plt.subplots()
+
+        # # Plot the first dataset on the left y-axis
+        # ax1.plot(field.x[0], field.u[0], color='blue')
+        # ax1.set_yticks([0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4])
+        # ax1.set_xlabel('x')
+        # ax1.set_ylabel('u', color='blue')
+
+        # # Create a secondary y-axis
+        # ax2 = ax1.twinx()
+
+        # # Plot the second dataset on the right y-axis
+        # ax2.plot(field.x[0], field.c_m[0], color='red')
+        # # ax2.set_yticks([0, 0.002, 0.004, 0.006, 0.008, 0.01, 0.012, 0.014, 0.016])
+        # ax2.set_ylabel('c_m', color='red')
+
+        # filename = "images/testing/plot" + str(titleCounter) + ".png"
+        # plt.savefig(filename)
+        # plt.close()  # Close the figure to clear it for the next run
+
+
+
+        # U and C profiles plotting
         plt.title('U and C profiles')
         plt.plot(field.x[0], field.u[0], color='blue', label='Left Y-axis')
         plt.xlabel('field.x (m)')
@@ -139,17 +161,23 @@ while field.t < t_end:
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
 
+        
         # -------------------------------------------------     K and Fr PROFILES GRAPH       ------------------------------------------------- #
 
+        # K and Fr profiles plotting data and making graph
         plt.title('K and Fr profiles')
         plt.plot(field.x[0], field.k_m[0], color='blue', label='Left Y-axis')
         plt.xlabel('field.x (m)')
         plt.ylabel('K (J/Kg)', color='blue')
         plt.tick_params(axis='y', colors='blue')
         ax2 = plt.twinx()
+        # ("h") This equation computes the depth of the fluid layer 
+        # calculates the depth of each layer ("h") by subtracting the bottom elevation ("z_b") from the midpoint elevation ("z_m").
         h = field.z_m - field.z_b
+        #The Richardson number (Ri) is a dimensionless number used to predict the likelihood of turbulence within the fluid flow of these turbidity currents.
+        #The ()"np.maximum") function is used to ensure that the denominator is never zero, which could lead to undefined behavior.
         Ri = par.R * par.g * field.c_m * h / np.maximum(field.u**2, (par.g * par.h_min))
-        # Froude Number?
+        # Froude Number, perdicts the transition from supercritical (Fr>1) to subcritical(Fr<1)
         Fr = np.sqrt(1.0 / np.maximum(Ri, 1e-10))
         ax2.plot(field.x[0], Fr[0], color='red', label='Right Y-axis')
         ax2.set_ylabel('Fr', color='red')
@@ -159,7 +187,6 @@ while field.t < t_end:
         plt.close()  # Close the figure to clear it for the next run
         
         # -------------------------------------------------     INSTANT AND CUMUL BED CHANGES GRAPH       ------------------------------------------------- #
-        
         plt.title('Instant and cumul. bed changes')
         plot1 = (field.z_b - field_prev.z_b) / dt
         plot2 = field.z_b - field_0.z_b
@@ -197,7 +224,10 @@ while field.t < t_end:
         grad_x = gradientVL(field_x, par, o)
         #        grad_y = gradientVL(field_y,par,o);
     # fluxing scheme (LHLL):
-    # WORKS
+
+    # Original --> flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
+
+    # WORKS(flux of H2O across the Hydraulic jump in horizontal direction of the flow)
     flux_x = fluxLHLL(field_x, grad_x, par, dt)
 
 
@@ -235,10 +265,9 @@ while field.t < t_end:
     
     iter = iter + 1
     
-    # # 206516
-    # if iter == 206516:
-    #     break
-    # if titleCounter == 102:
-    #     break
 
-    
+    # 206516
+    if iter == 206516:
+        break
+    if titleCounter == 102:
+        break
