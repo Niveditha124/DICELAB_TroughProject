@@ -3,11 +3,11 @@
 # Shallow-Water code for turbidity currents
 # based on Parker et al 4-eq model
 # two-dimensional, single turbid layer, second-order version
-#
+
 # Prepared by Benoit Spinewine (spinewine@gmail.com)
 
 # field.x might be position, and not distance
-# this is a test for sufyan
+
 # initialisation:
 import numpy as np
 from createFluxY import createFluxY
@@ -36,6 +36,7 @@ dt_output = 3600
 n = 200
 o = 1
 geostaticflag = 0
+# material and numerical parameters
 par = initpar
 # field = init1D.field(n, par) # input file
 field = initMonterrey(n, par)
@@ -131,7 +132,7 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
 
     # Original --> flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
 
-    # WORKS(flux of H2O across the Hydraulic jump in horizontal direction of the flow)
+    # (magnitude of sediment flux across the Hydraulic jump in the horizontal direction of the flow)
     flux_x = fluxLHLL(field_x, grad_x, par, dt)
 
 
@@ -141,12 +142,14 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
 
     # Original flux_y line of code    
     flux_y = createFluxY(field)
-
+    
+    #hyperbolic operator:
     if o == 1:
         # 1st order forward Euler:
         field = hyperbolic(field, flux_x, flux_y, par, dt)
         # relaxation operator:
         field = relax(field, par, dt, geostaticflag)
+        # time update
         field.t = field.t + dt
 
     else:
