@@ -5,30 +5,62 @@ import numpy as np
 import sys
 
 def geomorphic(field, par, dt):
-    # obtain norm and direction vectors
+    # (vel) calculates the norm of the velcocity vector at each point in the flow field, where (u) and (v) are the horizontal and vertical components
     vel = (field.u ** 2 + field.v ** 2) ** 0.5
+    # direction vectors (ix) and (iy), repersent the horizontal and vertical components of the flow velocity 
     ix = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.u / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
     iy = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.v / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
+    # (h) calculates the fluid layer depth 
     h = field.z_m - field.z_b
 
-    
-    # moving sediments
+    # (CH) calculates the amount of sediment being transported by the current 
     CH = h * field.c_m
-    # KH
+    # (KH) calculates the turbulent kinetic energy within the fluid layer
     KH = h * field.k_m
 
-    Ze5 = ((par.alpha*field.k_m) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * field.k_m) ** 0.5 / par.g / np.maximum(h, par.h_min)) ** 0.08) ** 5
+    
+    # temp = (par.alpha * field.k_m) ** 0.5
+    # Ze5 = temp / par.vs
+    # Ze5 = Ze5 * (par.Rp ** 0.6)
+    # temp2 = temp / par.g
+    # temp2 = temp2 / np.maximum(h, par.h_min)
+    # temp2 = temp2 ** 0.08
+    # Ze5 = Ze5 * temp2
+    # Ze5 = Ze5 ** 5
 
-    E = np.maximum((par.p * (1.3 * 10 ** -7)) * par.vs * Ze5 / (1 + (1.3 * 10 ** -7) / 0.3 * Ze5), 0)
-    D = np.maximum(par.vs * par.r0 * field.c_m, 0)
-    CH_new = np.maximum(CH + dt * (E - D), 0)
-    h_new = np.maximum(h + dt / par.c_b * (E - D), 0)
-    C_new = np.maximum(CH_new / np.maximum(h_new, par.h_min), 0)
-    KH_new = KH - dt * 0.5 * par.R * par.g * h_new * (E - D)
-    K_new = np.maximum(0, KH_new / np.maximum(h_new, par.h_min))
+    '''
+        inside = temp / par.g
+        print('inside: %f\n', inside)
+        inside = inside / max(h[0][0],par.h_min)
+        print('inside: %f\n', inside)
+        Ze5 = Ze5 * (inside ** 0.08)
+        print('Ze5: %f\n', Ze5)
+        Ze5 = Ze5 ** 5
+        print('Ze5: %f\n', Ze5)
+    '''
 
-    for i in range(10):
-        Ze5 = ((par.alpha*K_new) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * K_new) ** 0.5 / par.g / np.maximum(h_new, par.h_min)) ** 0.08) ** 5
+    '''
+    # solve for CH
+    # start with explicit estimate
+    denom = ((par.vs * par.Rp * 0.6 * (((par.alpha * field.k_m) ** 0.5) / (par.g / np.maximum(h, par.h_min)))) ** 0.08)
+    Ze5 = ((par.alpha * field.k_m) ** 0.5) / 1 # because we have to initialize the array to something that won't shit the bed, so we can reference it's index :)
+    
+    for each in denom:## checking where each 0 value is in the denominator, and where it is 0.0, using 1 as the denom instead so we don't have a division issue
+        for index, item in enumerate(each):
+            if item == 0.0: # if it was 0 before it remains the same
+                Ze5[0][index] = (par.alpha * field.k_m[0][index]) ** 0.5 / 1
+            else: # otherwise it changes to whatever the updated par and field values calculate out to
+                Ze5[0][index] = ((((par.alpha * field.k_m[0][index]) ** 0.5) / (par.vs * par.Rp * 0.6 * ((par.alpha * field.k_m[0][index]) ** 0.5) / (par.g / np.maximum(h, par.h_min)))) ** 0.08) ** 5
+    
+    # iterate 10 times with Newton Scheme
+    for x in range(10):
+        denom2 = (par.vs * par.Rp * 0.6 * ((par.alpha * K_new) ** 0.5) / (par.g / np.maximum(h_new, par.h_min)) ** 0.08) ** 5
+        for each in denom2:
+            for index, item in enumerate(each):
+                if item == 0.0:
+                    Ze5[0][index] = (par.alpha * K_new[0][index]) ** 0.5 / 1
+                else:
+                    Ze5[0][index] = ((((par.alpha * K_new[0][index]) ** 0.5) / (par.vs * par.Rp * 0.6 * ((par.alpha * K_new[0][index]) ** 0.5) / (par.g / np.maximum(h_new, par.h_min)))) ** 0.08) ** 5
         E = np.maximum((par.p * (1.3 * 10 ** -7)) * par.vs * Ze5 / (1 + (1.3 * 10 ** -7) / 0.3 * Ze5), 0)
         D = np.maximum(par.vs * par.r0 * C_new, 0)
         CH_new = np.maximum(CH + dt * (E - D), 0)
@@ -37,9 +69,79 @@ def geomorphic(field, par, dt):
         KH_new = KH - dt * 0.5 * par.R * par.g * h_new * (E - D)
         K_new = np.maximum(0, KH_new / np.maximum(h_new, par.h_min))
 
+    # ensure dissipation of K (should we do that? -- watf)
+    K_new = np.minimum(field.k_m, K_new)
+    
+    
+    
+    '''
+    Ze5 = ((par.alpha*field.k_m) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * field.k_m) ** 0.5 / par.g / np.maximum(h, par.h_min)) ** 0.08) ** 5
+
+    # print('Ze5: {:.10e}'.format(Ze5[0][0]))
+    E = np.maximum((par.p * (1.3 * 10 ** -7)) * par.vs * Ze5 / (1 + (1.3 * 10 ** -7) / 0.3 * Ze5), 0)
+    D = np.maximum(par.vs * par.r0 * field.c_m, 0)
+    CH_new = np.maximum(CH + dt * (E - D), 0)
+    h_new = np.maximum(h + dt / par.c_b * (E - D), 0)
+    C_new = np.maximum(CH_new / np.maximum(h_new, par.h_min), 0)
+    KH_new = KH - dt * 0.5 * par.R * par.g * h_new * (E - D)
+    K_new = np.maximum(0, KH_new / np.maximum(h_new, par.h_min))
+
+
+
+
+    
+    for i in range(10):
+        # Ze5 = ((par.alpha*K_new).^0.5/par.vs.*par.Rp^0.6.*((par.alpha*K_new).^0.5./par.g./max(h_new,par.h_min)).^0.08).^5;
+        Ze5 = ((par.alpha*K_new) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * K_new) ** 0.5 / par.g / np.maximum(h_new, par.h_min)) ** 0.08) ** 5
+        # E = max( par.p*1.3e-7*par.vs*Ze5./(1+1.3e-7/0.3*Ze5) , 0 );
+        E = np.maximum((par.p * (1.3 * 10 ** -7)) * par.vs * Ze5 / (1 + (1.3 * 10 ** -7) / 0.3 * Ze5), 0)
+        # D = max( par.vs*par.r0*C_new , 0 );
+        D = np.maximum(par.vs * par.r0 * C_new, 0)
+        # CH_new = max(CH + dt*(E-D) , 0);
+        CH_new = np.maximum(CH + dt * (E - D), 0)
+        # h_new = max (h + dt/par.c_b*(E-D) , 0);
+        h_new = np.maximum(h + dt / par.c_b * (E - D), 0)
+        # C_new = max(CH_new./max(h_new,par.h_min) , 0);
+        C_new = np.maximum(CH_new / np.maximum(h_new, par.h_min), 0)
+        # KH_new = KH - dt*0.5*par.R*par.g.*h_new.*(E-D);
+        KH_new = KH - dt * 0.5 * par.R * par.g * h_new * (E - D)
+        # K_new = max(0 , KH_new./max(h_new,par.h_min));
+        K_new = np.maximum(0, KH_new / np.maximum(h_new, par.h_min))
+
+    
+    # print('Values: ')
+    # print('CH: {:.16f}'.format(CH[0][0]))
+
+    # print('KH: {:.16f}'.format(KH[0][0]))
+
+    # print('par.alpha:', par.alpha)
+    # print('field.k_m:', field.k_m)
+    # print('par.vs:', par.vs)
+    # print('par.Rp:', par.Rp)
+    # print('par.g:', par.g)
+    # print('h:', h)
+    # print('par.h_min:', par.h_min)
+
+    # print('Ze5: {:.16f}'.format(Ze5[0][0]))
+
+    # print('E: {:.16f}'.format(E[0][0]))
+
+    # print('D: {:.16f}'.format(D[0][0]))
+
+    # print('CH_new: {:.16f}'.format(CH_new[0][0]))
+
+    # print('h_new: {:.16f}'.format(h_new[0][0]))
+
+    # print('C_new: {:.16f}'.format(C_new[0][0]))
+
+    # print('KH_new: {:.16f}'.format(KH_new[0][0]))
+
+    # print('K_new: {:.16f}'.format(K_new[0][0]))
+    
+
     # retrieve bed level change and impose limit. dzb is positive in case of deposition
-    dzb = np.minimum((dt * (D - E) / par.c_b), ((field.z_m - field.z_b) * field.c_m / par.c_b))
-    dzb = np.maximum(dzb, field.z_r - field.z_b)  # dzb is positive in case of deposition
+    dzb = np.minimum((dt * (D - E) / par.c_b), ((field.z_m - field.z_b) * field.c_m / par.c_b)) #limited by deposition of all suspended sediments
+    dzb = np.maximum(dzb, field.z_r - field.z_b) # limit by rigid bottom
 
     # retrieve all conservative variables from final bed level change
     h_new = h - dzb
@@ -56,10 +158,19 @@ def geomorphic(field, par, dt):
     # final update
     newfield = field
     newfield.z_b = field.z_b + dzb
-    newfield.c_m = np.minimum(np.maximum(CH_new / np.maximum(h_new, par.h_min), 0), 1)
+    newfield.c_m = np.minimum(np.maximum(CH_new / np.maximum(h_new, par.h_min), 0), 1) # do not change concentration where flow depth is about zero
+    if (np.any(np.isnan(h_new))):
+        print('h_new after has nans')
+        sys.exit()
     indices = np.where(h_new < par.h_min)
     newfield.c_m[indices] = field.c_m[indices]
+
     newfield.k_m = np.maximum(KH_new / np.maximum(h_new, par.h_min), 0)
 
+    # if h_new.all() < par.h_min:
+    #     newfield.c_m = field.c_m
+    # else:
+    #     newfield.c_m = np.minimum(np.maximum(CH_new / np.maximum(h_new, par.h_min), 0), 1)
+    # newfield.k_m = np.maximum(KH_new / np.maximum(h_new, par.h_min), 0)
     return newfield
     
