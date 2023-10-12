@@ -16,7 +16,7 @@ def friction(field, par, dt):
     # direction vectors (ix) and (iy), repersent the horizontal and vertical components of the flow velocity
     ix = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.u / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
     iy = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.v / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
-    # (h) calculates the fluid layer depth 
+    # (h) calculates current flow depth/thickness 
     # assumes that (h) is invariant
     h = field.z_m - field.z_b
     # solve for U and K 

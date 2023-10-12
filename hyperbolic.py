@@ -7,21 +7,25 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     dy = dx
 
     # correct line
+    # (ls) and (rs) calculate left and right slopes
     ls = flux_x.q_m[:, 0:n] - flux_x.q_m[:, 1:n+1]
     rs = flux_y.q_m[0:m, :] - flux_y.q_m[1:m+1, :]
+    # (z_m_new) updates the fluid elevation of the current
     z_m_new = field.z_m + ((dt / dx) * ls) + ((dt / dy) * rs)
-    
+   
     z_m_new = field.z_m + (dt/dx) * (flux_x.q_m[:, :n] - flux_x.q_m[:, 1:n+1]) + (dt/dy) * (flux_y.q_m[:m, :] - flux_y.q_m[1:m+1, :])
     
     #+ (dt/dy) * (flux_y.q_m[0:m, :] - flux_y.q_m[1:m+1, :])
     
-    
+    # (qm_x) calculates mass flux in the x-direction, which repersents the amount of sediment-laden water moving horizontally along the slope
     qm_x = np.multiply((field.z_m - field.z_b), field.u)
 
+    # (qm_x_new) updates mass flux in the x-direction integrating changes in the paramters of surface elevation, cross-flux, and bed slope
     qm_x_new = qm_x + (dt/dx) * (flux_x.sig_r[:, :n] - flux_x.sig_l[:, 1:n+1]) \
                 + (dt/dy) * (flux_y.sigCross[:m, :] - flux_y.sigCross[1:m+1, :]) \
                 + (dt/dx) * par.R * par.g * (field.c_m * (field.z_m - field.z_b)) * (flux_x.z_br[:, :n] - flux_x.z_bl[:, 1:n+1])
 
+    # ( qm_y) calculates mass flux in the y-direction, which represents the amount of sediment-laden water moving vertically along the slope
     qm_y = np.multiply((field.z_m - field.z_b), field.v)
 
     two = np.multiply((dt / dx), (flux_x.sigCross[:, np.arange(0, n)]))
@@ -34,16 +38,20 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     eight = np.multiply(seven, flux_y.z_br[np.arange(0, m), :])
     nine = flux_y.z_bl[np.arange(1, m+1), :]
 
+    # (qm_y_new) updates mass flux in the y-direction integrating changes in the paramters of surface elevation, cross-flux, and bed slope
     qm_y_new = qm_y + (dt / dx) * (flux_x.sigCross[:, 0:n] - flux_x.sigCross[:, 1:n+1]) \
             + (dt / dy) * (flux_y.sig_r[0:m, :] - flux_y.sig_l[1:m+1, :]) \
             + (dt / dy) * par.R * par.g * (field.c_m * (field.z_m - field.z_b)) * (flux_y.z_br[0:m, :] - flux_y.z_bl[1:m+1, :])
 
+    # (nu) calculates sediment mass per unit volume
     nu = np.multiply((field.z_m - field.z_b), field.c_m)
+    # (nu_new) updates sediment mass per unit volume based on changes in sediment flux  
     nu_new = nu + (dt/dx) * (flux_x.mu[:, :n] - flux_x.mu[:, 1:n+1]) \
             + (dt/dy) * (flux_y.mu[:m, :] - flux_y.mu[1:m+1, :])
     
-
+    # (kh) calculates turbulent kinetic energy per unit volume, which repersents the energy corresponding to turbulent motion within the current
     kh = np.multiply((field.z_m - field.z_b), field.k_m)
+    # (kh_new) updates turbulent kinetic energy per unit volume based on changes in turbulent kinetic energy flux
     kh_new = kh + (dt/dx) * (flux_x.kh[:, :n] - flux_x.kh[:, 1:n+1]) \
             + (dt/dy) * (flux_y.kh[:m, :] - flux_y.kh[1:m+1, :])
     
