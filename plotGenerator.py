@@ -50,7 +50,6 @@ def generate_iacbchanges(field, field_prev, field_0, dt, titleCounter):
     filename = 'data/field' + str(titleCounter) + '.txt'
 
 
-
 def generate_kfrprofile(field, par, titleCounter):
     '''Function generates the K and Fr profiles graph to predetermined directory. Change directory in this method directly'''
 

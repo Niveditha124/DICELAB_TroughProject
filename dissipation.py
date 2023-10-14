@@ -18,6 +18,7 @@ def dissipation (field, par, dt):
     # turbulennt energy is lost and dissipated due to it's energy being consumed in increasing the potential energy of the sediment being entrained
     Beta = (0.5 * ew * (1 - Ri - 2 * par.CfStar / par.alpha) + par.CfStar) / ((par.CfStar/par.alpha) ** 1.5)
     
+    
     # solves for update of turbulent kientic energy (K), (assumes h is invariant)
     # start with explicit solution
     C1 = Beta / np.maximum(h, par.h_min)

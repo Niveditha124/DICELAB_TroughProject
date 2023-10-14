@@ -13,8 +13,7 @@ def entrainment(field, par, dt):
 
     # (h) calculates current flow depth/thickness
     h = field.z_m - field.z_b
-
-
+    
     # conserved momentum, represents the quantity of motion in the flow
     MOM = h * vel # total momentum 
     momx = h * field.u # horizontal momentum component
