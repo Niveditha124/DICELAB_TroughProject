@@ -15,7 +15,7 @@ def geomorphic(field, par, dt):
 
     # (CH) calculates the amount of sediment being transported by the current 
     CH = h * field.c_m
-    # (KH) calculates the turbulent kinetic energy within the fluid layer
+    # (KH) calculates the turbulent kinetic energy within the current
     KH = h * field.k_m
 
     
