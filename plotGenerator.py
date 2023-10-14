@@ -60,13 +60,13 @@ def generate_kfrprofile(field, par, titleCounter):
     plt.ylabel('K (J/Kg)', color='blue')
     plt.tick_params(axis='y', colors='blue')
     ax2 = plt.twinx()
-    # ("h") This equation computes the depth of the fluid layer 
-    # calculates the depth of each layer ("h") by subtracting the bottom elevation ("z_b") from the midpoint elevation ("z_m").
+    # (h) calculates current flow depth/thickness
+    # calculates the depth of each layer (h) by subtracting the bottom elevation (z_b) from the midpoint elevation (z_m)
     h = field.z_m - field.z_b
-    #The Richardson number (Ri) is a dimensionless number used to predict the likelihood of turbulence within the fluid flow of these turbidity currents.
-    #The ()"np.maximum") function is used to ensure that the denominator is never zero, which could lead to undefined behavior.
+    # the Richardson number (Ri) is a dimensionless number used to predict the likelihood of turbulence within the fluid flow of these turbidity currents
+    # the np.maximum() function ensures Richardson number is non-negative, and negates the possibilty of undefined behavior
     Ri = par.R * par.g * field.c_m * h / np.maximum(field.u**2, (par.g * par.h_min))
-    # Froude Number, perdicts the transition from supercritical (Fr>1) to subcritical(Fr<1)
+    # Froude Number, perdicts the transition from supercritical flow (Fr>1) to subcritical folw (Fr<1)
     Fr = np.sqrt(1.0 / np.maximum(Ri, 1e-10))
     ax2.plot(field.x[0], Fr[0], color='red', label='Right Y-axis')
     ax2.set_ylabel('Fr', color='red')

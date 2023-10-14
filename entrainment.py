@@ -23,11 +23,11 @@ def entrainment(field, par, dt):
     # (SS) conserved suspended sediments, total amount of suspended sediments within the flow as the current moves downhill
     SS = h * field.c_m
 
-    # (Ri) calculates explicit Richardson number, a dimensionless parameter used to predict turbulence within the flow
+    # (Ri) calculates the explicit Richardson number, a dimensionless parameter used to predict turbulence within the flow
     Ri = par.R * par.g * field.c_m * h / np.maximum(vel**2, (par.g*par.h_min))
     Ri = par.R * par.g * field.c_m * h / np.maximum(vel**2, par.g * par.h_min)
     # VEL is fine, so it must be c_m
-    # ensures Richardson number is non-negative
+    # the np.maximum() function ensures Richardson number is non-negative, and negates the possibilty of undefined behavior
     Ri = np.maximum(Ri, 0)
     # acc derp af way of finding this
     for x in Ri:
