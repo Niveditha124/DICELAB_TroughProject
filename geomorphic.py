@@ -5,26 +5,19 @@ import numpy as np
 import sys
 
 def geomorphic(field, par, dt):
-    # obtain norm and direction vectors
+    # (vel) calculates the norm of the velcocity vector at each point in the flow field, where (u) and (v) are the horizontal and vertical components
     vel = (field.u ** 2 + field.v ** 2) ** 0.5
+    # direction vectors (ix) and (iy), repersent the horizontal and vertical components of the flow velocity 
     ix = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.u / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
     iy = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.v / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
+    # (h) calculates current flow depth/thickness
     h = field.z_m - field.z_b
 
-    
-    # moving sediments
+    # (CH) calculates the amount of sediment being transported by the current 
     CH = h * field.c_m
-    # KH
+    # (KH) calculates the turbulent kinetic energy within the current
     KH = h * field.k_m
-    '''
-    print('\n')
-    print('par.alpha:', par.alpha)
-    print('field.k_m:', field.k_m[0][0])
-    print('par.vs:', par.vs)
-    print('par.Rp:', par.Rp)
-    print('par.g:', par.g)
-    print('h: {:.6e}'.format(h[0][0]))
-    '''
+
     
     # temp = (par.alpha * field.k_m) ** 0.5
     # Ze5 = temp / par.vs
@@ -96,7 +89,7 @@ def geomorphic(field, par, dt):
 
 
 
-
+    
     for i in range(10):
         # Ze5 = ((par.alpha*K_new).^0.5/par.vs.*par.Rp^0.6.*((par.alpha*K_new).^0.5./par.g./max(h_new,par.h_min)).^0.08).^5;
         Ze5 = ((par.alpha*K_new) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * K_new) ** 0.5 / par.g / np.maximum(h_new, par.h_min)) ** 0.08) ** 5
@@ -147,8 +140,8 @@ def geomorphic(field, par, dt):
     
 
     # retrieve bed level change and impose limit. dzb is positive in case of deposition
-    dzb = np.minimum((dt * (D - E) / par.c_b), ((field.z_m - field.z_b) * field.c_m / par.c_b))
-    dzb = np.maximum(dzb, field.z_r - field.z_b)  # dzb is positive in case of deposition
+    dzb = np.minimum((dt * (D - E) / par.c_b), ((field.z_m - field.z_b) * field.c_m / par.c_b)) #limited by deposition of all suspended sediments
+    dzb = np.maximum(dzb, field.z_r - field.z_b) # limit by rigid bottom
 
     # retrieve all conservative variables from final bed level change
     h_new = h - dzb
@@ -165,7 +158,7 @@ def geomorphic(field, par, dt):
     # final update
     newfield = field
     newfield.z_b = field.z_b + dzb
-    newfield.c_m = np.minimum(np.maximum(CH_new / np.maximum(h_new, par.h_min), 0), 1)
+    newfield.c_m = np.minimum(np.maximum(CH_new / np.maximum(h_new, par.h_min), 0), 1) # do not change concentration where flow depth is about zero
     if (np.any(np.isnan(h_new))):
         print('h_new after has nans')
         sys.exit()

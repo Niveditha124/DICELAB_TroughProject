@@ -30,15 +30,6 @@ def gradientVL(field=None, par=None, o=0):
         grad.dqx_m = np.zeros(field.x.shape)
         grad.dqy_m = np.zeros(field.x.shape)
 
-        '''
-        dh_m = grad.dh_m
-        dmu = grad.dmu
-        dkh = grad.dkh
-        dz_b = grad.dz_b
-        dqx_m = grad.dqx_m
-        dqy_m = grad.dqy_m
-        '''
-
     else:
         m, n = field.x.shape
         # obtain gradient variables:
@@ -49,17 +40,11 @@ def gradientVL(field=None, par=None, o=0):
         mu = np.multiply(h_m, field.c_m)
         kh = np.multiply(h_m, field.k_m)
         # extend variables left and right:
-        # h_me = np.array([h_m[:, 0], h_m, h_m[:, n]])
         h_me = weedmark_ext(h_m)
-        # mu_e = np.array([mu[:, 1], mu, mu[:, n]])
         mu_e = weedmark_ext(mu)
-        # kh_e = np.array([kh[:, 1], kh, kh[:, n]])
         kh_e = weedmark_ext(kh)
-        # z_be = np.array([z_b[:, 1], z_b, z_b[:, n]])
         z_be = weedmark_ext(z_b)
-        # qx_me = np.array([qx_m[:, 1], qx_m, qx_m[:, n]])
         qx_me = weedmark_ext(qx_m)
-        # qy_me = np.array([qy_m[:, 1], qy_m, qy_m[:, n]])
         qy_me = weedmark_ext(qy_m)
         # matrix multiplication
         grad.dh_m = minmod(h_me[:, np.arange(2, n + 2)] - h_me[:, np.arange(1, n + 1)],
