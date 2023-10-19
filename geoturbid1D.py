@@ -9,6 +9,8 @@
 # field.x might be position, and not distance
 
 # initialisation:
+import os
+import sys
 import numpy as np
 from createFluxY import createFluxY
 from deepCopier import deep_copy
@@ -26,6 +28,7 @@ from mirror import mirror
 from relax import relax
 from fieldIO import stringify_field, parse_field # parse_field implement later to parse in field text files
 from timestep import timestep
+import serializer
 
 
 titleCounter = 0
@@ -58,6 +61,11 @@ firstTimeStep = 1
 # firstTimeStep = 0;
 iter = 1
 flux_x = None
+
+# Storing serialized field objects to folder
+# Creates folder if it DNE
+if not os.path.isdir('./serialized'):
+    os.mkdir('./serialized')
 
 while field.t < t_end:          # Loops from begginning of field to end (usually 0-101)
 
@@ -102,12 +110,16 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
         plotGenerator.generate_flowprofile(field, field_0, titleCounter)
         plotGenerator.generate_ucprofile(field, titleCounter)
         plotGenerator.generate_kfrprofile(field, par, titleCounter)
+        plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, titleCounter)
+        
         # Writing field data to file
         filename = 'data/field' + str(titleCounter) + '.txt'
-        plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, titleCounter)
-
         # Output to data files
         stringify_field(filename, field)
+
+        # Serialize data and store to file
+        # Makes life easier when you want to read in the field objects later
+        serializer.encode(titleCounter, field, field_0, field_prev, par)
 
         # Incrementing title counter
         titleCounter = titleCounter + 1
