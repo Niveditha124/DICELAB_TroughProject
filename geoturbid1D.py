@@ -8,6 +8,29 @@
 
 # field.x might be position, and not distance
 
+# Create folder with timestamp for data
+import os
+import time
+
+def store_data(folder_name):
+    # Create and store your images in folder_name
+    pass
+
+if __name__ == "__main__":
+    folder_name = 'my_folder_' + time.strftime("%Y_%m_%d_%H_%M_%S")
+    folder_data = folder_name+'/data'
+    folder_videos = folder_name+'/videos'
+    folder_images = folder_name+'/images'
+    folder_serialized = folder_name+'/serialized'
+    os.mkdir(folder_name)
+    os.mkdir(folder_data)
+    os.mkdir(folder_videos)
+    os.mkdir(folder_images)
+    os.mkdir(folder_serialized)
+    store_data(folder_name)
+
+
+#############################################################################
 # initialisation:
 import numpy as np
 from createFluxY import createFluxY
@@ -176,5 +199,4 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
         break
     if titleCounter == 102:
         break
-
 
