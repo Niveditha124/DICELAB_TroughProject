@@ -22,7 +22,7 @@ def generate_flowprofile(field, field_0, titleCounter):
         plt.ylabel('(m)')
         title = 'flow profile, t = ' + str(math.floor(field.t/3600))
         plt.title(title)
-        # Save the plot as a PNG image
+        plt.ylim(-300,300)
         filename = "images/python/flowprofile/plot" + str(titleCounter) + ".png"
         plt.savefig(filename)
         plt.close()  # Close the figure to clear it for the next run
