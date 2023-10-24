@@ -28,7 +28,7 @@ from mirror import mirror
 from relax import relax
 from fieldIO import stringify_field, parse_field # parse_field implement later to parse in field text files
 from timestep import timestep
-import serializer
+from serializer import Serializer
 
 
 titleCounter = 0
@@ -119,8 +119,10 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
 
         # Serialize data and store to file
         # Makes life easier when you want to read in the field objects later
-        serializer.encode(titleCounter, field, field_0, field_prev, par)
-
+        # serializer.encode(titleCounter, field, field_0, field_prev, par)
+        serializerObj = Serializer(field=field, field_0=field_0, field_prev=field_prev, par=par, dt=dt)
+        serializerObj.encode(titleCounter)
+        serializerObj.decode('serialized/field0.txt')
         # Incrementing title counter
         titleCounter = titleCounter + 1
         i_output = i_output + 1
