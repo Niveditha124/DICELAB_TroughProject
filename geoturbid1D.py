@@ -9,6 +9,7 @@
 # field.x might be position, and not distance
 
 # Create folder with timestamp for data
+# potato
 import os
 import time
 
