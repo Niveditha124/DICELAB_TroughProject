@@ -24,7 +24,7 @@ def fieldplot(field=None, field_0=None, field_prev=None, par=None, dt=None):
     fontsize = 11
     fontweight = 'bold'
     # PLOT PROFILES
-    if 1:
+    if 1: # full sets of profiles
         # 1. flow profile
         plt.subplot(2, 2, 1)
         plt.plot(field.x, field.z_r, 'k', 'linewidth', 3)

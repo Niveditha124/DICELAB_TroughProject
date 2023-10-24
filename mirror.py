@@ -5,27 +5,30 @@ from weedmark_ext import weedmark_ext
 
 # CLEAN UP WHEN FUNCTIONAL
 class newfield:
-    x = field.x
+    # assigning properties from the original (field) object to the new class
+    x = field.x 
     y = field.y
-    z_m = field.z_m
-    c_m = field.c_m
-    k_m = field.k_m
-    z_b = field.z_b
-    z_r = field.z_r
-    u = field.u
-    v = field.v
-    Q_up = field.Q_up
-    H_up = field.H_up
-    U_up = field.U_up
-    C_up = field.C_up
-    K_up = field.K_up
+    z_m = field.z_m # elevation of the flow at a certain point??
+    c_m = field.c_m # sediment concentration within the current
+    k_m = field.k_m # turbulent kinetic energy within the flow
+    z_b = field.z_b # sediment bed elevation??
+    z_r = field.z_r # rigid channel bottom??
+    # upstream inflow variables:
+    u = field.u # velocity component along the horizontal direction
+    v = field.v # velocity component along the vertical direction
+    Q_up = field.Q_up # the volume transport rate of suspended sediment
+    H_up = field.H_up # turbidity current depth/thickness
+    U_up = field.U_up # flow velocity
+    C_up = field.C_up # the layer-averaged volume concentration of suspended sediment carried by the turbidity current
+    K_up = field.K_up # turbulent kinetic energy witihn the flow
 
 
-# this is absolutely shagged :) <-- bruh
+
 def mirror(field):
     # MIRROR extend field left and right using mirror symmetry
-    m, n = field.x.shape
-    dx = field.x[0, 1] - field.x[0, 0]
+    # creating new arrays by extending the original arrays using mirror symmetry
+    m, n = field.x.shape # obtaining the shape of (field.x)
+    dx = field.x[0, 1] - field.x[0, 0] # Calculating the grid spacing (dx)
     # newfield.x = np.array([field.x[0, 0]-dx, field.x, field.x[0, n-1]+dx], dtype=object)
     # newfield.x = weedmark_ext(field.x)
     newfield.x = np.concatenate((field.x[:, 0][:, np.newaxis] - dx, field.x, field.x[:, -1][:, np.newaxis] + dx), axis=1)
@@ -63,16 +66,15 @@ def mirror(field):
     # newfield.v = weedmark_ext(field.v)
     newfield.v = np.concatenate((field.v[:, 0][:, np.newaxis], field.v, field.v[:, -1][:, np.newaxis]), axis=1)
     
-    # Not sure but screw it lets hard code it
-    # Might need to change it later
-
+    
+    # Assigning properties which are not extended
     newfield.Q_up = field.Q_up
     newfield.H_up = field.H_up
     newfield.U_up = field.U_up
     newfield.C_up = field.C_up
     newfield.K_up = field.K_up
 
-    # Not sure about this one...
+    # Returning the extended field
     newfield.t = field.t
 
     return newfield

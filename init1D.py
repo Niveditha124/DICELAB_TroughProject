@@ -12,14 +12,14 @@ class field:
     p1 = 0 # (p1) reach 1
    # defines the lengths of the three reaches
     L3 = 5000
-    L2 = 15000 # L2 = 6000
+    L2 = 2500 # L2 = 6000
     L1 = 15000 # (L1) length of reach 6000 (L1 = 6000)
    # (Lx) computes the sum of all reach lenghts
     Lx = L1 + L2 + L3
     # defines the slopes of the three reaches
     S3 = 0
-    S2 = 0.003 # S2 = 0.006
-    S1 = 0.003 # (S1) slope of reach 1 (S1 = 0.013)
+    S2 = 25 # S2 = 0.006
+    S1 = 30 # (S1) slope of reach 1 (S1 = 0.013)
     # (x0) defines the starting point of the x-coordinate
     x0 = - L1 
     # (n) = number of cells per unit block length
@@ -37,11 +37,11 @@ class field:
     y0 = 0
     Ly = 0.5
     # initalizes arrays for the follwing flow field variabels 
-    k_m = np.ones((x.shape[0], x.shape[1])) * 0 # (k_m) turbulent kinetic energy 
-    z_r = np.ones((x.shape[0], x.shape[1])) * - 2000 # (z_r) rigid channel bottom
-    z_b = np.ones((x.shape[0], x.shape[1])) * - 1000 # (z_b) sediment bed elevation 
-    z_m = np.ones((x.shape[0], x.shape[1])) * - 1000 # (z_m) fluid elevation 
-    c_m = np.ones((x.shape[0], x.shape[1])) * 0 # (c_m) turbidity concentration 
+    k_m = np.ones((x.shape[0], x.shape[1])) * 0 # (k_m) turbulent kinetic energy within the flow
+    z_r = np.ones((x.shape[0], x.shape[1])) * - 2000 # (z_r) rigid channel bottom??
+    z_b = np.ones((x.shape[0], x.shape[1])) * - 1000 # (z_b) sediment bed elevation?? 
+    z_m = np.ones((x.shape[0], x.shape[1])) * - 1000 # (z_m)  elevation of the flow at a certain point??
+    c_m = np.ones((x.shape[0], x.shape[1])) * 0 # (c_m) sediment concentration within the current
     v = np.zeros((x.shape[0], x.shape[1])) #  (v) vertical velocity component 
     u = np.zeros((x.shape[0], x.shape[1])) # (u) horizontal velocity component 
     # z_r[-1, -1 - 2] = -1000
@@ -82,20 +82,20 @@ class field:
     # intializes time variable
     t = 0
     # defines initial values for flow parameters
-    H_up = 60 # initial water depth
-    C_up = 0.333 # initial turbidity concentration 
-    U_up = 1 # initial horizontal velocity
-    Q_up = H_up * U_up # Initial flow rate
-    K_up = 0 # initial turbulent kinetic energy
+    H_up = 60 # turbidity current depth/thickness
+    C_up = 0.333 # the layer-averaged volume concentration of suspended sediment carried by the turbidity current
+    U_up = 1 # flow velocity
+    Q_up = H_up * U_up # the volume transport rate of suspended sediment
+    K_up = 0 # # turbulent kinetic energy witihn the flow
 
 
     def __init__(self, n, par):
         # initializes flow field properties for three reaches
         self.L1 = 6000
-        self.S1 = 0.013
+        self.S1 = 30
         self.p1 = 0
         self.L2 = 6000
-        self.S2 = 0.006
+        self.S2 = 25
         self.p2 = 0
         self.L3 = 5000
         self.S3 = 0

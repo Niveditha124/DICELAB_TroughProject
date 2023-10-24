@@ -3,7 +3,7 @@ import sys
 from init1D import field
 from weedmark_ext import weedmark_ext
 
-
+# class definition for storing gradients
 class grad:
     dh_m = np.zeros(field.x.shape)
     dmu = np.zeros(field.x.shape)
@@ -12,17 +12,17 @@ class grad:
     dqx_m = np.zeros(field.x.shape)
     dqy_m = np.zeros(field.x.shape)
 
-
+# calculating the "minmod" of two input values (a) and (b)
 def minmod(a, b):
     ab = np.multiply(a, b)
     c = np.multiply(ab > 0, (np.multiply(abs(a) < abs(b), a) + np.multiply(~(abs(a) < abs(b)), b)))
     return c
 
-
+# GRADIENTVL Van Leer slope limiter
 def gradientVL(field=None, par=None, o=0):
     # o = 0
     if o == 1:
-
+       # reseting gradient variables back to to the condition (o = 1) 
         grad.dh_m = np.zeros(field.x.shape)
         grad.dmu = np.zeros(field.x.shape)
         grad.dkh = np.zeros(field.x.shape)
