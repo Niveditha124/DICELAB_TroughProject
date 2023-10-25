@@ -10,14 +10,14 @@ Comments
 Proposed Folder Structure:
 
 2023_10_25_19_00_00
-|-- data
-|-- videos
-|-- images
-|   |-- flowprofile
-|   |-- iacbchanges
-|   |-- kfrprofile
-|   |-- ucprofile
-|-- serialized
+- data
+- videos
+- images
+  - flowprofile
+  - iacbchanges
+  - kfrprofile
+  - ucprofile
+- serialized
 
 
 To do: 
