@@ -23,11 +23,19 @@ if __name__ == "__main__":
     folder_videos = folder_name+'/videos'
     folder_images = folder_name+'/images'
     folder_serialized = folder_name+'/serialized'
+    folder_flowprofile = folder_videos + '/flowprofile'
+    folder_iacbchanges = folder_videos + '/iacbchanges'
+    folder_kfrprofile = folder_videos + '/kfrprofile'
+    folder_ucprofile= folder_videos + '/ucprofile'
     os.mkdir(folder_name)
     os.mkdir(folder_data)
     os.mkdir(folder_videos)
     os.mkdir(folder_images)
     os.mkdir(folder_serialized)
+    os.mkdir(folder_flowprofile)
+    os.mkdir(folder_iacbchanges)
+    os.mkdir(folder_kfrprofile)
+    os.mkdir(folder_ucprofile)
     store_data(folder_name)
 
 
