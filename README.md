@@ -12,6 +12,10 @@ Proposed Folder Structure:
 2023_10_25_19_00_00
 - data
 - videos
+  - flowprofile
+  - iacbchanges
+  - kfrprofile
+  - ucprofile
 - images
   - flowprofile
   - iacbchanges
