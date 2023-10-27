@@ -58,6 +58,20 @@ from mirror import mirror
 from relax import relax
 from fieldIO import stringify_field, parse_field # parse_field implement later to parse in field text files
 from timestep import timestep
+#############################################################################
+# User Inputs
+
+# Gravity user input
+print('Current Gravity (g): ',  initpar.g)
+temp = None
+while temp is None:
+    try:
+        temp = float(input('Enter a float for Gravity (g): '))
+    except ValueError:
+        print("Error: Enter a valid number!".format(temp))
+initpar.g = (temp) # Makes new Gravity number 
+
+
 
 
 titleCounter = 0
