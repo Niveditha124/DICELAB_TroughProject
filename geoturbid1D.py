@@ -9,39 +9,9 @@
 # field.x might be position, and not distance
 
 # Create folder with timestamp for data
-# potato
+
 import os
 import time
-
-def store_data(folder_name):
-    # Create and store your images in folder_name
-    pass
-
-if __name__ == "__main__":
-    folder_name = 'my_folder_' + time.strftime("%Y_%m_%d_%H_%M_%S")
-    folder_data = folder_name+'/data'
-    folder_videos = folder_name+'/videos'
-    folder_images = folder_name+'/images'
-    folder_serialized = folder_name+'/serialized'
-    folder_flowprofile = folder_videos + '/flowprofile'
-    folder_iacbchanges = folder_videos + '/iacbchanges'
-    folder_kfrprofile = folder_videos + '/kfrprofile'
-    folder_ucprofile= folder_videos + '/ucprofile'
-    os.mkdir(folder_name)
-    os.mkdir(folder_data)
-    os.mkdir(folder_videos)
-    os.mkdir(folder_images)
-    os.mkdir(folder_serialized)
-    os.mkdir(folder_flowprofile)
-    os.mkdir(folder_iacbchanges)
-    os.mkdir(folder_kfrprofile)
-    os.mkdir(folder_ucprofile)
-    store_data(folder_name)
-
-
-#############################################################################
-# initialisation:
-import os
 import sys
 import numpy as np
 from createFluxY import createFluxY
@@ -62,7 +32,42 @@ from fieldIO import stringify_field, parse_field # parse_field implement later t
 from timestep import timestep
 from serializer import Serializer
 
+def store_data(folder_name):
+    # Create and store your images in folder_name
+    pass
 
+if __name__ == "__main__":
+    folder_name = 'my_folder_' + time.strftime("%Y_%m_%d_%H_%M_%S")
+    folder_data = folder_name+'/data'
+    folder_videos = folder_name+'/videos'
+    folder_images = folder_name+'/images'
+    folder_serialized = folder_name+'/serialized'
+
+    videos_flowprofile = folder_videos + '/flowprofile'
+    videos_iacbchanges = folder_videos + '/iacbchanges'
+    videos_kfrprofile = folder_videos + '/kfrprofile'
+    videos_ucprofile= folder_videos + '/ucprofile'
+
+    images_flowprofile = folder_images + '/flowprofile'
+    images_iacbchanges = folder_images + '/iacbchanges'
+    images_kfrprofile = folder_images + '/kfrprofile'
+    images_ucprofile= folder_images + '/ucprofile'
+
+    os.mkdir(folder_name)
+    os.mkdir(folder_data)
+    os.mkdir(folder_videos)
+    os.mkdir(folder_images)
+    os.mkdir(folder_serialized)
+    os.mkdir(videos_flowprofile)
+    os.mkdir(videos_iacbchanges)
+    os.mkdir(videos_kfrprofile)
+    os.mkdir(videos_ucprofile)
+    os.mkdir(images_flowprofile)
+    os.mkdir(images_iacbchanges)
+    os.mkdir(images_kfrprofile)
+    os.mkdir(images_ucprofile)
+    store_data(folder_name)
+    
 #############################################################################
 # User Inputs
 
@@ -93,6 +98,7 @@ o = 1
 geostaticflag = 0
 # material and numerical parameters
 par = initpar
+
 # field = init1D.field(n, par) # input file
 field = initMonterrey(n, par)
 # field_0 = field
@@ -113,11 +119,6 @@ firstTimeStep = 1
 # firstTimeStep = 0;
 iter = 1
 flux_x = None
-
-# Storing serialized field objects to folder
-# Creates folder if it DNE
-if not os.path.isdir('./serialized'):
-    os.mkdir('./serialized')
 
 while field.t < t_end:          # Loops from begginning of field to end (usually 0-101)
 
@@ -161,18 +162,13 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
 
         if plotCreationFlag:
 
-            # filename will be grabbed during each run once unique folder is created
-            # Remove/change later
-            # TODO set this variable to point to the folder, to be done later by anyone
-            filename = ''
-
-            plotGenerator.generate_flowprofile(field, field_0, filename + 'flowprofile/plot' + str(titleCounter) + '.png')
-            plotGenerator.generate_ucprofile(field, filename + 'ucprofile/plot' + str(titleCounter) + '.png')
-            plotGenerator.generate_kfrprofile(field, par, filename + 'kfrprofile/plot' + str(titleCounter) + '.png')
-            plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, filename + 'iacbchanges/plot' + str(titleCounter) + '.png')
+            plotGenerator.generate_flowprofile(field, field_0, images_flowprofile + '/plot' + str(titleCounter) + '.png')
+            plotGenerator.generate_ucprofile(field, images_ucprofile + '/plot' + str(titleCounter) + '.png')
+            plotGenerator.generate_kfrprofile(field, par, images_kfrprofile + '/plot' + str(titleCounter) + '.png')
+            plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, images_iacbchanges + '/plot' + str(titleCounter) + '.png')
         
         # Writing field data to file
-        filename = 'data/field' + str(titleCounter) + '.txt'
+        filename = folder_data + '/field' + str(titleCounter) + '.txt'
         # Output to data files
         stringify_field(filename, field)
 
@@ -180,14 +176,13 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
         # Makes life easier when you want to read in the field objects later
         # serializer.encode(titleCounter, field, field_0, field_prev, par)
         serializerObj = Serializer(field=field, field_0=field_0, field_prev=field_prev, par=par, dt=dt)
-        serializerObj.encode(serializerObj, titleCounter)
-        returnedObj = serializerObj.decode('serialized/field0.txt')
+        serializerObj.encode(serializerObj, titleCounter, folder_serialized)
         # Incrementing title counter
         titleCounter = titleCounter + 1
         i_output = i_output + 1
     
 
-    # book-keeping
+    # book-keeping|
     field_prev = deep_copy(field, field_prev)
     # half-step relaxation operator:
     if np.logical_and((o == 2), (iter % 2 == 1)):
