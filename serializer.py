@@ -19,16 +19,18 @@ class Serializer:
             self.field_prev = kwargs['field_prev']
             self.par = kwargs['par']
             self.dt = kwargs['dt']
-        # else:
-        #     print('Please specify field, field_0, field_prev, par, dt variables')
-        #     sys.exit()
+        elif len(kwargs) == 0:
+            pass
+        else:
+            print('Please specify field, field_0, field_prev, par, dt variables')
+            sys.exit()
     
     @classmethod
-    def encode(self, titleCounter):
+    def encode(self, obj, titleCounter):
         # Perform check to see if this folder exists // actually already done in geoturbid1D.py
         filename = './serialized/field' + str(titleCounter) + '.txt'
         # Encodes the entire Serializer object that contains field, field_0, field_prev, par, dt
-        encoded = jsonpickle.encode(self)
+        encoded = jsonpickle.encode(obj)
         f = open(filename, 'w')
         f.write(encoded)
         f.close()
@@ -37,17 +39,15 @@ class Serializer:
     def decode(self,filename):
         # Read file in that contains field, field_0, field_prev, par, dt
         f = open(filename, 'r')
-        self.field = f.field
-        self.field_0 = f.field_0
-        self.field_prev = f.field_prev
-        self.par = f.par
-        self.dt = f.dt
-        print(f.dt)
-        
-        return jsonpickle.decode(f.read())
-
-    
-    
-    
-    
-    
+        # Decode file content to obj Object
+        obj = jsonpickle.decode(f.read())
+        f.close()
+        # Assign parsed values to our variables
+        decodedObj = Serializer(field = obj.field, 
+                                field_0 = obj.field_0,
+                                field_prev = obj.field_prev, 
+                                par = obj.par, dt = obj.dt
+                                )
+        # Return our instance of the object
+        return decodedObj
+   
