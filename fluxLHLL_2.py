@@ -4,6 +4,7 @@ import sys
 
 class fluxx:
     def __init__(self, name):
+        # initializes instance variables
         self.z_mr = None
         self.z_br = None
         self.z_bl = None
@@ -18,6 +19,7 @@ class fluxx:
         self.name = name
 
     def which(self, x):
+        # initializes arrays with specific shapes
         s = (1, 203)
         t = (1, 204)
         self.x = x
@@ -34,6 +36,7 @@ class fluxx:
         self.z_br = np.zeros(s)
 
 def createFlux (self, field):
+    # initializes arrays with specific shapes
     s = (2,202)
     self.q_m = np.zeros(s)
     self.sig_l = np.zeros(s)
@@ -54,29 +57,41 @@ def fluxLHLL_2(name, field, grad, par, dt):
     # extrapolations left and right (in face-centred variables):
     flux_x = fluxx(name)
     flux_y = fluxx(name)
-
+    # obtains the dimensions of the array field.x (m=number of rows and n=number of columns)
     m, n = field.x.shape
+    # computes the grid spacing
     dx = field.x[0, 1] - field.x[0, 0]
+    # calculates current flow depth/thickness 
     h_m = field.z_m - field.z_b
+    # Initialize arrays (h_ml) and (h_mr)
     h_ml = np.full((1, 203), 0.5)
     h_mr = np.full((1, 203), 0.5)
+    # updates (h_ml) and (h_mr) using element-wise operations
     h_ml = ((h_ml[:, np.arange(0, n - 1)] + h_m[:, np.arange(0, n - 1)]) * grad.dh_m[:, np.arange(0, n - 1)])
     h_mr = (h_m[:, np.arange(1, n)] - (h_mr[:, np.arange(0, n - 1)]) * grad.dh_m[:, np.arange(1, n)])
 
+    # initialize arrays (mu_l) and (mu_r)
     mu_l = np.full((1, 203), 0.5)
     mu_r = np.full((1, 203), 0.5)
+    # calculates (mu) by element-wise multiplication
     mu = np.multiply(h_m, field.c_m)  # shape is 1,204
+    # updates (mu_l) and (mu_r) using element-wise operations
     mu_l = ((mu_l[:, np.arange(0, n - 1)] + mu[:, np.arange(0, n - 1)]) * grad.dmu[:, np.arange(0, n - 1)])
     mu_r = (mu[:, np.arange(1, n)] - (mu_r[:, np.arange(0, n - 1)]) * grad.dmu[:, np.arange(1, n)])
 
+    # initializes arrays (kh_l) and (kh_r)
     kh_l = np.full((1, 203), 0.5)
     kh_r = np.full((1, 203), 0.5)
+    # calculates (kh) by element-wise multiplication
     kh = np.multiply(h_m, field.k_m) # shape is 1,204
+    # Updates (kh_l) and (kh_r) using element-wise operations
     kh_l = ((kh_l[:, np.arange(0, n - 1)] + kh[:, np.arange(0, n - 1)]) * grad.dkh[:, np.arange(0, n - 1)])
     kh_r = (kh[:, np.arange(1, n)] - (kh_r[:, np.arange(0, n - 1)]) * grad.dkh[:, np.arange(1, n)])
 
+    # initializes arrays (z_bl) and (z_br)
     z_bl = np.full((1, 203), 0.5)
     z_br = np.full((1, 203), 0.5)
+    # updates (z_bl) and (z_br) using element-wise operations
     z_bl = ((z_bl[:, np.arange(0, n - 1)] + field.z_b[:, np.arange(0, n - 1)]) * grad.dz_b[:, np.arange(0, n - 1)])
     z_br = (field.z_b[:, np.arange(1, n)] - (z_br[:, np.arange(0, n - 1)]) * grad.dz_b[:, np.arange(1, n)])
 
@@ -123,7 +138,7 @@ def fluxLHLL_2(name, field, grad, par, dt):
     temp_u_l = u_l ** 2
     temp_h_ml = h_ml ** 2
 
-    # left and right fluxes:    
+    # left and right fluxes:  
     sig_l = np.multiply(h_ml, np.power(u_l, 2)) + ((0.5 * par.g * par.R) * np.multiply(c_ml, np.power(h_ml, 2)))
     '''
     if name == 'x':
@@ -192,7 +207,8 @@ def fluxLHLL_2(name, field, grad, par, dt):
     kh_star_min = np.multiply(- h_mr, k_mr) * dx / dt
     kh_star_max = np.multiply(h_ml, k_ml) * dx / dt
     kh_star = np.minimum(np.maximum(kh_star_min, kh_star), kh_star_max)
-
+    
+    # update flux_x with calculated values
     flux_x.q_m = q_m_star
     flux_x.sig_l = sig_starl
     flux_x.sig_r = sig_starr
@@ -203,7 +219,8 @@ def fluxLHLL_2(name, field, grad, par, dt):
     flux_x.z_mr = z_mr
     flux_x.z_bl = z_bl
     flux_x.z_br = z_br
-
+    
+    # initialize flux_y with zeros for specific arrays
     flux_y.q_m = np.zeros((2, field.x.shape[1]-2))
     flux_y.sig_l = sig_starl
     flux_y.sig_r = sig_starr

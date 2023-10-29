@@ -7,6 +7,22 @@ Comments
 2. initMonterray as input file for base optimal results in MATLAB
 3. ensure you have directory images/python/ with the following folders ['flowprofile', 'iacbchanges', 'kfrprofile', 'ucprofile']
 
+Proposed Folder Structure:
+
+2023_10_25_19_00_00
+- data
+- videos
+  - flowprofile
+  - iacbchanges
+  - kfrprofile
+  - ucprofile
+- images
+  - flowprofile
+  - iacbchanges
+  - kfrprofile
+  - ucprofile
+- serialized
+
 
 To do: 
   
