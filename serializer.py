@@ -26,19 +26,19 @@ class Serializer:
             sys.exit()
     
     @classmethod
-    def encode(self, obj, titleCounter):
+    def encode(self, obj, titleCounter, filepath):
         # Perform check to see if this folder exists // actually already done in geoturbid1D.py
-        filename = './serialized/field' + str(titleCounter) + '.txt'
+        filepath += '/field' + str(titleCounter) + '.txt'
         # Encodes the entire Serializer object that contains field, field_0, field_prev, par, dt
         encoded = jsonpickle.encode(obj)
-        f = open(filename, 'w')
+        f = open(filepath, 'w')
         f.write(encoded)
         f.close()
         
     @classmethod
-    def decode(self,filename):
+    def decode(self,filepath):
         # Read file in that contains field, field_0, field_prev, par, dt
-        f = open(filename, 'r')
+        f = open(filepath, 'r')
         # Decode file content to obj Object
         obj = jsonpickle.decode(f.read())
         f.close()
