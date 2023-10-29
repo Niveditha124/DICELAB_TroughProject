@@ -2,8 +2,9 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+#TODO: Error checking for filepath directory
 
-def generate_flowprofile(field, field_0, titleCounter):
+def generate_flowprofile(field, field_0, filepath):
         '''Function generates the flow profile graph to predetermined directory. Change directory in this method directly'''
 
         x1 = field.x[0]
@@ -23,13 +24,12 @@ def generate_flowprofile(field, field_0, titleCounter):
         title = 'flow profile, t = ' + str(math.floor(field.t/3600))
         plt.title(title)
         # Save the plot as a PNG image
-        filename = "images/python/flowprofile/plot" + str(titleCounter) + ".png"
-        plt.savefig(filename)
+        plt.savefig(filepath)
         plt.close()  # Close the figure to clear it for the next run
 
 
 
-def generate_iacbchanges(field, field_prev, field_0, dt, titleCounter):
+def generate_iacbchanges(field, field_prev, field_0, dt, filepath):
     '''Function generates the instant and cumulative bed changes graph to predetermined directory. Change directory in this method directly'''
 
     plt.title('Instant and cumul. bed changes')
@@ -43,14 +43,11 @@ def generate_iacbchanges(field, field_prev, field_0, dt, titleCounter):
     ax2.plot(field.x[0], plot2[0], color='red', label='Right Y-axis')
     ax2.set_ylabel('', color='red')
     ax2.tick_params(axis='y', colors='red')
-    filename = "images/python/iacbchanges/plot" + str(titleCounter) + ".png"
-    plt.savefig(filename)
+    plt.savefig(filepath)
     plt.close()  # Close the figure to clear it for the next run
-    # Writing field data to file
-    filename = 'data/field' + str(titleCounter) + '.txt'
 
 
-def generate_kfrprofile(field, par, titleCounter):
+def generate_kfrprofile(field, par, filepath):
     '''Function generates the K and Fr profiles graph to predetermined directory. Change directory in this method directly'''
 
     plt.title('K and Fr profiles')
@@ -70,13 +67,12 @@ def generate_kfrprofile(field, par, titleCounter):
     ax2.plot(field.x[0], Fr[0], color='red', label='Right Y-axis')
     ax2.set_ylabel('Fr', color='red')
     ax2.tick_params(axis='y', colors='red')
-    filename = "images/python/kfrprofile/plot" + str(titleCounter) + ".png"
-    plt.savefig(filename)
+    plt.savefig(filepath)
     plt.close()  # Close the figure to clear it for the next run
 
 
 
-def generate_ucprofile(field, titleCounter):
+def generate_ucprofile(field, filepath):
     '''Function generates the U and C profiles graph to predetermined directory. Change directory in this method directly'''
 
     plt.title('U and C profiles')
@@ -88,6 +84,5 @@ def generate_ucprofile(field, titleCounter):
     ax2.plot(field.x[0], field.c_m[0], color='red', label='Right Y-axis')
     ax2.set_ylabel('field.c_m', color='red')
     ax2.tick_params(axis='y', colors='red')
-    filename = "images/python/ucprofile/plot" + str(titleCounter) + ".png"
-    plt.savefig(filename)
+    plt.savefig(filepath)
     plt.close()  # Close the figure to clear it for the next run
