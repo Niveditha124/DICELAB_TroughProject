@@ -8,6 +8,38 @@
 
 # field.x might be position, and not distance
 
+# Create folder with timestamp for data
+# potato
+import os
+import time
+
+def store_data(folder_name):
+    # Create and store your images in folder_name
+    pass
+
+if __name__ == "__main__":
+    folder_name = 'my_folder_' + time.strftime("%Y_%m_%d_%H_%M_%S")
+    folder_data = folder_name+'/data'
+    folder_videos = folder_name+'/videos'
+    folder_images = folder_name+'/images'
+    folder_serialized = folder_name+'/serialized'
+    folder_flowprofile = folder_videos + '/flowprofile'
+    folder_iacbchanges = folder_videos + '/iacbchanges'
+    folder_kfrprofile = folder_videos + '/kfrprofile'
+    folder_ucprofile= folder_videos + '/ucprofile'
+    os.mkdir(folder_name)
+    os.mkdir(folder_data)
+    os.mkdir(folder_videos)
+    os.mkdir(folder_images)
+    os.mkdir(folder_serialized)
+    os.mkdir(folder_flowprofile)
+    os.mkdir(folder_iacbchanges)
+    os.mkdir(folder_kfrprofile)
+    os.mkdir(folder_ucprofile)
+    store_data(folder_name)
+
+
+#############################################################################
 # initialisation:
 import os
 import sys
@@ -29,6 +61,20 @@ from relax import relax
 from fieldIO import stringify_field, parse_field # parse_field implement later to parse in field text files
 from timestep import timestep
 from serializer import Serializer
+
+
+#############################################################################
+# User Inputs
+
+# Gravity user input
+print('Current Gravity (g): ',  initpar.g)
+temp = None
+while temp is None:
+    try:
+        temp = float(input('Enter a float for Gravity (g): '))
+    except ValueError:
+        print("Error: Enter a valid number!".format(temp))
+initpar.g = (temp) # Makes new Gravity number 
 
 
 titleCounter = 0
@@ -203,5 +249,4 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
         break
     if titleCounter == 102:
         break
-
 

@@ -4,12 +4,12 @@ from matplotlib.animation import FuncAnimation
 import time
 
 
-
+# converting a number to a string
 def num2str(i):
     str_i = str(i)
     return str_i
 
-
+# generating a field plot
 def fieldplot_2(figure, ax, line1, test, field=None, field_0=None, field_prev=None, par=None, dt=None):
 
     # crop out-of-domain regions of the field:
@@ -43,11 +43,13 @@ def fieldplot_2(figure, ax, line1, test, field=None, field_0=None, field_prev=No
         '''
         line1.set_xdata(np.arange(1000000))
         line1.set_ydata(test)
+        # updates the data of the plot line 
         figure.canvas.draw()
         figure.canvas.flush_events()
         time.sleep(0.1)
         
     else:
+        # plotting the flow profile
         plt.hold(False)
         plt.plot(field.x, field.z_r, 'k')
         plt.hold(True)
