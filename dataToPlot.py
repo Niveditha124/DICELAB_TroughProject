@@ -16,10 +16,7 @@ def extract_numeric_part(filename):
 
 # TODO: Get datasource folder from user however tf you want idc at this point <3
 # Get the parent folder: eg: 2023_10_25_19_00_00
-dataSource = './'
-
-# We wsant the plot outputs to be in the folders inside the dataSource folder
-plotOutputFolder = dataSource
+dataSource = 'my_folder_2023_10_29_00_09_55'
 
 # Parse in filed object
 
@@ -30,30 +27,20 @@ try:
     sorted_dataFiles = sorted(dataFiles, key=extract_numeric_part)
 except:
     print('Please ensure that you have fieldX.txt files at the given directory (dataSource)')
+    print(dataSource)
     sys.exit()
 
-# Filenames of all fieldX.txt files
-# print(sorted_dataFiles)
 
-# # Creates output at a folder with a timestamp
-
-# if not os.path.exists(plotOutputFolder):
-#     plotOutputFolder = './' + plotOutputFolder + datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-#     os.mkdir(plotOutputFolder)
-
-# Already done within geoturbid1D
-# Creates the 4 folders to store plots
-# for subfolder in plotFolders:
-#     os.mkdir(plotOutputFolder + '/images/' + subfolder)
-    
-# Call generators
+folder_flowprofile = os.path.join(dataSource, os.path.join('images', 'flowprofile'))
+folder_iacbchanges = os.path.join(dataSource, os.path.join('images', 'iacbchanges'))
+folder_kfrprofile = os.path.join(dataSource, os.path.join('images', 'kfrprofile'))
+folder_ucprofike = os.path.join(dataSource, os.path.join('images', 'ucprofile'))
 
 print()
 
 for file in sorted_dataFiles:
+
     filename = os.path.join(dataSource, os.path.join('serialized', file))
-    # TODO: Uncomment later after showing it to Isaac
-    # filename = os.path.join(dataSource, os.path.join('serialized', file))
     # Using our personally created serializer class
     serializerObj = Serializer.decode(filename)
     field, field_0, field_prev, par, dt = serializerObj.field, serializerObj.field_0, serializerObj.field_prev, serializerObj.par, serializerObj.dt
@@ -66,14 +53,12 @@ for file in sorted_dataFiles:
         print('Cannot find a file with the appropriate name. Please try again')
         sys.exit()
     
+    plotGenerator.generate_flowprofile(field, field_0, folder_flowprofile + '/plot' + str(titleCounter) + '.png')
+    plotGenerator.generate_ucprofile(field, folder_iacbchanges + '/plot' + str(titleCounter) + '.png')
+    plotGenerator.generate_kfrprofile(field, par, folder_kfrprofile + '/plot' + str(titleCounter) + '.png')
+    plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, folder_ucprofike + '/plot' + str(titleCounter) + '.png')
     #TODO temp remove later
-    dataSource = './images/'
-    plotGenerator.generate_flowprofile(field, field_0, dataSource + 'flowprofile/plot' + str(titleCounter) + '.png')
-    plotGenerator.generate_ucprofile(field, dataSource + 'ucprofile/plot' + str(titleCounter) + '.png')
-    plotGenerator.generate_kfrprofile(field, par, dataSource + 'kfrprofile/plot' + str(titleCounter) + '.png')
-    plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, dataSource + 'iacbchanges/plot' + str(titleCounter) + '.png')
-    #TODO temp remove later
-    dataSource = './'
     print(file + ' plot created')
 
-print('Plots created successfully. Stored in ' + dataSource + 'images')
+dataSource = os.path.join(dataSource, 'images')
+print('Plots created successfully. Stored in ' + dataSource)
