@@ -41,6 +41,8 @@ if __name__ == "__main__":
 
 #############################################################################
 # initialisation:
+import os
+import sys
 import numpy as np
 from createFluxY import createFluxY
 from deepCopier import deep_copy
@@ -58,6 +60,9 @@ from mirror import mirror
 from relax import relax
 from fieldIO import stringify_field, parse_field # parse_field implement later to parse in field text files
 from timestep import timestep
+from serializer import Serializer
+
+
 #############################################################################
 # User Inputs
 
@@ -72,9 +77,13 @@ while temp is None:
 initpar.g = (temp) # Makes new Gravity number 
 
 
-
-
 titleCounter = 0
+# Can be changed later somehow based on user's wants
+plotCreationFlag = input('Do you want to generate plot images during this run? (y/n)')
+if plotCreationFlag.strip().lower() == 'y':
+    plotCreationFlag = True
+else:
+    plotCreationFlag = False
 
 dispflag = 0
 t_end = 3600*1000
@@ -104,6 +113,11 @@ firstTimeStep = 1
 # firstTimeStep = 0;
 iter = 1
 flux_x = None
+
+# Storing serialized field objects to folder
+# Creates folder if it DNE
+if not os.path.isdir('./serialized'):
+    os.mkdir('./serialized')
 
 while field.t < t_end:          # Loops from begginning of field to end (usually 0-101)
 
@@ -145,16 +159,29 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
         field.x[field.z_b == 1000] = np.nan
         field.x[field.z_b == -1000] = np.nan
 
-        plotGenerator.generate_flowprofile(field, field_0, titleCounter)
-        plotGenerator.generate_ucprofile(field, titleCounter)
-        plotGenerator.generate_kfrprofile(field, par, titleCounter)
+        if plotCreationFlag:
+
+            # filename will be grabbed during each run once unique folder is created
+            # Remove/change later
+            # TODO set this variable to point to the folder, to be done later by anyone
+            filename = ''
+
+            plotGenerator.generate_flowprofile(field, field_0, filename + 'flowprofile/plot' + str(titleCounter) + '.png')
+            plotGenerator.generate_ucprofile(field, filename + 'ucprofile/plot' + str(titleCounter) + '.png')
+            plotGenerator.generate_kfrprofile(field, par, filename + 'kfrprofile/plot' + str(titleCounter) + '.png')
+            plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, filename + 'iacbchanges/plot' + str(titleCounter) + '.png')
+        
         # Writing field data to file
         filename = 'data/field' + str(titleCounter) + '.txt'
-        plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, titleCounter)
-
         # Output to data files
         stringify_field(filename, field)
 
+        # Serialize data and store to file
+        # Makes life easier when you want to read in the field objects later
+        # serializer.encode(titleCounter, field, field_0, field_prev, par)
+        serializerObj = Serializer(field=field, field_0=field_0, field_prev=field_prev, par=par, dt=dt)
+        serializerObj.encode(serializerObj, titleCounter)
+        returnedObj = serializerObj.decode('serialized/field0.txt')
         # Incrementing title counter
         titleCounter = titleCounter + 1
         i_output = i_output + 1
