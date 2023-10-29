@@ -2,6 +2,9 @@
     Deletes all plot images made in the images folder
     Feel free to change this code as per whatever you want idc.
     Note: Now also deletes serialized folder content
+
+    # NOTE: Legacy code since we use a different file structure now.
+    Feel free to update and alter as per your use case.
 '''
 
 import os
