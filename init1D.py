@@ -1,6 +1,4 @@
 import numpy as np
-from numpy import argwhere
-from numpy import interp
 from scipy.interpolate import interp1d
 
 # INITFIELD initialise flow field
