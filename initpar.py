@@ -8,16 +8,16 @@ nu = 1e-6
 
 # %   material parameters:
 # rho_W = 23.97  # % [kg/m^3] 1000
-rho_W = 1000
+rho_W = 1000 # Water/Fluid Density
 # rho_S = 916  # % [kg/m^3] 2650
-rho_S = 2650
-rho_WS = 25.3  #
+rho_S = 2650 # Sediment Density
+rho_WS = 25.3  
 #c_b = 0.7  # % [m^3/m^3] sediment concentration in static bed [0.50]
 c_b = 0.50
 rho_w = rho_W  #
 # %   R = (rho_S/rho_W)-1# % excess weight coefficient for the sediments = (rho_S-rho_w)/rho_w [-]
 # TODO: Which code is the old code?
-R = (rho_S - rho_WS) / rho_W  #
+R = (rho_S - rho_WS) / rho_W  #(R) denotes the submerged specific gravity of the sediment
 
 rPrime = R * c_b  # % excess weight coefficient for the bed load layer
 r = 1 + rPrime  # % mult. coefficient accounting for bulk excess weight of the bed load layer

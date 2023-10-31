@@ -72,7 +72,7 @@ if __name__ == "__main__":
 # User Inputs
 
 # Gravity user input
-print('Current Gravity (g): ',  initpar.g)
+print('\nCurrent Gravity (g): ',  initpar.g)
 temp = None
 while temp is None:
     try:
@@ -81,10 +81,31 @@ while temp is None:
         print("Error: Enter a valid number!".format(temp))
 initpar.g = (temp) # Makes new Gravity number 
 
+# Sediment Density user input
+print('\nCurrent Sediment Density (rho_S): ',  initpar.rho_S)
+temp = None
+while temp is None:
+    try:
+        temp = float(input('Enter a float for Sediment Density (rho_S): '))
+    except ValueError:
+        print("Error: Enter a valid number!".format(temp))
+initpar.rho_S = (temp) # Makes new Gravity number 
+
+# Fluid Density user input
+print('\nCurrent Water/Fluid Density (rho_W): ',  initpar.rho_W)
+temp = None
+while temp is None:
+    try:
+        temp = float(input('Enter a float for Water/Fluid Density (rho_W): '))
+    except ValueError:
+        print("Error: Enter a valid number!".format(temp))
+initpar.rho_W = (temp) # Makes new Gravity number 
+
+
 
 titleCounter = 0
 # Can be changed later somehow based on user's wants
-plotCreationFlag = input('Do you want to generate plot images during this run? (y/n)')
+plotCreationFlag = input('\nDo you want to generate plot images during this run? (y/n): ')
 if plotCreationFlag.strip().lower() == 'y':
     plotCreationFlag = True
 else:
