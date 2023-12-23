@@ -20,7 +20,8 @@ def fieldplot(field=None, field_0=None, field_prev=None, par=None, dt=None):
     # field.z_m(field.c_m<0.0001)=NaN;
 
     # GENERAL PLOT PROPERTIES
-    ax = np.array([0, 21000, - 200, 100])
+    # start x, end x, min y, max y
+    ax = np.array([0, 21000, - 200, 100])    # Change to fit CSV file data
     fontsize = 11
     fontweight = 'bold'
     # PLOT PROFILES
