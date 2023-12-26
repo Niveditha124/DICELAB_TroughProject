@@ -139,54 +139,6 @@ class field:
         S = field.S
         L = field.L
         pert = field.p
-        
-        # initialise flow domain:
-        # x0 = - L1
-        # Lx = L1 + L2 + L3
-        # y0 = 0
-        # Ly = 0.5
-        # dx = Lx / field.n
-        # dy = dx
-        # x = np.arange((x0 - 0.5 * dx), (x0 + Lx + 0.5 * dx) + dx, dx)
-        # y = [1]
-        # field.x = np.ones((len(field.y), 1)) * field.x
-        # field.y = np.transpose(field.y) * np.ones((1, len(field.x)))
-        # isX1 = np.argwhere(np.logical_and((field.x[0] > -field.L1), (field.x[0] < 0)))
-        # isX2 = np.argwhere(np.logical_and((field.x[0] > 0), (field.x[0] < field.L2)))
-        # isX3 = np.argwhere(np.logical_and((field.x[0] > field.L2), (field.x[0] < (field.L2 + field.L3))))
-        # top of turbid layer:
-        # field.z_m = np.ones((field.x.shape[0], field.x.shape[1])) * - 1000
-
-        # z_m(x<0) = 0.75;
-
-        # turbid concentration
-        # field.c_m = np.ones((field.x.shape[0], field.x.shape[1])) * 0
-
-        # c_m(x<0) = 0.2;
-
-        # turbulent kinetic energy
-        # field.k_m = np.ones((field.x.shape[1], field.x.shape[1])) * 0
-
-        # rigid channel bottom under sediment bed:
-        # field.z_r = np.ones((field.x.shape[0], field.x.shape[1])) * - 2000
-
-        # known points for interpolation
-        # xx = [-1e10   0 1e10];
-        # zz = [1e10*S1 0 -1e10*S1];
-        # z_r = interp1(xx,zz,x);
-        # field.z_r[-1, -1 - 2] = -1000
-        # sediment bed level:
-        # field.z_b = np.ones((field.x.shape[0], field.x.shape[1])) * - 1000
-        # known points for interpolation
-        # xx = np.array([- L1, 0, L2, L2 + L3])
-        # zz = np.array([L1 * S1, 0, - L2 * S2, - L2 * S2 - L3 * S3])
-        # set_interp = interp1d(xx, zz, kind='linear', fill_value='extrapolate')
-        # field.z_b = set_interp(field.x)
-        # field.z_b[-1, -1 - 2] = -1000
-        # rigid rim around domain (downstream only):
-        # field.z_r[-1, -1] = 1000
-        # print(isX1.shape) # (71, 1)
-        # print(z_b.shape) # (1, 202)
 
         # initial bed perturbations
 

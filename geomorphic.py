@@ -18,63 +18,6 @@ def geomorphic(field, par, dt):
     # (KH) calculates the turbulent kinetic energy within the current
     KH = h * field.k_m
 
-    
-    # temp = (par.alpha * field.k_m) ** 0.5
-    # Ze5 = temp / par.vs
-    # Ze5 = Ze5 * (par.Rp ** 0.6)
-    # temp2 = temp / par.g
-    # temp2 = temp2 / np.maximum(h, par.h_min)
-    # temp2 = temp2 ** 0.08
-    # Ze5 = Ze5 * temp2
-    # Ze5 = Ze5 ** 5
-
-    '''
-        inside = temp / par.g
-        print('inside: %f\n', inside)
-        inside = inside / max(h[0][0],par.h_min)
-        print('inside: %f\n', inside)
-        Ze5 = Ze5 * (inside ** 0.08)
-        print('Ze5: %f\n', Ze5)
-        Ze5 = Ze5 ** 5
-        print('Ze5: %f\n', Ze5)
-    '''
-
-    '''
-    # solve for CH
-    # start with explicit estimate
-    denom = ((par.vs * par.Rp * 0.6 * (((par.alpha * field.k_m) ** 0.5) / (par.g / np.maximum(h, par.h_min)))) ** 0.08)
-    Ze5 = ((par.alpha * field.k_m) ** 0.5) / 1 # because we have to initialize the array to something that won't shit the bed, so we can reference it's index :)
-    
-    for each in denom:## checking where each 0 value is in the denominator, and where it is 0.0, using 1 as the denom instead so we don't have a division issue
-        for index, item in enumerate(each):
-            if item == 0.0: # if it was 0 before it remains the same
-                Ze5[0][index] = (par.alpha * field.k_m[0][index]) ** 0.5 / 1
-            else: # otherwise it changes to whatever the updated par and field values calculate out to
-                Ze5[0][index] = ((((par.alpha * field.k_m[0][index]) ** 0.5) / (par.vs * par.Rp * 0.6 * ((par.alpha * field.k_m[0][index]) ** 0.5) / (par.g / np.maximum(h, par.h_min)))) ** 0.08) ** 5
-    
-    # iterate 10 times with Newton Scheme
-    for x in range(10):
-        denom2 = (par.vs * par.Rp * 0.6 * ((par.alpha * K_new) ** 0.5) / (par.g / np.maximum(h_new, par.h_min)) ** 0.08) ** 5
-        for each in denom2:
-            for index, item in enumerate(each):
-                if item == 0.0:
-                    Ze5[0][index] = (par.alpha * K_new[0][index]) ** 0.5 / 1
-                else:
-                    Ze5[0][index] = ((((par.alpha * K_new[0][index]) ** 0.5) / (par.vs * par.Rp * 0.6 * ((par.alpha * K_new[0][index]) ** 0.5) / (par.g / np.maximum(h_new, par.h_min)))) ** 0.08) ** 5
-        E = np.maximum((par.p * (1.3 * 10 ** -7)) * par.vs * Ze5 / (1 + (1.3 * 10 ** -7) / 0.3 * Ze5), 0)
-        D = np.maximum(par.vs * par.r0 * C_new, 0)
-        CH_new = np.maximum(CH + dt * (E - D), 0)
-        h_new = np.maximum(h + dt / par.c_b * (E - D), 0)
-        C_new = np.maximum(CH_new / np.maximum(h_new, par.h_min), 0)
-        KH_new = KH - dt * 0.5 * par.R * par.g * h_new * (E - D)
-        K_new = np.maximum(0, KH_new / np.maximum(h_new, par.h_min))
-
-    # ensure dissipation of K (should we do that? -- watf)
-    K_new = np.minimum(field.k_m, K_new)
-    
-    
-    
-    '''
     Ze5 = ((par.alpha*field.k_m) ** 0.5 / par.vs * par.Rp ** 0.6 * ((par.alpha * field.k_m) ** 0.5 / par.g / np.maximum(h, par.h_min)) ** 0.08) ** 5
 
     # print('Ze5: {:.10e}'.format(Ze5[0][0]))
@@ -108,35 +51,6 @@ def geomorphic(field, par, dt):
         # K_new = max(0 , KH_new./max(h_new,par.h_min));
         K_new = np.maximum(0, KH_new / np.maximum(h_new, par.h_min))
 
-    
-    # print('Values: ')
-    # print('CH: {:.16f}'.format(CH[0][0]))
-
-    # print('KH: {:.16f}'.format(KH[0][0]))
-
-    # print('par.alpha:', par.alpha)
-    # print('field.k_m:', field.k_m)
-    # print('par.vs:', par.vs)
-    # print('par.Rp:', par.Rp)
-    # print('par.g:', par.g)
-    # print('h:', h)
-    # print('par.h_min:', par.h_min)
-
-    # print('Ze5: {:.16f}'.format(Ze5[0][0]))
-
-    # print('E: {:.16f}'.format(E[0][0]))
-
-    # print('D: {:.16f}'.format(D[0][0]))
-
-    # print('CH_new: {:.16f}'.format(CH_new[0][0]))
-
-    # print('h_new: {:.16f}'.format(h_new[0][0]))
-
-    # print('C_new: {:.16f}'.format(C_new[0][0]))
-
-    # print('KH_new: {:.16f}'.format(KH_new[0][0]))
-
-    # print('K_new: {:.16f}'.format(K_new[0][0]))
     
 
     # retrieve bed level change and impose limit. dzb is positive in case of deposition
