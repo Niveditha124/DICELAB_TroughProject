@@ -92,29 +92,34 @@ if __name__ == "__main__":
 # User Inputs
 
 # Gravity user input
-user_input = (get_user_input('Please enter a value for Gravity', initpar.g))
-if user_input:
-    initpar.g = user_input
-    user_input = None
+def request_user_inputs():
+    user_input = (get_user_input('Please enter a value for Gravity', initpar.g))
+    if user_input:
+        initpar.g = user_input
+        user_input = None
 
-# Sediment Density user input
-user_input = (get_user_input('Please enter a value for Sediment Density (rho_S):', initpar.rho_S))
-if user_input:
-    initpar.rho_S = user_input
-    user_input = None
-    
-# Fluid Density user input
-user_input = (get_user_input('Please enter a value for Water/Fluid Density (rho_W):', initpar.rho_W))
-if user_input:
-    initpar.rho_W = user_input
-    user_input = None
+    # Sediment Density user input
+    user_input = (get_user_input('Please enter a value for Sediment Density (rho_S):', initpar.rho_S))
+    if user_input:
+        initpar.rho_S = user_input
+        user_input = None
+        
+    # Fluid Density user input
+    user_input = (get_user_input('Please enter a value for Water/Fluid Density (rho_W):', initpar.rho_W))
+    if user_input:
+        initpar.rho_W = user_input
+        user_input = None
 
-# Generate Plot user input
-plotCreationFlag = input('\nDo you want to generate plot images during this run? (y/n): ')
-if plotCreationFlag.strip().lower()[0] == 'y':
-    plotCreationFlag = True; print('Creating plots')
-else:
-    plotCreationFlag = False; print('k make your own plots then...')
+    # Generate Plot user input
+    plotCreationFlag = input('\nDo you want to generate plot images during this run? (y/n): ')
+    if plotCreationFlag.strip().lower()[0] == 'y':
+        plotCreationFlag = True; print('Creating plots')
+    else:
+        plotCreationFlag = False; print('k make your own plots then...')
+        
+# Uncomment if you want to ask user for custom values
+# Otherwise it will run default values - Use when testing code
+request_user_inputs()
 
 #############################################################################
 
@@ -127,6 +132,10 @@ o = 1
 geostaticflag = 0
 # material and numerical parameters
 par = initpar
+
+# TODO: REMOVEE THIS TESTING CODE 
+field = initScooby(n,par)
+sys.exit()
 
 # field = init1D.field(n, par) # input file
 field = initMonterrey(n, par)
