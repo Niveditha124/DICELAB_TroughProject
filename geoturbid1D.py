@@ -16,6 +16,7 @@ import sys
 import numpy as np
 from createFluxY import createFluxY
 from deepCopier import deep_copy
+from initScooby import initScooby
 import plotGenerator
 
 import init1D
@@ -35,6 +36,25 @@ from serializer import Serializer
 def store_data(folder_name):
     # Create and store your images in folder_name
     pass
+
+def get_user_input(prompt, default_value):
+    prompt += '(current: ' + str(default_value) + ')'
+    while True:
+        user_input = input(prompt)
+
+        if not user_input:
+            # User pressed Enter, handle it as needed
+            print("Selecting default...")
+            return None
+        else:
+            try:
+                # Try converting the input to a float
+                float_value = float(user_input)
+                return float_value
+            except ValueError:
+                # If conversion to float fails, prompt the user again
+                print("Invalid input. Please enter a valid float or Enter for defaults.")
+
 
 if __name__ == "__main__":
     folder_name = 'my_folder_' + time.strftime("%Y_%m_%d_%H_%M_%S")
@@ -72,42 +92,29 @@ if __name__ == "__main__":
 # User Inputs
 
 # Gravity user input
-print('\nCurrent Gravity (g): ',  initpar.g)
-temp = None
-while temp is None:
-    try:
-        temp = float(input('Enter a float for Gravity (g): '))
-    except ValueError:
-        print("Error: Enter a valid number!".format(temp))
-initpar.g = (temp) # Makes new Gravity number 
+user_input = (get_user_input('Please enter a value for Gravity', initpar.g))
+if user_input:
+    initpar.g = user_input
+    user_input = None
 
 # Sediment Density user input
-print('\nCurrent Sediment Density (rho_S): ',  initpar.rho_S)
-temp = None
-while temp is None:
-    try:
-        temp = float(input('Enter a float for Sediment Density (rho_S): '))
-    except ValueError:
-        print("Error: Enter a valid number!".format(temp))
-initpar.rho_S = (temp) # Makes new Gravity number 
-
+user_input = (get_user_input('Please enter a value for Sediment Density (rho_S):', initpar.rho_S))
+if user_input:
+    initpar.rho_S = user_input
+    user_input = None
+    
 # Fluid Density user input
-print('\nCurrent Water/Fluid Density (rho_W): ',  initpar.rho_W)
-temp = None
-while temp is None:
-    try:
-        temp = float(input('Enter a float for Water/Fluid Density (rho_W): '))
-    except ValueError:
-        print("Error: Enter a valid number!".format(temp))
-initpar.rho_W = (temp) # Makes new Gravity number 
+user_input = (get_user_input('Please enter a value for Water/Fluid Density (rho_W):', initpar.rho_W))
+if user_input:
+    initpar.rho_W = user_input
+    user_input = None
 
-
-# Can be changed later somehow based on user's wants
+# Generate Plot user input
 plotCreationFlag = input('\nDo you want to generate plot images during this run? (y/n): ')
-if plotCreationFlag.strip().lower() == 'y':
-    plotCreationFlag = True
+if plotCreationFlag.strip().lower()[0] == 'y':
+    plotCreationFlag = True; print('Creating plots')
 else:
-    plotCreationFlag = False
+    plotCreationFlag = False; print('k make your own plots then...')
 
 #############################################################################
 
