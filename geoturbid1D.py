@@ -57,6 +57,9 @@ def get_user_input(prompt, default_value):
 
 
 if __name__ == "__main__":
+
+    os.system('cls')
+
     folder_name = 'my_folder_' + time.strftime("%Y_%m_%d_%H_%M_%S")
     folder_data = folder_name+'/data'
     folder_videos = folder_name+'/videos'
@@ -93,6 +96,7 @@ if __name__ == "__main__":
 
 # Gravity user input
 def request_user_inputs():
+    global plotCreationFlag
     user_input = (get_user_input('Please enter a value for Gravity', initpar.g))
     if user_input:
         initpar.g = user_input
@@ -116,10 +120,6 @@ def request_user_inputs():
         plotCreationFlag = True; print('Creating plots')
     else:
         plotCreationFlag = False; print('k make your own plots then...')
-        
-# Uncomment if you want to ask user for custom values
-# Otherwise it will run default values - Use when testing code
-request_user_inputs()
 
 #############################################################################
 
@@ -132,6 +132,11 @@ o = 1
 geostaticflag = 0
 # material and numerical parameters
 par = initpar
+plotCreationFlag = False # False by default, can be changed by user later or change default value idk
+
+# TODO: Uncomment if you want to ask user for custom values
+# Otherwise it will run default values - Use when testing code
+# request_user_inputs()
 
 # TODO: REMOVEE THIS TESTING CODE 
 field = initScooby(n,par)
