@@ -110,7 +110,7 @@ data = [
 x_original, y_original = zip(*data)
 
 # Number of points you want after interpolation
-desired_points = 202
+desired_points = 5000
 
 # Interpolate to get additional points
 x_interpolated = np.linspace(min(x_original), max(x_original), desired_points)
