@@ -19,42 +19,42 @@ import numpy as np
 
 def initScooby(n,par):
     
-    #INITFIELD initialise flow field
-    #
-    # n = number of cells per unit block length
+    # #INITFIELD initialise flow field
+    # #
+    # # n = number of cells per unit block length
 
-    # initialise flow domain:
-    x0 = 0 # (x0) defines the initial x-coordinate 
-    # Original
-    # Lx = 22000 # (Lx) repersents the length of the flow domain (1 m)
-    Lx = 5000
+    # # initialise flow domain:
+    # x0 = 0 # (x0) defines the initial x-coordinate 
+    # # Original
+    # # Lx = 22000 # (Lx) repersents the length of the flow domain (1 m)
+    # Lx = 5000
     
-    y0 = 0 # (y0) defines the initial y-coordinate 
-    Ly = 0.5 # (Ly) computes the total width of the flow domain (1 m) 
+    # y0 = 0 # (y0) defines the initial y-coordinate 
+    # Ly = 0.5 # (Ly) computes the total width of the flow domain (1 m) 
     
-    # Lx = length of the flow domain (1m)
-    # n = number of cells per unit block length
+    # # Lx = length of the flow domain (1m)
+    # # n = number of cells per unit block length
 
-    dx = Lx/n # (dx) computes the grid spacing based off the sum of all reach lengths (Lx) and number of cells (n)
-    dy=dx
+    # dx = Lx/n # (dx) computes the grid spacing based off the sum of all reach lengths (Lx) and number of cells (n)
+    # dy=dx
     
     # creating field object
     field = init1D.field(n, par) # input file
 
-    # creating an array of (x) values
-    #x = (x0-0.5*dx):dx:(x0+Lx+0.5*dx)
-    # TODO: HELP how does this always give us 202? Also what is the significance of it?
-    # Does it matter in the grand scheme?
-    a = (x0-0.5*dx)
-    b = (x0+Lx+0.5*dx) + 1
-    # Creating a list of items between the range of a to b, with steps dx
-    x = np.arange(a,b, dx)
-    print('a: ', a)
-    print('b: ', b)
-    print('dx: ', dx)
-    # x = np.arange((x0-0.5*dx), (x0+Lx+0.5*dx) + 1, dx) # +1 to match MATLAB results
-    print(x)
-    # sys.exit()
+    # # creating an array of (x) values
+    # #x = (x0-0.5*dx):dx:(x0+Lx+0.5*dx)
+    # # TODO: HELP how does this always give us 202? Also what is the significance of it?
+    # # Does it matter in the grand scheme?
+    # a = (x0-0.5*dx)
+    # b = (x0+Lx+0.5*dx) + 1
+    # # Creating a list of items between the range of a to b, with steps dx
+    # x = np.arange(a,b, dx)
+    # print('a: ', a)
+    # print('b: ', b)
+    # print('dx: ', dx)
+    # # x = np.arange((x0-0.5*dx), (x0+Lx+0.5*dx) + 1, dx) # +1 to match MATLAB results
+    # print(x)
+    # # sys.exit()
     
     # creating a 1 by 1 (y) array with a single value of (1)
     y = np.ones((1,1))
