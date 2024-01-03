@@ -11,11 +11,30 @@ and have all the lab members stare at you in disbelief and confusion.
 
 Love you! <3
 
+# TODO: Check all field. variables coming out of initMonterrey and compare to initScooby
+
 '''
 
 import sys
 import init1D
 import numpy as np
+import pandas as pd
+
+def parse_user_data(path):
+    df = pd.read_csv(path, header=None, names=['Distance', 'Height'])
+    x = df['Distance'].tolist()
+    y = df['Height'].tolist()
+
+    return [x],[y] # To match how data is returned in Monterrey (weird nested array shit)
+
+
+if __name__ == "__main__":
+    x = parse_user_data('monterrey_output.csv')[0]
+    print(type(x))
+    x = np.array(x)
+    print(type(x))
+    print(x)
+
 
 def initScooby(n,par):
     
@@ -56,6 +75,21 @@ def initScooby(n,par):
     # print(x)
     # # sys.exit()
     
+
+    # Creating our own x
+    # TODO: Make x contain values from user
+    # TODO: x/field.x contains x values, field.z_b contains y values
+    x,z_b = parse_user_data('monterrey_output.csv')
+
+    x = np.array(x)
+    z_b = np.array(z_b)
+
+  
+
+
+
+    max_limit = 202
+
     # creating a 1 by 1 (y) array with a single value of (1)
     y = np.ones((1,1))
     
@@ -76,18 +110,20 @@ def initScooby(n,par):
 
     # setting the rigid channel bottom under sediment bed to (-2000) for the whole grid:
     field.z_r = np.ones(field.x.shape) * -2000  # default
-     # setting (z_r) to (-1000) for (x) values greater than (21000):
-    field.z_r[field.x > 21000] = -1000 # field.z_r(field.x>21000) = -1000
+    # setting (z_r) to (-1000) for (x) values greater than (21000):
+    # field.z_r[field.x > 21000] = -1000 # field.z_r(field.x>21000) = -1000
+    # Not really needed, but its fine we'll do our version anyways
+    field.z_r[field.x > max_limit] = -1000
     
-  
+    # Needed before to initialize z_b, not needed anymore.
     # sediment bed level:
-    field.z_b = np.ones(field.x.shape) * -1000  # default
+    # field.z_b = np.ones(field.x.shape) * -1000  # default
     # known points for interpolation
-    xx = [-1e99, 0, 6000, 21000, 21001, 1e99]
-    zz = [0, 0, -78,  -123,  -1000, -1000]
-    field.z_b = np.interp(field.x, xx, zz)
-    print(field.z_b)
-    print(field.x.shape)
+    # xx = [-1e99, 0, 6000, 21000, 21001, 1e99]
+    # zz = [0, 0, -78,  -123,  -1000, -1000]
+    # field.z_b = np.interp(field.x, xx, zz)
+    # Not going to perform interpolation anymore since user will provide all points
+
     # setting the rigid rim around the domain (downstream only) to (1000):
     field.z_r[-1][-1] = 1000
 
