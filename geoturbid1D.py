@@ -138,12 +138,16 @@ plotCreationFlag = False # False by default, can be changed by user later or cha
 # Otherwise it will run default values - Use when testing code
 # request_user_inputs()
 
-# TODO: REMOVEE THIS TESTING CODE 
-field = initScooby(n,par)
-sys.exit()
+# TODO: REMOVE THIS TESTING CODE 
+# field = initScooby(n,par)
+# print(field.z_b)
+# sys.exit()
 
 # field = init1D.field(n, par) # input file
 field = initMonterrey(n, par)
+print(field.z_b)
+sys.exit()
+
 # field_0 = field
 field_0 = initMonterrey(n, par)
 # field_prev = field
