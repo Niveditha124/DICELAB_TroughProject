@@ -20,6 +20,29 @@ import init1D
 import numpy as np
 import pandas as pd
 
+def printField(field):
+    # Print statements for each variable
+    print("\nField.x:", field.x)
+    print("\nField.y:", field.y)
+    print("\nField.u:", field.u)
+    print("\nField.v:", field.v)
+    print("\nField.z_m:", field.z_m)
+    print("\nField.z_r:", field.z_r)
+    print("\nField.z_b:", field.z_b)
+    print("\nField.c_m:", field.c_m)
+    print("\nField.k_m:", field.k_m)
+    
+    with open('scoobyOutput.txt', 'w') as f:
+        print("\nField.x:", field.x, file=f)
+        print("\nField.y:", field.y, file=f)
+        print("\nField.u:", field.u, file=f)
+        print("\nField.v:", field.v, file=f)
+        print("\nField.z_m:", field.z_m, file=f)
+        print("\nField.z_r:", field.z_r, file=f)
+        print("\nField.z_b:", field.z_b, file=f)
+        print("\nField.c_m:", field.c_m, file=f)
+        print("\nField.k_m:", field.k_m, file=f)
+
 def parse_user_data(path):
     df = pd.read_csv(path, header=None, names=['Distance', 'Height'])
     x = df['Distance'].tolist()
@@ -57,6 +80,7 @@ def initScooby(n,par):
     # dx = Lx/n # (dx) computes the grid spacing based off the sum of all reach lengths (Lx) and number of cells (n)
     # dy=dx
     
+    max_limit = 202
     # creating field object
     field = init1D.field(n, par) # input file
 
@@ -81,21 +105,25 @@ def initScooby(n,par):
     # TODO: x/field.x contains x values, field.z_b contains y values
     x,z_b = parse_user_data('monterrey_output.csv')
 
-    x = np.array(x)
-    z_b = np.array(z_b)
+    # Assigning the parsed x, z_b values into field.
+    field.x = np.array(x)
+    field.z_b = np.array(z_b)
+    
 
   
 
 
 
-    max_limit = 202
+    
 
     # creating a 1 by 1 (y) array with a single value of (1)
     y = np.ones((1,1))
-    
     #  setting field (x) and (y) attributes using the above arrays to define the grid
-    field.x = np.ones((1,1)) * x # field.x = np.ones(lengt(y), 1) * x
-    field.y = y * np.ones((1, len(x)))
+    # field.x = np.ones((1,1)) * x # field.x = np.ones(lengt(y), 1) * x
+    field.y = y * np.ones((1, len(field.x[0]))) # shape of field.x and not x since in this code x is not a numpy array yet
+    print('shape of y: ', y.shape)
+    print('shape of x: ', field.x.shape)
+    print('SCOOBY: ', field.y, field.y.shape)
 
     # setting the top of turbid layer to (-1000) for the whole grid:
     field.z_m = np.ones( field.x.shape ) * -1000 #.001
@@ -110,10 +138,14 @@ def initScooby(n,par):
 
     # setting the rigid channel bottom under sediment bed to (-2000) for the whole grid:
     field.z_r = np.ones(field.x.shape) * -2000  # default
+    
     # setting (z_r) to (-1000) for (x) values greater than (21000):
     # field.z_r[field.x > 21000] = -1000 # field.z_r(field.x>21000) = -1000
     # Not really needed, but its fine we'll do our version anyways
-    field.z_r[field.x > max_limit] = -1000
+    # TODO: We might not need to even do this. Ask Isaac
+    field.z_r[field.x > 21000] = -1000
+    
+    
     
     # Needed before to initialize z_b, not needed anymore.
     # sediment bed level:
@@ -126,10 +158,13 @@ def initScooby(n,par):
 
     # setting the rigid rim around the domain (downstream only) to (1000):
     field.z_r[-1][-1] = 1000
-
+    
+    
+    
     # z-ordering condition:
     field.z_b = np.maximum(field.z_b , field.z_r)
     field.z_m = np.maximum(field.z_m , field.z_b)
+    
 
     # velocities:
     field.u = np.zeros(field.x.shape)
@@ -147,5 +182,5 @@ def initScooby(n,par):
     # time:
     # -----
     field.t = 0
-    
+    printField(field)
     return field
