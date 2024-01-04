@@ -58,7 +58,7 @@ def get_user_input(prompt, default_value):
 
 if __name__ == "__main__":
 
-    os.system('cls')
+    os.system('clear')
 
     folder_name = 'my_folder_' + time.strftime("%Y_%m_%d_%H_%M_%S")
     folder_data = folder_name+'/data'
@@ -139,13 +139,10 @@ plotCreationFlag = False # False by default, can be changed by user later or cha
 # request_user_inputs()
 
 # TODO: REMOVE THIS TESTING CODE 
-# field = initScooby(n,par)
-# print(field.z_b)
-# sys.exit()
+field = initScooby(n,par)
 
 # field = init1D.field(n, par) # input file
 field = initMonterrey(n, par)
-print(field.z_b)
 sys.exit()
 
 # field_0 = field
