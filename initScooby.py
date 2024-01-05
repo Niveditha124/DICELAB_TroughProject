@@ -51,14 +51,6 @@ def parse_user_data(path):
     return [x],[y] # To match how data is returned in Monterrey (weird nested array shit)
 
 
-if __name__ == "__main__":
-    x = parse_user_data('monterrey_output.csv')[0]
-    print(type(x))
-    x = np.array(x)
-    print(type(x))
-    print(x)
-
-
 def initScooby(n,par):
     
     # #INITFIELD initialise flow field
@@ -103,17 +95,11 @@ def initScooby(n,par):
     # Creating our own x
     # TODO: Make x contain values from user
     # TODO: x/field.x contains x values, field.z_b contains y values
-    x,z_b = parse_user_data('monterrey_output.csv')
+    x,z_b = parse_user_data('user_input.csv')
 
     # Assigning the parsed x, z_b values into field.
     field.x = np.array(x)
     field.z_b = np.array(z_b)
-    
-
-  
-
-
-
     
 
     # creating a 1 by 1 (y) array with a single value of (1)
@@ -121,9 +107,6 @@ def initScooby(n,par):
     #  setting field (x) and (y) attributes using the above arrays to define the grid
     # field.x = np.ones((1,1)) * x # field.x = np.ones(lengt(y), 1) * x
     field.y = y * np.ones((1, len(field.x[0]))) # shape of field.x and not x since in this code x is not a numpy array yet
-    print('shape of y: ', y.shape)
-    print('shape of x: ', field.x.shape)
-    print('SCOOBY: ', field.y, field.y.shape)
 
     # setting the top of turbid layer to (-1000) for the whole grid:
     field.z_m = np.ones( field.x.shape ) * -1000 #.001
@@ -157,7 +140,8 @@ def initScooby(n,par):
     # Not going to perform interpolation anymore since user will provide all points
 
     # setting the rigid rim around the domain (downstream only) to (1000):
-    field.z_r[-1][-1] = 1000
+    # TODO: Check if this is needed? Although it makes the last point of the graph go yeet up
+    # field.z_r[-1][-1] = 1000
     
     
     
@@ -177,8 +161,6 @@ def initScooby(n,par):
     field.Q_up = field.H_up * field.U_up # the volume transport rate of suspended sediment
     field.K_up = par.CfStar / par.alpha * field.U_up ** 2  # assume turbulence is fully developed at inflow
     
-    
-
     # time:
     # -----
     field.t = 0
