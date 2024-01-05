@@ -132,23 +132,28 @@ o = 1
 geostaticflag = 0
 # material and numerical parameters
 par = initpar
-plotCreationFlag = False # False by default, can be changed by user later or change default value idk
+plotCreationFlag = True # True by default, can be changed by user later or change default value idk
 
 # TODO: Uncomment if you want to ask user for custom values
 # Otherwise it will run default values - Use when testing code
 # request_user_inputs()
 
 # TODO: REMOVE THIS TESTING CODE 
-field = initScooby(n,par)
+# field = initScooby(n,par)
+
+# # field = init1D.field(n, par) # input file
+# field = initMonterrey(n, par)
+# # field_0 = field
+# field_0 = initMonterrey(n, par)
+# # field_prev = field
+# field_prev = initMonterrey(n, par)
 
 # field = init1D.field(n, par) # input file
-field = initMonterrey(n, par)
-sys.exit()
-
+field = initScooby(n, par)
 # field_0 = field
-field_0 = initMonterrey(n, par)
+field_0 = initScooby(n, par)
 # field_prev = field
-field_prev = initMonterrey(n, par)
+field_prev = initScooby(n, par)
 
 # disk output and screen display parameters
 # t0 = (par.h0/par.g)^0.5;]
