@@ -72,5 +72,3 @@ def initMonterrey(n,par):
     field.t = 0
     
     return field
-
-

@@ -16,7 +16,8 @@ def extract_numeric_part(filename):
 
 # TODO: Get datasource folder from user however tf you want idc at this point <3
 # Get the parent folder: eg: 2023_10_25_19_00_00
-dataSource = 'my_folder_2023_10_29_00_09_55'
+# dataSource = 'my_folder_2023_10_29_00_09_55'
+dataSource = input('Please enter the folder of a run: ')
 
 # Parse in filed object
 

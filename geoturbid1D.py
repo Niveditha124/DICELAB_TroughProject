@@ -102,8 +102,6 @@ while temp is None:
 initpar.rho_W = (temp) # Makes new Gravity number 
 
 
-
-titleCounter = 0
 # Can be changed later somehow based on user's wants
 plotCreationFlag = input('\nDo you want to generate plot images during this run? (y/n): ')
 if plotCreationFlag.strip().lower() == 'y':
@@ -111,6 +109,9 @@ if plotCreationFlag.strip().lower() == 'y':
 else:
     plotCreationFlag = False
 
+#############################################################################
+
+titleCounter = 0
 dispflag = 0
 t_end = 3600*1000
 dt_output = 3600

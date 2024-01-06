@@ -16,30 +16,38 @@ def init3Reaches(n, par):
     field = init1D.field(n, par)
 
     # Defining parameters for each reach
-    L1 = 10000 # length of reach 1
-    S1 = 0.01 # slope of reach 1
-    p1 = 0 # amplitude of initial bed perturbation for reach 1
-    L2 = 30000
-    S2 = 0.003
-    p2 = 1
-    L3 = 10000
-    S3 = 0
-    p3 = 0
+    # L1 = 10000 # length of reach 1
+    # S1 = 0.01 # slope of reach 1
+    # p1 = 0 # amplitude of initial bed perturbation for reach 1
+    # L2 = 30000
+    # S2 = 0.003
+    # p2 = 1
+    # L3 = 10000
+    # S3 = 0
+    # p3 = 0
+
+    L = [10000, 30000, 10000]
+    S = [0.01, 0.003, 0]
+    p = [0,1,0]
 
     # assigning the parameters to the field object
-    field.S1 = S1
-    field.S2 = S2
-    field.S3 = S3
-    field.L1 = L1
-    field.L2 = L2
-    field.L3 = L3
-    field.pert1 = p1
-    field.pert2 = p2
-    field.pert3 = p3
+    # field.S1 = S1
+    # field.S2 = S2
+    # field.S3 = S3
+    # field.L1 = L1
+    # field.L2 = L2
+    # field.L3 = L3
+    # field.pert1 = p1
+    # field.pert2 = p2
+    # field.pert3 = p3
+    field.S = S
+    field.L = L
+    field.pert = p
 
     # initialise flow domain:
-    x0 = -L1 # (x0) defines the starting point of the x-coordinate
-    Lx = L1+L2+L3 # (Lx) computes the sum of all reach lenghts (1 m)
+    x0 = -L[0] # (x0) defines the starting point of the x-coordinate
+    # Lx = L1+L2+L3 # (Lx) computes the sum of all reach lenghts (1 m)
+    Lx = sum(L)
     y0 = 0 # (y0) defines the initial y-coordinate 
     Ly = 0.5 # (Ly) computes the total width of the flow domain (1 m) 
     dx = Lx/n # (dx) computes the grid spacing based off the sum of all reach lengths (Lx) and number of cells (n)
@@ -52,16 +60,16 @@ def init3Reaches(n, par):
     field.y = y * np.ones((1,len(x)))
 
     # defines index arrays for each reach
-    isX1 = np.where((field.x > -field.L1) & (field.x < 0))[1]
+    isX1 = np.where((field.x > -field.L[0]) & (field.x < 0))[1]
     # Adding 1 to every element in the list for some reason they are all 1 less idk
     isX1 = [x+1 for x in isX1]
     isX1 = np.array(isX1) # converting back to ndarray
 
-    isX2 = np.where((field.x > 0) & (field.x<field.L2))[1]
+    isX2 = np.where((field.x > 0) & (field.x<field.L[1]))[1]
     isX2 = [x+1 for x in isX2]
     isX2 = np.array(isX2) # converting back to ndarray
     
-    isX3 = np.where((field.x > field.L2) & (field.x < (field.L2 + field.L3)))[1]
+    isX3 = np.where((field.x > field.L[1]) & (field.x < (field.L[1] + field.L[2])))[1]
     isX3 = [x+1 for x in isX3]
     isX3 = np.array(isX3) # converting back to ndarray
 
@@ -89,8 +97,8 @@ def init3Reaches(n, par):
     field.z_b = np.ones( field.x.shape ) *- 1000 # default
     
     # defines known points for interpolation to set bed levels
-    xx = np.array([-L1, 0, L2, L2+L3])
-    zz = np.array([L1*S1, 0, -L2*S2, -L2*S2-L3*S3])
+    xx = np.array([-L[0], 0, L[1], L[1]+L[2]])
+    zz = np.array([L[0]*S[0], 0, -L[1]*S[1], -L[1]*S[1]-L[2]*S[2]])
     # field.z_b = np.interp(xx,zz,field.x[0])
 
     # interpolating to set bed levels
@@ -108,11 +116,11 @@ def init3Reaches(n, par):
     #initial bed perturbations
     shape = field.z_b.shape
     for i in isX1:
-        field.z_b[0][i] = np.float64(field.z_b[0][i] + ( np.random.rand() * p1 - p1 / 2))
+        field.z_b[0][i] = np.float64(field.z_b[0][i] + ( np.random.rand() * p[0] - p[0] / 2))
     for i in isX2:
-        field.z_b[0][i] = np.float64(field.z_b[0][i] + ( np.random.rand() * p2 - p2 / 2))
+        field.z_b[0][i] = np.float64(field.z_b[0][i] + ( np.random.rand() * p[1] - p[1] / 2))
     for i in isX3:
-        field.z_b[0][i] = np.float64(field.z_b[0][i] + ( np.random.rand() * p3 - p3 / 2))
+        field.z_b[0][i] = np.float64(field.z_b[0][i] + ( np.random.rand() * p[2] - p[2] / 2))
 
 
     

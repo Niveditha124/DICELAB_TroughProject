@@ -29,7 +29,7 @@ def create_gif(png_folder, output_gif, duration=100):
 
 if __name__ == "__main__":
     # Replace these paths with your PNG folder path and the desired output GIF path
-    png_folder_path = "images\python\iacbchanges"
-    output_gif_path = "videos/original - g=3698/iacbchanges_python.gif"
+    png_folder_path = "my_folder_2023_12_26_16_37_54\images/flowprofile"
+    output_gif_path = "my_folder_2023_12_26_16_37_54/videos/flowprofile - CodeArrayWorks.gif"
 
     create_gif(png_folder_path, output_gif_path)
