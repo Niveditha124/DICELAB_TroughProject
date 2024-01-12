@@ -95,7 +95,7 @@ def initScooby(n,par):
     # Creating our own x
     # TODO: Make x contain values from user
     # TODO: x/field.x contains x values, field.z_b contains y values
-    x,z_b = parse_user_data('user_input.csv')
+    x,z_b = parse_user_data('monterrey_output.csv')
 
     # Assigning the parsed x, z_b values into field.
     field.x = np.array(x)

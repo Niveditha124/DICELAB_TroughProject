@@ -25,8 +25,8 @@ def generate_flowprofile(field, field_0, filepath):
         plt.title(title)
         # Save the plot as a PNG image
         # plt.ylim(-300,300)
-        maxYLimit = max(max(field_0.z_b[0]), max(field.z_b[0]), max(field.z_m[0])) - 1000 + 100
-        minYLimit = min(min(field_0.z_b[0]), min(field.z_b[0]), min(field.z_m[0])) + 1000 - 100
+        maxYLimit = max(max(y1),max(y2),max(y3)) 
+        minYLimit = min(min(y1),min(y2),min(y3))
         plt.ylim(minYLimit, maxYLimit)
         plt.savefig(filepath)
         plt.close()  # Close the figure to clear it for the next run
