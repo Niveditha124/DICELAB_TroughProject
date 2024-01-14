@@ -72,7 +72,7 @@ def initScooby(n,par):
     # dx = Lx/n # (dx) computes the grid spacing based off the sum of all reach lengths (Lx) and number of cells (n)
     # dy=dx
     
-    max_limit = 202
+    #max_limit = 202
     # creating field object
     field = init1D.field(n, par) # input file
 

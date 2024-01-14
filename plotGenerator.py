@@ -1,9 +1,15 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 #TODO: Error checking for filepath directory
+def parse_user_data(path):
+    df = pd.read_csv(path, header=None, names=['Distance', 'Height'])
+    x = df['Distance'].tolist()
+    y = df['Height'].tolist()
 
+    return [x],[y] # To match how data is returned in Monterrey (weird nested array shit)
 def generate_flowprofile(field, field_0, filepath):
         '''Function generates the flow profile graph to predetermined directory. Change directory in this method directly'''
 
@@ -25,8 +31,13 @@ def generate_flowprofile(field, field_0, filepath):
         plt.title(title)
         # Save the plot as a PNG image
         # plt.ylim(-300,300)
-        maxYLimit = max(max(y1),max(y2),max(y3)) 
-        minYLimit = min(min(y1),min(y2),min(y3))
+        x,y = parse_user_data('monterrey_output.csv')
+        y = y[0]
+        maxYLimit = max(y) - (max(y)/2)
+        minYLimit = min(y) + (min(y)/2)
+        if maxYLimit == 0: # formatting graph if max y is 0
+            maxYLimit = 100
+
         plt.ylim(minYLimit, maxYLimit)
         plt.savefig(filepath)
         plt.close()  # Close the figure to clear it for the next run
