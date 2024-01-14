@@ -31,7 +31,7 @@ def generate_flowprofile(field, field_0, filepath):
         plt.title(title)
         # Save the plot as a PNG image
         # plt.ylim(-300,300)
-        x,y = parse_user_data('monterrey_output.csv')
+        x,y = parse_user_data('output.csv')
         y = y[0]
         maxYLimit = max(y) - (max(y)/2)
         minYLimit = min(y) + (min(y)/2)
