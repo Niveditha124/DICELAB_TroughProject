@@ -1,11 +1,16 @@
 import numpy as np
 import sys
+import init1D
+import initpar
 
 
 class fluxx:
+    par = initpar
+    n = 200
+    fieldfluxx = init1D.field(n,par)
     # initializes class attributes with specific shapes
-    s = (1, 203)
-    t = (1, 204)
+    s = (1, fieldfluxx.s + 1)
+    t = (1, fieldfluxx.s + 2)
     q_m = np.zeros(s)
     sig_l = np.zeros(s)
     sig_r = np.zeros(s)
