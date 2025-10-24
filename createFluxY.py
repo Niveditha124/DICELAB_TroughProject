@@ -3,7 +3,7 @@ import numpy as np
 class createFluxY:
     
     def __init__(self, field):
-        s = (2,202)
+        s = (2, field.s)
         self.q_m = np.zeros(s)
         self.sig_l = np.zeros(s)
         self.sig_r = np.zeros(s)
