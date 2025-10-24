@@ -83,7 +83,7 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     kh_r = kh[:, 1:n] - 0.5 * grad.dkh[:, 1:n]
     
     # z_bl = np.full((1, 203), 0.5)
-    s = (1, 203)
+    s = (1, field.s+1)
     z_bl = np.zeros(s)
     z_br = np.full((1, 203), 0.5)
     # z_bl = ((z_bl[:, np.arange(0, n - 1)] + field.z_b[:, np.arange(0, n - 1)]) * grad.dz_b[:, np.arange(0, n - 1)])
