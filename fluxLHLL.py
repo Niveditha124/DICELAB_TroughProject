@@ -1,11 +1,16 @@
 import numpy as np
 import sys
+import init1D
+import initpar
 
 
 class fluxx:
+    par = initpar
+    n = 200
+    fieldfluxx = init1D.field(n,par)
     # initializes class attributes with specific shapes
-    s = (1, 203)
-    t = (1, 204)
+    s = (1, fieldfluxx.s + 1)
+    t = (1, fieldfluxx.s + 2)
     q_m = np.zeros(s)
     sig_l = np.zeros(s)
     sig_r = np.zeros(s)
@@ -78,7 +83,7 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     kh_r = kh[:, 1:n] - 0.5 * grad.dkh[:, 1:n]
     
     # z_bl = np.full((1, 203), 0.5)
-    s = (1, 203)
+    s = (1, field.s+1)
     z_bl = np.zeros(s)
     z_br = np.full((1, 203), 0.5)
     # z_bl = ((z_bl[:, np.arange(0, n - 1)] + field.z_b[:, np.arange(0, n - 1)]) * grad.dz_b[:, np.arange(0, n - 1)])

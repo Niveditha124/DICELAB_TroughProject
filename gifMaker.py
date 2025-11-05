@@ -16,8 +16,6 @@ def create_gif(png_folder, output_gif, duration=100):
     # Sort the files to maintain the order of frames
     # png_files.sort()
     sorted_filenames = sorted(png_files, key=extract_numeric_part)
-    print(sorted_filenames)
-    input()
 
     for png_file in sorted_filenames:
         img_path = os.path.join(png_folder, png_file)
@@ -25,11 +23,33 @@ def create_gif(png_folder, output_gif, duration=100):
         images.append(img)
 
     # Save the images as a GIF
-    images[0].save(output_gif, save_all=True, append_images=images[1:], optimize=False, duration=duration, loop=0)
+    images[0].save(
+            output_gif, 
+            save_all=True, 
+            append_images=images[1:], 
+            optimize=False, 
+            duration=duration, 
+            loop=0
+        )
+    print(f"GIF created: {output_gif}")
 
 if __name__ == "__main__":
     # Replace these paths with your PNG folder path and the desired output GIF path
-    png_folder_path = "my_folder_2023_12_26_16_37_54\images/flowprofile"
-    output_gif_path = "my_folder_2023_12_26_16_37_54/videos/flowprofile - CodeArrayWorks.gif"
+    folder_name = 'my_folder_' + time.strftime("%Y_%m_%d_%H_%M_%S")
+    
+    # Define image and video folders
+    png_flowprofile = folder_name + "/images/flowprofile"
+    png_ucprofile = folder_name + "/images/ucprofile"
+    png_kfrprofile = folder_name + "/images/kfrprofile"
+    png_iacbchanges = folder_name + "/images/iacbchanges"
 
-    create_gif(png_folder_path, output_gif_path)
+    output_flowprofile = folder_name + "/videos/flowprofile - CodeArrayWorks.gif"
+    output_ucprofile = folder_name + "/videos/ucprofile - CodeArrayWorks.gif"
+    output_kfrprofile = folder_name + "/videos/kfrprofile - CodeArrayWorks.gif"
+    output_iacbchanges = folder_name + "/videos/iacbchanges - CodeArrayWorks.gif"
+
+    # Create GIFs
+    create_gif(png_flowprofile, output_flowprofile)
+    create_gif(png_ucprofile, output_ucprofile)
+    create_gif(png_kfrprofile, output_kfrprofile)
+    create_gif(png_iacbchanges, output_iacbchanges)

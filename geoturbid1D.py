@@ -31,6 +31,8 @@ from relax import relax
 from fieldIO import stringify_field, parse_field # parse_field implement later to parse in field text files
 from timestep import timestep
 from serializer import Serializer
+import gifMaker
+
 
 def store_data(folder_name):
     # Create and store your images in folder_name
@@ -71,44 +73,53 @@ if __name__ == "__main__":
 #############################################################################
 # User Inputs
 
-# Gravity user input
-print('\nCurrent Gravity (g): ',  initpar.g)
-temp = None
-while temp is None:
-    try:
-        temp = float(input('Enter a float for Gravity (g): '))
-    except ValueError:
-        print("Error: Enter a valid number!".format(temp))
-initpar.g = (temp) # Makes new Gravity number 
 
-# Sediment Density user input
-print('\nCurrent Sediment Density (rho_S): ',  initpar.rho_S)
-temp = None
-while temp is None:
-    try:
-        temp = float(input('Enter a float for Sediment Density (rho_S): '))
-    except ValueError:
-        print("Error: Enter a valid number!".format(temp))
-initpar.rho_S = (temp) # Makes new Gravity number 
-
-# Fluid Density user input
-print('\nCurrent Water/Fluid Density (rho_W): ',  initpar.rho_W)
-temp = None
-while temp is None:
-    try:
-        temp = float(input('Enter a float for Water/Fluid Density (rho_W): '))
-    except ValueError:
-        print("Error: Enter a valid number!".format(temp))
-initpar.rho_W = (temp) # Makes new Gravity number 
+UserInputFlag = input('\nDo you want to provide parameters? (if not, default parameters will be used) (y/n): ')
+if UserInputFlag.strip().lower() == 'y':
+    UserInputFlag = True
+else:
+    UserInputFlag = False
 
 
+if UserInputFlag:
+    # Gravity user input
+    print('\nCurrent Gravity (g): ',  initpar.g)
+    temp = None
+    while temp is None:
+        try:
+            temp = float(input('Enter a float for Gravity (g): '))
+        except ValueError:
+            print("Error: Enter a valid number!".format(temp))
+    initpar.g = (temp) # Makes new Gravity number 
+    
+    # Sediment Density user input
+    print('\nCurrent Sediment Density (rho_S): ',  initpar.rho_S)
+    temp = None
+    while temp is None:
+        try:
+            temp = float(input('Enter a float for Sediment Density (rho_S): '))
+        except ValueError:
+            print("Error: Enter a valid number!".format(temp))
+    initpar.rho_S = (temp) # Makes new Gravity number 
+    
+    # Fluid Density user input
+    print('\nCurrent Water/Fluid Density (rho_W): ',  initpar.rho_W)
+    temp = None
+    while temp is None:
+        try:
+            temp = float(input('Enter a float for Water/Fluid Density (rho_W): '))
+        except ValueError:
+            print("Error: Enter a valid number!".format(temp))
+    initpar.rho_W = (temp) # Makes new Gravity number 
+    
+    
 # Can be changed later somehow based on user's wants
 plotCreationFlag = input('\nDo you want to generate plot images during this run? (y/n): ')
 if plotCreationFlag.strip().lower() == 'y':
     plotCreationFlag = True
 else:
     plotCreationFlag = False
-
+    
 #############################################################################
 
 titleCounter = 0
@@ -120,13 +131,9 @@ o = 1
 geostaticflag = 0
 # material and numerical parameters
 par = initpar
-
-# field = init1D.field(n, par) # input file
-field = initMonterrey(n, par)
-# field_0 = field
-field_0 = initMonterrey(n, par)
-# field_prev = field
-field_prev = initMonterrey(n, par)
+field = init1D.field(n, par)
+field_0 = init1D.field(n,par)
+field_prev = init1D.field(n,par)
 
 # disk output and screen display parameters
 # t0 = (par.h0/par.g)^0.5;]
@@ -266,4 +273,29 @@ while field.t < t_end:          # Loops from begginning of field to end (usually
         break
     if titleCounter == 102:
         break
+
+
+
+print("\nSimulation complete!")
+
+############################# make gif 
+
+png_folder_path = images_flowprofile
+output_gif_path = videos_flowprofile + "/flowprofile.gif"
+gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
+
+png_folder_path = images_ucprofile
+output_gif_path = videos_ucprofile + "/ucprofile.gif"
+gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
+
+png_folder_path = images_kfrprofile
+output_gif_path = videos_kfrprofile + "/kfrprofile.gif"
+gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
+
+png_folder_path = images_iacbchanges
+output_gif_path = videos_iacbchanges + "/iacbchanges.gif"
+gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
+
+print("GIFs saved!")
+
 

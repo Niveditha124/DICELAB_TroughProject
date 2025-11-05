@@ -8,6 +8,7 @@ class newfield:
     # assigning properties from the original (field) object to the new class
     x = field.x 
     y = field.y
+    s = field.s #shape of the x array
     z_m = field.z_m # elevation of the flow at a certain point??
     c_m = field.c_m # sediment concentration within the current
     k_m = field.k_m # turbulent kinetic energy within the flow
@@ -65,7 +66,8 @@ def mirror(field):
     # newfield.v = np.array([field.v[0, 0], field.v, field.v[:, n - 1]], dtype=object)
     # newfield.v = weedmark_ext(field.v)
     newfield.v = np.concatenate((field.v[:, 0][:, np.newaxis], field.v, field.v[:, -1][:, np.newaxis]), axis=1)
-    
+
+    newfield.s = field.s
     
     # Assigning properties which are not extended
     newfield.Q_up = field.Q_up

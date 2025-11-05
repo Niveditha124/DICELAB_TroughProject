@@ -24,7 +24,7 @@ def generate_flowprofile(field, field_0, filepath):
         title = 'flow profile, t = ' + str(math.floor(field.t/3600))
         plt.title(title)
         # Save the plot as a PNG image
-        plt.ylim(-300,300)
+        plt.ylim(-300,2500)
         plt.savefig(filepath)
         plt.close()  # Close the figure to clear it for the next run
 

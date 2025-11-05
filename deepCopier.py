@@ -34,6 +34,7 @@ def deep_copy(field: init1D.field, newfield: init1D.field):
 
 
     newfield.n = copy.deepcopy(field.n)
+    newfield.s = copy.deepcopy(field.s)
     newfield.U_up = copy.deepcopy(field.U_up)
     newfield.H_up = copy.deepcopy(field.H_up)
     newfield.C_up = copy.deepcopy(field.C_up)
