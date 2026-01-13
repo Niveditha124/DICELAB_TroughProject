@@ -1,11 +1,20 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+from PIL import Image
+import seaborn as sns
+import matplotlib 
 
-#TODO: Error checking for filepath directory
+
+past_x = []
+past_y = []
+colors = []
 
 def generate_flowprofile(field, field_0, filepath):
         '''Function generates the flow profile graph to predetermined directory. Change directory in this method directly'''
+
+        
 
         x1 = field.x[0]
         y1 = field_0.z_b[0]
@@ -15,18 +24,88 @@ def generate_flowprofile(field, field_0, filepath):
         y3 = field.z_m[0]
 
         # -------------------------------------------------     FLOW PROFILE GRAPH       ------------------------------------------------- #
-        plt.plot(x1, y1, color=(0.7, 0.7, 0.7))
-        plt.plot(x2, y2, color='r')
-        plt.plot(x3, y3, color='b')
+        idx = np.argmax(x1 >= 1000)
+        plt.plot(x1[idx:], y1[idx:], color=(0.7, 0.7, 0.7))
+        plt.plot(x2[idx:], y2[idx:], color='r')
+        if field.f == 1:
+            plt.plot(x3[idx:], y3[idx:], color='b')
         plt.grid(color='gray', linestyle='--', linewidth=0.5)
         plt.xlabel('field.x (m)')
         plt.ylabel('(m)')
         title = 'flow profile, t = ' + str(math.floor(field.t/3600))
         plt.title(title)
+        '''if field.h == 0 & field.f == 0:
+            plt.text(1, 1, "hemi & flow off", transform=plt.gca().transAxes,ha='right', va='top')
+        if field.h == 0 & field.f == 1:
+            plt.text(1, 1, "hemi off, flow on", transform=plt.gca().transAxes,ha='right', va='top')
+        if field.h == 1 & field.f == 1:
+            plt.text(1, 1, "hemi & flow on", transform=plt.gca().transAxes,ha='right', va='top')
+        if field.h == 1 & field.f == 0:
+            plt.text(1, 1, "hemi on, flow off", transform=plt.gca().transAxes,ha='right', va='top')'''
+
         # Save the plot as a PNG image
-        plt.ylim(-300,2500)
+        #plt.xlim(1000,40000)
+        #plt.ylim(-300, 2500)
+        #plt.ylim(-500,250)
         plt.savefig(filepath)
         plt.close()  # Close the figure to clear it for the next run
+
+def generate_flowprofilecontour(field, field_0, filepath):
+    x = field.x[0]          
+    y = field.z_b[0]        
+    y2 = field.z_m[0]       
+    if field.f == 0: 
+        nu2d = np.ones((field.s,field.s))
+    else:
+        nu2d = field.nu2d       
+
+    global past_x, past_y, colors
+    past_x.append(x)
+    past_y.append(y)
+
+    sns.set_theme(style="whitegrid", context="talk")
+    plt.figure(figsize=(18, 10))
+    cmap = matplotlib.colormaps.get_cmap('RdGy')
+
+
+    for i in range(len(past_x)):
+        if i == len(past_x) - 1:
+            color = cmap(np.random.rand())
+            colors.append(color)
+        else:
+            color = colors[i]
+            y_clipped = np.minimum(past_y[i], y)
+            sns.lineplot(x=past_x[i], y=y_clipped, linewidth=3,
+                         color=color, alpha=0.7)
+
+    J = nu2d.shape[0]                     
+    frac = np.linspace(0, 1, J)[:, None]   
+    Ygrid = y + frac * (y2 - y)           
+    Xgrid = np.tile(x[None, :], (J, 1))    
+
+
+    mask = (Ygrid < y) | (Ygrid > y2)      
+    nu_masked = np.ma.masked_where(mask, nu2d)
+
+    contour = plt.contourf(Xgrid, Ygrid, nu_masked,
+                           cmap='GnBu', levels=50)
+    cbar = plt.colorbar(contour)
+    cbar.set_label('flow density (nu)')
+
+    sns.lineplot(x=x, y=y2, color='b', linewidth=2.5, label='Flow Surface')
+    sns.lineplot(x=x, y=y, color='black', linewidth=3, label='Bed Elevation')
+
+    plt.xlabel('field.x (m)')
+    plt.ylabel('(m)')
+    #plt.ylim(-0, 900)
+    #plt.xlim(0, 20000)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(filepath, dpi=300)
+    plt.close()
+
+
+
 
 
 
