@@ -10,11 +10,10 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     # (ls) and (rs) calculate left and right slopes
     ls = flux_x.q_m[:, 0:n] - flux_x.q_m[:, 1:n+1]
     rs = flux_y.q_m[0:m, :] - flux_y.q_m[1:m+1, :]
+
     # (z_m_new) updates the fluid elevation of the current
     z_m_new = field.z_m + ((dt / dx) * ls) + ((dt / dy) * rs)
-   
     z_m_new = field.z_m + (dt/dx) * (flux_x.q_m[:, :n] - flux_x.q_m[:, 1:n+1]) + (dt/dy) * (flux_y.q_m[:m, :] - flux_y.q_m[1:m+1, :])
-    
     #+ (dt/dy) * (flux_y.q_m[0:m, :] - flux_y.q_m[1:m+1, :])
     
     # (qm_x) calculates mass flux in the x-direction, which repersents the amount of sediment-laden water moving horizontally along the slope
@@ -46,8 +45,15 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     # (nu) calculates sediment mass per unit volume
     nu = np.multiply((field.z_m - field.z_b), field.c_m)
     # (nu_new) updates sediment mass per unit volume based on changes in sediment flux  
-    nu_new = nu + (dt/dx) * (flux_x.mu[:, :n] - flux_x.mu[:, 1:n+1]) \
-            + (dt/dy) * (flux_y.mu[:m, :] - flux_y.mu[1:m+1, :])
+    nu_new = nu + (dt/dx) * (flux_x.mu[:, :n] - flux_x.mu[:, 1:n+1]) 
+            #+ (dt/dy) * (flux_y.mu[:m, :] - flux_y.mu[1:m+1, :])
+    
+    mux = np.tile(flux_x.mu,(field.s,1))
+    muy = np.tile(flux_y.mu, (1,field.s))
+    nu_new2d = nu + (dt/dx)* (mux[:, :n] - mux[:, 1:n+1]) \
+                + (dt/dy) * (muy[:n, :] - muy[1:n+1, :])
+    
+    #nu_new2d = []
     
     # (kh) calculates turbulent kinetic energy per unit volume, which repersents the energy corresponding to turbulent motion within the current
     kh = np.multiply((field.z_m - field.z_b), field.k_m)
@@ -63,7 +69,7 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
 
     # positivity condition
     c_m_new = np.maximum(c_m_new, 0)
-
+    
     # turb kin energy update:
     k_m_new = ((z_m_new - field.z_b) > par.h_min) * kh_new / np.maximum((z_m_new - field.z_b), par.h_min) + ((z_m_new - field.z_b) <= par.h_min) * field.k_m
 
@@ -76,10 +82,15 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
 
     # final update
     newfield = field
-    newfield.z_m = z_m_new
+    if field.f == 1:
+        newfield.z_m = z_m_new
+    else: 
+        newfield.z_m = field.z_b
     newfield.u = u_new
     newfield.v = v_new
     newfield.c_m = c_m_new
     newfield.k_m = k_m_new
+    newfield.nu = nu_new     
+    newfield.nu2d = nu_new2d   
 
     return newfield
