@@ -65,7 +65,12 @@ def entrainment(field, par, dt):
     newfield = field
     newfield.u = u_new
     newfield.v = v_new
-    newfield.z_m = field.z_b + h_new
+    if field.f == 1:
+        newfield.z_m = field.z_b + h_new
+    else:
+        newfield.z_m = field.z_b
     newfield.c_m = c_new
     newfield.k_m = k_new
+
+
     return newfield
