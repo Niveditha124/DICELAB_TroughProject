@@ -42,7 +42,7 @@ Rf = math.pow(((math.pow(10, y)) / Rp), 1 / 3)
 vs = Rf * (R * g * D) ** 0.5
 # v_hemi = 0 * 90e-6  # % rate of aggradation from hemipelagic sediments in-between turbidity current events 1e-5
 # TODO
-v_hemi = 1e-5
+v_hemi = 1e-8
 # %   numerical parameters:
 # h0 = 300  # % typical depth [m] [10]
 h0 = 10
