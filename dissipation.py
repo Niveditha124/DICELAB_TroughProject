@@ -13,7 +13,7 @@ def dissipation (field, par, dt):
     # the np.maximum() function ensures Richardson number is non-negative, and negates the possibilty of undefined behavior
     Ri = np.maximum(Ri, 0) 
     # (ew) calculates the dimensionless coefficient governing the entrainment of ambient water into the current
-    ew = 0.00153 / (0.0204 + Ri)
+    ew = (0.00153 / (0.0204 + Ri))
     # (Beta) calculates the dissipation of turbulent kinetic energy due to the ever-increasing values of the sediment entertainment coefficent (es) 
     # turbulennt energy is lost and dissipated due to it's energy being consumed in increasing the potential energy of the sediment being entrained
     Beta = (0.5 * ew * (1 - Ri - 2 * par.CfStar / par.alpha) + par.CfStar) / ((par.CfStar/par.alpha) ** 1.5)
