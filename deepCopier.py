@@ -16,17 +16,8 @@ def deep_copy(field: init1D.field, newfield: init1D.field):
     newfield.z_b = copy.deepcopy(field.z_b)
     newfield.u = copy.deepcopy(field.u)
     newfield.v = copy.deepcopy(field.v)
-    
-    # Integers should auto deep copy I think
-    # newfield.L1 = copy.deepcopy(field.L1)
-    # newfield.S1 = copy.deepcopy(field.S1)
-    # newfield.p1 = copy.deepcopy(field.p1)
-    # newfield.L2 = copy.deepcopy(field.L2)
-    # newfield.S2 = copy.deepcopy(field.S2)
-    # newfield.p2 = copy.deepcopy(field.p2)
-    # newfield.L3 = copy.deepcopy(field.L3)
-    # newfield.S3 = copy.deepcopy(field.S3)
-    # newfield.p3 = copy.deepcopy(field.p3)
+
+
     
     newfield.L = copy.deepcopy(field.L)
     newfield.S = copy.deepcopy(field.S)
@@ -34,13 +25,17 @@ def deep_copy(field: init1D.field, newfield: init1D.field):
 
 
     newfield.n = copy.deepcopy(field.n)
-    newfield.s = copy.deepcopy(field.s)
     newfield.U_up = copy.deepcopy(field.U_up)
     newfield.H_up = copy.deepcopy(field.H_up)
     newfield.C_up = copy.deepcopy(field.C_up)
     newfield.Q_up = copy.deepcopy(field.Q_up)
     newfield.K_up = copy.deepcopy(field.K_up)
     newfield.t = copy.deepcopy(field.t)
+    newfield.s = copy.deepcopy(field.s)
+    newfield.nu = copy.deepcopy(field.nu)
+    newfield.nu2d = copy.deepcopy(field.nu2d)
+    newfield.f = copy.deepcopy(field.f)
+    newfield.h = copy.deepcopy(field.h)
     
     return newfield
 
