@@ -128,8 +128,8 @@ else:
 #############################################################################
 import pandas as pd
 # creating an array of (x) values
-intermittency = pd.read_csv("intermittency_v1.csv")
-inter_time = intermittency["time (hours)"].values
+intermittency = pd.read_csv("intermittency_1year.csv")*3600
+inter_time = (intermittency["time (hours)"].values)
 flow = intermittency["flow (1/0)"].values
 hemi = intermittency["hemipelagic (1/0)"].values
 #################################################################################
@@ -138,7 +138,10 @@ titleCounter = 0
 dispflag = 0
 #t_end = 3600*1000
 t_end = max(inter_time)
-dt_output = 3600
+dt_output = 360000
+
+
+
 
 n = 200
 o = 1
@@ -151,6 +154,7 @@ field_0 = initMonterrey(n,par)
 field_prev = initMonterrey(n,par)
 
 
+
 t_output = np.arange(0, t_end + dt_output, dt_output)
 i_output = 1
 
@@ -158,7 +162,6 @@ i_output = 1
 firstTimeStep = 1
 iter = 1
 flux_x = None
-
 
 while field.t < t_end:          # Loops from begginning of field to end 
 
@@ -176,9 +179,11 @@ while field.t < t_end:          # Loops from begginning of field to end
 
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
 
-        dt = timestep(field, par)           # timestep evaluation
+        dt = timestep(field, par)    # timestep evaluation
+        dtarray.append(dt)
         if firstTimeStep:
             dt = min(dt, 0.1)           
+            
             firstTimeStep = 0
         # disp(['t = ' num2str(field.t) ' [sec]']); # time display
     # empty outflowing pit
@@ -210,11 +215,11 @@ while field.t < t_end:          # Loops from begginning of field to end
 
         if plotCreationFlag:
 
-            #plotGenerator.generate_flowprofile(field, field_0, images_flowprofile + '/plot' + str(titleCounter) + '.png')
+            plotGenerator.generate_flowprofile(field, field_0, images_flowprofile + '/plot' + str(titleCounter) + '.png')
             #plotGenerator.generate_ucprofile(field, images_ucprofile + '/plot' + str(titleCounter) + '.png')
             #plotGenerator.generate_kfrprofile(field, par, images_kfrprofile + '/plot' + str(titleCounter) + '.png')
             #plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, images_iacbchanges + '/plot' + str(titleCounter) + '.png')
-            plotGenerator.generate_flowprofilecontour(field, field_0, images_flowprofilecontour + '/plot' + str(titleCounter)+'.png')
+            #plotGenerator.generate_flowprofilecontour(field, field_0, images_flowprofilecontour + '/plot' + str(titleCounter)+'.png')
         
         # Writing field data to file
         filename = folder_data + '/field' + str(titleCounter) + '.txt'
@@ -233,33 +238,12 @@ while field.t < t_end:          # Loops from begginning of field to end
     # book-keeping|
     field_prev = deep_copy(field, field_prev)
 
-    if field.h == 1 and field.f == 0: 
-        # half-step relaxation operator:
-        if np.logical_and((o == 2), (iter % 2 == 1)):
-            field = relax(field, par, 0.5 * dt, geostaticflag)
-
-        # extend field left and right:   
-        field_x = mirror(field)
-
+    if field.f == 0: 
         #hyperbolic operator:
         if o == 1:
-            field = relax(field, par, dt, geostaticflag)
+            field.z_m = field.z_b
             # time update
             field.t = field.t + dt
-
-        else:
-            if o == 2:
-                # 2nd order predictor-corrector (Alcrudo & Garcia-Navarro 1993):
-                if iter % 2 == 1:
-                    # book-keeping of previous field:
-                    field_prev = deep_copy(field, field_prev)
-                    # predictor step:
-                    field = hyperbolic(field, flux_x, flux_y, par, 0.5 * dt)
-                else:
-                    # half-step relaxation operator:
-                    field = relax(field, par, 0.5 * dt, geostaticflag)
-                    # time update:
-                    field.t = field.t + dt
 
     if field.f == 1:    
         # half-step relaxation operator:
@@ -293,11 +277,12 @@ while field.t < t_end:          # Loops from begginning of field to end
         if o == 1:
             # 1st order forward Euler:
             field = hyperbolic(field, flux_x, flux_y, par, dt)
+            
             # relaxation operator:
             field = relax(field, par, dt, geostaticflag)
             # time update
             field.t = field.t + dt
-
+    
         else:
             if o == 2:
                 # 2nd order predictor-corrector (Alcrudo & Garcia-Navarro 1993):
@@ -315,14 +300,14 @@ while field.t < t_end:          # Loops from begginning of field to end
                     # time update:
                     field.t = field.t + dt
     
-    
+
     iter = iter + 1
     
     # 206516 # 406516
-    if iter == 406516:
+    if iter == 406516*4:
         
         break
-    if titleCounter == 400: #102
+    if titleCounter == 402: #102
         break
 
 
@@ -330,11 +315,12 @@ print(field.t)
 ############################# make gif
 print("\nSimulation complete!")
 
-'''png_folder_path = images_flowprofile
+png_folder_path = images_flowprofile
 output_gif_path = videos_flowprofile + "/flowprofile.gif"
 gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
 
-png_folder_path = images_ucprofile
+
+'''png_folder_path = images_ucprofile
 output_gif_path = videos_ucprofile + "/ucprofile.gif"
 gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
 
@@ -344,10 +330,10 @@ gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
 
 png_folder_path = images_iacbchanges
 output_gif_path = videos_iacbchanges + "/iacbchanges.gif"
-gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)'''
+gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
 
 png_folder_path = images_flowprofilecontour
 output_gif_path = videos_flowprofilecontour + "/flowprofilecontour.gif"
-gifMaker.create_gif(png_folder_path, output_gif_path, duration= 150)
+gifMaker.create_gif(png_folder_path, output_gif_path, duration= 150)'''
 
 print("GIFs saved!")
