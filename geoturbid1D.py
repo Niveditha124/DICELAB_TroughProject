@@ -180,7 +180,7 @@ while field.t < t_end:          # Loops from begginning of field to end
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
 
         dt = timestep(field, par)    # timestep evaluation
-        dtarray.append(dt)
+     
         if firstTimeStep:
             dt = min(dt, 0.1)           
             
