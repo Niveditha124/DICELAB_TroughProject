@@ -47,7 +47,7 @@ def geomorphic(field, par, dt):
 
 
     # retrieve bed level change and impose limit. dzb is positive in case of deposition
-    dzb = np.minimum((dt * (90*(D*5 - E)) / par.c_b), ((field.z_m - field.z_b) * field.c_m / par.c_b)) #limited by deposition of all suspended sediments
+    dzb = np.minimum((dt * ((D - E)) / par.c_b), ((field.z_m - field.z_b) * field.c_m / par.c_b)) #limited by deposition of all suspended sediments
     dzb = np.maximum(dzb, field.z_r - field.z_b) # limit by rigid bottom
 
     
