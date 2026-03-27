@@ -61,3 +61,4 @@ def gradientVL(field=None, par=None, o=0):
                             qy_me[:, np.arange(1, n + 1)] - qy_me[:, np.arange(0, n)])
 
     return grad
+
