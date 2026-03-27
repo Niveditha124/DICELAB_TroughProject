@@ -31,4 +31,9 @@ def dissipation (field, par, dt):
     # final update
     newfield = field
     newfield.k_m = K_new
+
+    
+
     return newfield
+
+
