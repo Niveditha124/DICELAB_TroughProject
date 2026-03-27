@@ -5,23 +5,14 @@ from scipy.interpolate import interp1d
 class field:
     # defines the magnitude of initial bed perturbations for each reach
     # These perturbations refer to variations in the sediment bed's elevation
-    # p3 = 0 # (p3) reach 3
-    # p2 = 0 # (p2) reach 2
-    # p1 = 0 # (p1) reach 1
     p = [0,0,0] # p values at each reach
    # defines the lengths of the three reaches
-    # L3 = 5000
-    # L2 = 2500 # L2 = 6000
-    # L1 = 15000 # (L1) length of reach 6000 (L1 = 6000)
+   
     L = [15000,2500, 5000] # Array for all lengths of the three reaches
    # (Lx) computes the sum of all reach lenghts
-    # Lx = L1 + L2 + L3     # Manual 
     Lx = sum(L)             # all elements in the array
 
     # defines the slopes of the three reaches
-    # S3 = 0
-    # S2 = 25 # S2 = 0.006
-    # S1 = 30 # (S1) slope of reach 1 (S1 = 0.013)
     S = [30,25,0]
     # (x0) defines the starting point of the x-coordinate
     x0 = - L[0] 
@@ -47,7 +38,6 @@ class field:
     c_m = np.ones((x.shape[0], x.shape[1])) * 0 # (c_m) sediment concentration within the current
     v = np.zeros((x.shape[0], x.shape[1])) #  (v) vertical velocity component 
     u = np.zeros((x.shape[0], x.shape[1])) # (u) horizontal velocity component 
-    # z_r[-1, -1 - 2] = -1000
     z_r[0][-3:] = -1000 # sets specific values in z_r array
     
     # defines reference points for interpolating the sediment bed elevation 
@@ -56,7 +46,6 @@ class field:
     set_interp = interp1d(xx, zz, kind='linear', fill_value='extrapolate')
     z_b = set_interp(x)
     # sets specific values in z_r array
-    # z_b[-1, -1 - 2] = -1000
     z_b[0][-3:] = -1000
     z_r[0][-1] = 1000
     # idientifies certain ranges within the x-coordinate for each reach
@@ -95,18 +84,12 @@ class field:
     nu2d = np.ones((x.shape[0],x.shape[1]))*0
     f  = 0
     h = 0
+    ls = np.ones((x.shape[0],x.shape[1]))
+    rs = 0
 
     def __init__(self, n, par):
         # initializes flow field properties for three reaches
-        # self.L1 = 6000
-        # self.S1 = 30
-        # self.p1 = 0
-        # self.L2 = 6000
-        # self.S2 = 25
-        # self.p2 = 0
-        # self.L3 = 5000
-        # self.S3 = 0
-        # self.p3 = 0
+ 
         self.L = [6000, 6000, 5000]
         self.S = [30, 25, 0]
         self.p = [0,0,0]
@@ -133,18 +116,11 @@ class field:
         self.nu2d = field.nu2d
         self.f = field.f
         self.h = field.h
+        self.ls = field.ls
+        self.rs = field.rs
 
     def init1D(self, n, par):
         # initializes parameters and variables for 1D simulation
-        # S1 = field.S1
-        # S2 = field.S2
-        # S3 = field.S3
-        # L1 = field.L1
-        # L2 = field.L2
-        # L3 = field.L3
-        # pert1 = field.p1
-        # pert2 = field.p2
-        # pert3 = field.p3
         S = field.S
         L = field.L
         pert = field.p
@@ -159,12 +135,6 @@ class field:
         # U_up = (par.R*par.g*C_up*H_up/Ri_up)^0.5;
         field.Q_up = field.H_up * field.U_up
         field.K_up = par.CfStar / par.alpha * field.U_up ** 2 # assume turbulence is fully developed at inflow
-        # z-ordering condition:
-        # field.z_b = np.maximum(field.z_b, field.z_r)
-        # field.z_m = np.maximum(field.z_m, field.z_b)
-        # velocities:
-        # field.u = np.zeros((field.x.shape[0], field.x.shape[1]))
-        # field.v = np.zeros((field.x.shape[0], field.x.shape[1]))
         # time:
         # -----
         field.t = 0
