@@ -35,7 +35,10 @@ except:
 folder_flowprofile = os.path.join(dataSource, os.path.join('images', 'flowprofile'))
 folder_iacbchanges = os.path.join(dataSource, os.path.join('images', 'iacbchanges'))
 folder_kfrprofile = os.path.join(dataSource, os.path.join('images', 'kfrprofile'))
-folder_ucprofike = os.path.join(dataSource, os.path.join('images', 'ucprofile'))
+folder_ucprofile = os.path.join(dataSource, os.path.join('images', 'ucprofile'))
+folder_flowprofilecontour = os.path.join(dataSource, os.path.join('images','flowprofilecontour'))
+folder_pressureprofile = os.path.join(dataSource, os.path.join('images','pressureprofile'))
+
 
 print()
 
@@ -57,7 +60,11 @@ for file in sorted_dataFiles:
     plotGenerator.generate_flowprofile(field, field_0, folder_flowprofile + '/plot' + str(titleCounter) + '.png')
     plotGenerator.generate_ucprofile(field, folder_iacbchanges + '/plot' + str(titleCounter) + '.png')
     plotGenerator.generate_kfrprofile(field, par, folder_kfrprofile + '/plot' + str(titleCounter) + '.png')
-    plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, folder_ucprofike + '/plot' + str(titleCounter) + '.png')
+    plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, folder_ucprofile + '/plot' + str(titleCounter) + '.png')
+    plotGenerator.generate_flowprofilecontour(field, field_0, folder_flowprofilecontour + '/plot' + str(titleCounter) + '.png')
+    plotGenerator.generate_pressureprofile(field, folder_pressureprofile + '/plot' + str(titleCounter) + '.png')
+    
+    
     #TODO temp remove later
     print(file + ' plot created')
 
