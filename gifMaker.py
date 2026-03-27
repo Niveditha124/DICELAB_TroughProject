@@ -38,4 +38,43 @@ if __name__ == "__main__":
     png_kfrprofile = folder_name + "/images/kfrprofile"
     png_iacbchanges = folder_name + "/images/iacbchanges"
     png_flowprofilecontour = folder_name + "/images/flowprofilecontour"
-    png_height = folder_name + '/images/height'
+    png_pressureprofile = folder_name + "/images/pressureprofile"
+
+
+def create_combined_gif(folder1, folder2, folder3, output_gif, duration=100):
+
+    files1 = sorted([f for f in os.listdir(folder1) if f.endswith('.png')], key=extract_numeric_part)
+    files2 = sorted([f for f in os.listdir(folder2) if f.endswith('.png')], key=extract_numeric_part)
+    files3 = sorted([f for f in os.listdir(folder3) if f.endswith('.png')], key=extract_numeric_part)
+
+    images = []
+
+    for f1, f2, f3 in zip(files1, files2, files3):
+
+        img1 = Image.open(os.path.join(folder1, f1))
+        img2 = Image.open(os.path.join(folder2, f2))
+        img3 = Image.open(os.path.join(folder3, f3))
+
+        # Ensure same height
+        height = max(img1.height, img2.height, img3.height)
+
+        total_width = img1.width + img2.width + img3.width
+
+        combined = Image.new("RGB", (total_width, height))
+
+        x_offset = 0
+        for img in [img1, img2, img3]:
+            combined.paste(img, (x_offset, 0))
+            x_offset += img.width
+
+        images.append(combined)
+
+    images[0].save(
+        output_gif,
+        save_all=True,
+        append_images=images[1:],
+        duration=duration,
+        loop=0
+    )
+
+    print(f"Combined GIF created: {output_gif}")
