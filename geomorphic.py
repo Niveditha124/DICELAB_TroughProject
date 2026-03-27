@@ -7,6 +7,7 @@ import sys
 def geomorphic(field, par, dt):
     # (vel) calculates the norm of the velcocity vector at each point in the flow field, where (u) and (v) are the horizontal and vertical components
     vel = (field.u ** 2 + field.v ** 2) ** 0.5
+    
 
     # direction vectors (ix) and (iy), repersent the horizontal and vertical components of the flow velocity 
     ix = ((vel > ((par.g * par.h_min) ** 0.5)).astype(int)) * (field.u / (np.maximum(vel, (par.g * par.h_min) ** 0.5)))
@@ -14,6 +15,8 @@ def geomorphic(field, par, dt):
 
     # (h) calculates current flow depth/thickness
     h = field.z_m - field.z_b
+
+    
 
     # (CH) calculates the amount of sediment being transported by the current 
     CH = h * field.c_m
@@ -29,6 +32,7 @@ def geomorphic(field, par, dt):
     C_new = np.maximum(CH_new / np.maximum(h_new, par.h_min), 0)
     KH_new = KH - dt * 0.5 * par.R * par.g * h_new * (E - D)
     K_new = np.maximum(0, KH_new / np.maximum(h_new, par.h_min))
+
     
     for i in range(10):
     
@@ -43,9 +47,11 @@ def geomorphic(field, par, dt):
 
 
     # retrieve bed level change and impose limit. dzb is positive in case of deposition
-    dzb = np.minimum((dt * ((D - E)*7) / par.c_b), ((field.z_m - field.z_b) * field.c_m / par.c_b)) #limited by deposition of all suspended sediments
+    dzb = np.minimum((dt * (90*(D*5 - E)) / par.c_b), ((field.z_m - field.z_b) * field.c_m / par.c_b)) #limited by deposition of all suspended sediments
     dzb = np.maximum(dzb, field.z_r - field.z_b) # limit by rigid bottom
 
+    
+   
     # retrieve all conservative variables from final bed level change
     h_new = h - dzb
     CH_new = np.minimum(np.maximum(CH - dzb * par.c_b, 0), h_new)
@@ -62,11 +68,14 @@ def geomorphic(field, par, dt):
     newfield.z_b = field.z_b + dzb
     newfield.c_m = np.minimum(np.maximum(CH_new / np.maximum(h_new, par.h_min), 0), 1) # do not change concentration where flow depth is about zero
     if (np.any(np.isnan(h_new))):
+        print(".")
         print('h_new after has nans')
         sys.exit()
     indices = np.where(h_new < par.h_min)
     newfield.c_m[indices] = field.c_m[indices]
 
-    newfield.k_m = np.maximum(KH_new / np.maximum(h_new, par.h_min), 0)
+    newfield.k_m = (np.maximum(KH_new / np.maximum(h_new, par.h_min), 0))
+
 
     return newfield
+    
