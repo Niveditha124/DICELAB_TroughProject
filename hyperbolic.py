@@ -5,8 +5,9 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     m, n = field.x.shape
     dx = field.x[0, 1] - field.x[0, 0]
     dy = dx
+    
+  
 
-    # correct line
     # (ls) and (rs) calculate left and right slopes
     ls = flux_x.q_m[:, 0:n] - flux_x.q_m[:, 1:n+1]
     rs = flux_y.q_m[0:m, :] - flux_y.q_m[1:m+1, :]
@@ -15,7 +16,7 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     z_m_new = field.z_m + ((dt / dx) * ls) + ((dt / dy) * rs)
     z_m_new = field.z_m + (dt/dx) * (flux_x.q_m[:, :n] - flux_x.q_m[:, 1:n+1]) + (dt/dy) * (flux_y.q_m[:m, :] - flux_y.q_m[1:m+1, :])
     #+ (dt/dy) * (flux_y.q_m[0:m, :] - flux_y.q_m[1:m+1, :])
-    
+
     # (qm_x) calculates mass flux in the x-direction, which repersents the amount of sediment-laden water moving horizontally along the slope
     qm_x = np.multiply((field.z_m - field.z_b), field.u)
 
@@ -50,16 +51,17 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     
     mux = np.tile(flux_x.mu,(field.s,1))
     muy = np.tile(flux_y.mu, (1,field.s))
-    nu_new2d = nu + (dt/dx)* (mux[:, :n] - mux[:, 1:n+1]) \
-                + (dt/dy) * (muy[:n, :] - muy[1:n+1, :])
+    #nu_new2d = nu + (dt/dx)* (mux[:, :n] - mux[:, 1:n+1]) \
+                #+ (dt/dy) * (muy[:n, :] - muy[1:n+1, :])
     
-    #nu_new2d = []
+    nu_new2d = []
     
     # (kh) calculates turbulent kinetic energy per unit volume, which repersents the energy corresponding to turbulent motion within the current
     kh = np.multiply((field.z_m - field.z_b), field.k_m)
     # (kh_new) updates turbulent kinetic energy per unit volume based on changes in turbulent kinetic energy flux
     kh_new = kh + (dt/dx) * (flux_x.kh[:, :n] - flux_x.kh[:, 1:n+1]) \
             + (dt/dy) * (flux_y.kh[:m, :] - flux_y.kh[1:m+1, :])
+
     
     # z-ordering condition:
     z_m_new = np.maximum(z_m_new, field.z_b)
@@ -75,10 +77,14 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
 
     # positivity condition
     k_m_new = np.maximum(k_m_new, 0)
+    
 
     # velocity update
     u_new = ((z_m_new - field.z_b) >= par.h_min) * qm_x_new / np.maximum((z_m_new - field.z_b), par.h_min)
     v_new = ((z_m_new - field.z_b) >= par.h_min) * qm_y_new / np.maximum((z_m_new - field.z_b), par.h_min)
+
+    u_new[0, 0] = max(u_new[0, 0], 0.0) # upstream must not reverse
+
 
     # final update
     newfield = field
@@ -92,5 +98,10 @@ def hyperbolic(field, flux_x, flux_y, par, dt):
     newfield.k_m = k_m_new
     newfield.nu = nu_new     
     newfield.nu2d = nu_new2d   
+  
+
+
+
 
     return newfield
+
