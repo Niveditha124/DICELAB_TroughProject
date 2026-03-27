@@ -20,6 +20,13 @@ class fluxx:
     z_mr = np.zeros(s)
     z_bl = np.zeros(s)
     z_br = np.zeros(s)
+    ls = []
+    rs = []
+    u = []
+    sr = []
+    sl = []
+    q_ml = []
+    q_mr = []
     
     # constructor to initialize class instance attributes
     def __init__ (self, q_m, sig_l, sig_r, sigCross, mu, kh, z_ml, z_mr, z_bl, z_br):
@@ -33,8 +40,13 @@ class fluxx:
         self.z_mr = z_mr
         self.z_bl = z_bl
         self.z_br = z_br
-
-
+        self.ls = ls
+        self.rs = rs
+        self.u = u 
+        self.sr = sr
+        self.sl = sl
+        self.q_ml = q_ml
+        self.q_mr = q_mr
 
 
 
@@ -55,6 +67,8 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     dx = field.x[0, 1] - field.x[0, 0] # (dx) is the grid spacing in the x-direction
     s = (1, field.s+1)
 
+    
+
     # (h_m) calculates the current flow depth/thickness
     h_m = field.z_m - field.z_b 
     h_ml = np.full(s, 0.5) 
@@ -72,10 +86,18 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
 
     # (kh) calculates the turbulent kinetic energy within the flow
     kh = h_m * field.k_m
+
+
+    
     kh_l = np.full(s, 0.5)
     kh_r = np.full(s, 0.5)
+
+  
+
     kh_l = kh[:, :n-1] + 0.5 * grad.dkh[:, :n-1]
     kh_r = kh[:, 1:n] - 0.5 * grad.dkh[:, 1:n]
+
+
     
     z_bl = np.zeros(s)
     z_br = np.full(s, 0.5)
@@ -84,8 +106,11 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     
     # (q_m) calculates the volume transport rate of suspended sediment
     q_m = np.multiply(h_m, field.u)
+
+
     q_ml = q_m[:, :n-1] + 0.5 * grad.dqx_m[:, :n-1]
     q_mr = q_m[:, 1:n] - 0.5 * grad.dqx_m[:, 1:n]
+
     
     # (qy_m), (qy_ml), and (qy_mr), calculates the volume transport rate of suspended sediment in the current, in the y-direction
     qy_m = np.multiply(h_m, field.v)
@@ -94,6 +119,8 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     qy_ml = qy_m[:, :n-1] + 0.5 * grad.dqy_m[:, :n-1]
     qy_mr = (qy_m[:, np.arange(1, n)] - (qy_mr[:, np.arange(0, n - 1)]) * grad.dqy_m[:, np.arange(1, n)])
     qy_mr = qy_m[:, 1:n] - 0.5 * grad.dqy_m[:, 1:n]
+
+
 
     # positivity constraint on mu and kh
     mu_l = np.maximum(mu_l, 0)
@@ -119,6 +146,7 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     k_ml = np.multiply((h_ml >= par.h_min), kh_l) / np.maximum(h_ml, par.h_min) # turbulent kinetic energy at the left side
     k_mr = np.multiply((h_mr >= par.h_min), kh_r) / np.maximum(h_mr, par.h_min) # turbulent kinetic energy at the right side
 
+
     # left and right fluxes:
     sig_l = np.multiply(h_ml, u_l ** 2) + 0.5 * par.g * par.R * (np.multiply(c_ml, h_ml ** 2))
     sig_r = np.multiply(h_mr, u_r ** 2) + 0.5 * par.g * par.R * (np.multiply(c_mr, h_mr ** 2))
@@ -140,11 +168,16 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     q_m_star = np.multiply(
         (np.multiply(SR, q_ml) - np.multiply(SL, q_mr) + np.multiply(np.multiply(SL, SR), (z_mr - z_ml))), prod)
 
+
+
+
     # anti-emptying constraint:
     q_m_star_min = - h_mr * dx / dt 
+    q_m_star_min[:, 0] = 0 
     q_m_star_max = h_ml * dx / dt
     q_m_star = np.minimum(np.maximum(q_m_star_min, q_m_star), q_m_star_max)
 
+    
     # canonical HLL statement for momentum:
     sig_star = np.multiply(
         (np.multiply(SR, sig_l) - np.multiply(SL, sig_r) + np.multiply(np.multiply(SL, SR), (q_mr - q_ml))), prod)
@@ -164,6 +197,8 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     q_m_star = np.multiply((~e), q_m_star)
     sig_starl = np.multiply((~e), sig_starl)
     sig_starr = np.multiply((~e), sig_starr) + np.multiply(e, (sig_r + np.multiply(np.multiply(np.multiply(2 * SL, SR), q_mr), prod)))
+    
+    
 
     # upwind momentum cross-flux:
     sigCross_star = np.multiply((np.multiply((q_m_star.all() > 0), v_l) + np.multiply((~(q_m_star.all() > 0)), v_r)), q_m_star.all())
@@ -173,7 +208,8 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
 
     
     # upwind turbulent kinetic energy flux:
-    kh_star = np.where(q_m_star > 0, k_ml, k_mr) * q_m_star
+    kh_star = (np.where(q_m_star > 0, k_ml, k_mr) * q_m_star)
+   
 
     # anti-emptying constraint:
     mu_star_min = np.multiply(- h_mr, c_mr) * dx / dt
@@ -182,7 +218,8 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     kh_star_min = np.multiply(- h_mr, k_mr) * dx / dt
     kh_star_max = np.multiply(h_ml, k_ml) * dx / dt
     kh_star = np.minimum(np.maximum(kh_star_min, kh_star), kh_star_max)
-    
+
+
     # final assignment:
     fluxx.q_m = q_m_star
     fluxx.sig_l = sig_starl
@@ -194,6 +231,8 @@ def fluxLHLL(field=None, grad=None, par=None, dt=None):
     fluxx.z_mr = z_mr
     fluxx.z_bl = z_bl
     fluxx.z_br = z_br
+
+
 
     return fluxx
 
