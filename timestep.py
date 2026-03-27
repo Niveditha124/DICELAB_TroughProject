@@ -17,11 +17,13 @@ def timestep(field, par):
     dx = field.x[0, 1] - field.x[0, 0]
     dy = dx
     dl = min(dx, dy)
+   
 
     if speed_max == 0:
         dt = 1
     else:
         dt = (par.courant * dl) / speed_max
         # speed max is zero, then all the arrays shit the bed.
-
     return dt
+
+
