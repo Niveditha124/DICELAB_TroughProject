@@ -11,6 +11,27 @@ past_x = []
 past_y = []
 colors = []
 
+
+def generate_pressureprofile(field, filepath):
+
+    plt.title('pressure profile over bed elevation')
+    plt.plot(field.x[0], field.ls[0], color='blue', label='Left Y-axis')
+    plt.xlabel('field.x')
+    plt.ylabel('field.p', color='blue')
+
+    #plt.plot(field.x[0], field.u[0], color='blue', label='Left Y-axis')
+    #plt.xlabel('field.x')
+    #plt.ylabel('field.u', color='blue')
+
+    plt.tick_params(axis='y', colors='blue')
+    ax2 = plt.twinx()
+    ax2.plot(field.x[0], field.z_b[0], color='red', label='Right Y-axis')
+    ax2.set_ylabel('field.z_b', color='red')
+    ax2.tick_params(axis='y', colors='red')
+    plt.savefig(filepath)
+    plt.close() 
+
+
 def generate_flowprofile(field, field_0, filepath):
         '''Function generates the flow profile graph to predetermined directory. Change directory in this method directly'''
 
@@ -27,25 +48,15 @@ def generate_flowprofile(field, field_0, filepath):
         idx = np.argmax(x1 >= 1000)
         plt.plot(x1[idx:], y1[idx:], color=(0.7, 0.7, 0.7))
         plt.plot(x2[idx:], y2[idx:], color='r')
-        if field.f == 1:
-            plt.plot(x3[idx:], y3[idx:], color='b')
+        plt.plot(x3[idx:], y3[idx:], color='b')
         plt.grid(color='gray', linestyle='--', linewidth=0.5)
         plt.xlabel('field.x (m)')
         plt.ylabel('(m)')
-        title = 'flow profile, t = ' + str(math.floor(field.t/3600))
+        title = 'flow profile, t = ' + str(math.floor(field.t/3600)) + ' hours'
         plt.title(title)
-        '''if field.h == 0 & field.f == 0:
-            plt.text(1, 1, "hemi & flow off", transform=plt.gca().transAxes,ha='right', va='top')
-        if field.h == 0 & field.f == 1:
-            plt.text(1, 1, "hemi off, flow on", transform=plt.gca().transAxes,ha='right', va='top')
-        if field.h == 1 & field.f == 1:
-            plt.text(1, 1, "hemi & flow on", transform=plt.gca().transAxes,ha='right', va='top')
-        if field.h == 1 & field.f == 0:
-            plt.text(1, 1, "hemi on, flow off", transform=plt.gca().transAxes,ha='right', va='top')'''
 
         # Save the plot as a PNG image
-        #plt.xlim(1000,40000)
-        #plt.ylim(-300, 2500)
+
         #plt.ylim(-500,250)
         plt.savefig(filepath)
         plt.close()  # Close the figure to clear it for the next run
