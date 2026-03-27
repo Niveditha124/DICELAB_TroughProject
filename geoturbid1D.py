@@ -50,12 +50,16 @@ if __name__ == "__main__":
     videos_kfrprofile = folder_videos + '/kfrprofile'
     videos_ucprofile= folder_videos + '/ucprofile'
     videos_flowprofilecontour = folder_videos + '/flowprofilecontour'
+    videos_pressureprofile = folder_videos + '/pressureprofile'
+
 
     images_flowprofile = folder_images + '/flowprofile'
     images_iacbchanges = folder_images + '/iacbchanges'
     images_kfrprofile = folder_images + '/kfrprofile'
     images_ucprofile= folder_images + '/ucprofile'
     images_flowprofilecontour = folder_images + '/flowprofilecontour'
+    images_pressureprofile = folder_images + '/pressureprofile'
+
 
     os.mkdir(folder_name)
     os.mkdir(folder_data)
@@ -67,11 +71,13 @@ if __name__ == "__main__":
     os.mkdir(videos_kfrprofile)
     os.mkdir(videos_ucprofile)
     os.mkdir(videos_flowprofilecontour)
+    os.mkdir(videos_pressureprofile)
     os.mkdir(images_flowprofile)
     os.mkdir(images_iacbchanges)
     os.mkdir(images_kfrprofile)
     os.mkdir(images_ucprofile)
     os.mkdir(images_flowprofilecontour)
+    os.mkdir(images_pressureprofile)
     store_data(folder_name)
     
 #############################################################################
@@ -127,7 +133,6 @@ else:
     
 #############################################################################
 import pandas as pd
-# creating an array of (x) values
 intermittency = pd.read_csv("intermittency_1year.csv")*3600
 inter_time = (intermittency["time (hours)"].values)
 flow = intermittency["flow (1/0)"].values
@@ -139,12 +144,13 @@ dispflag = 0
 #t_end = 3600*1000
 t_end = max(inter_time)
 dt_output = 360000
+#dt_output = 144000
 
 
 
 
 n = 200
-o = 1
+o = 2
 geostaticflag = 0
 
 # material and numerical parameters
@@ -180,12 +186,13 @@ while field.t < t_end:          # Loops from begginning of field to end
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
 
         dt = timestep(field, par)    # timestep evaluation
-     
+        
         if firstTimeStep:
             dt = min(dt, 0.1)           
             
             firstTimeStep = 0
-        # disp(['t = ' num2str(field.t) ' [sec]']); # time display
+
+ 
     # empty outflowing pit
     field.z_b[field.z_r == - 6000] = field.z_r[field.z_r == - 6000]
     field.z_m[field.z_r == - 6000] = field.z_r[field.z_r == - 6000]
@@ -194,7 +201,9 @@ while field.t < t_end:          # Loops from begginning of field to end
     field.v[field.z_r == - 6000] = 0
     field.c_m[field.z_r == - 6000] = 0
     field.k_m[field.z_r == - 6000] = 0
-    
+
+
+   
     # screen display:
     if np.logical_or((o == 1), (np.logical_and((o == 2), (iter % 2 == 1)))):
         if dispflag == 1:
@@ -216,10 +225,11 @@ while field.t < t_end:          # Loops from begginning of field to end
         if plotCreationFlag:
 
             plotGenerator.generate_flowprofile(field, field_0, images_flowprofile + '/plot' + str(titleCounter) + '.png')
-            #plotGenerator.generate_ucprofile(field, images_ucprofile + '/plot' + str(titleCounter) + '.png')
-            #plotGenerator.generate_kfrprofile(field, par, images_kfrprofile + '/plot' + str(titleCounter) + '.png')
+            plotGenerator.generate_ucprofile(field, images_ucprofile + '/plot' + str(titleCounter) + '.png')
+            plotGenerator.generate_kfrprofile(field, par, images_kfrprofile + '/plot' + str(titleCounter) + '.png')
             #plotGenerator.generate_iacbchanges(field, field_prev, field_0, dt, images_iacbchanges + '/plot' + str(titleCounter) + '.png')
             #plotGenerator.generate_flowprofilecontour(field, field_0, images_flowprofilecontour + '/plot' + str(titleCounter)+'.png')
+            plotGenerator.generate_pressureprofile(field, images_pressureprofile + '/plot' + str(titleCounter) + '.png')
         
         # Writing field data to file
         filename = folder_data + '/field' + str(titleCounter) + '.txt'
@@ -238,17 +248,20 @@ while field.t < t_end:          # Loops from begginning of field to end
     # book-keeping|
     field_prev = deep_copy(field, field_prev)
 
-    if field.f == 0: 
-        #hyperbolic operator:
-        if o == 1:
+    if field.f == 0:
+        if field.h == 0:
             field.z_m = field.z_b
-            # time update
-            field.t = field.t + dt
+        else:
+            field.z_b = field.z_b + dt*par.v_hemi
+            field.z_m = field.z_b 
+         # time update
+        field.t = field.t + dt
 
-    if field.f == 1:    
+    elif field.f == 1:    
         # half-step relaxation operator:
         if np.logical_and((o == 2), (iter % 2 == 1)):
             field = relax(field, par, 0.5 * dt, geostaticflag)
+            
 
         # extend field left and right:   
         field_x = mirror(field)
@@ -260,16 +273,15 @@ while field.t < t_end:          # Loops from begginning of field to end
        
         # fluxing scheme (LHLL):
 
-        # Original --> flux_x = fluxLHLL_2('x', field_x, grad_x, par, dt) # grad_x can be undefined but maybe we don't care?
-
+        
         # (magnitude of sediment flux across the Hydraulic jump in the horizontal direction of the flow)
         flux_x = fluxLHLL(field_x, grad_x, par, dt)
+     
 
 
         # impose BC at upstream inflow section
-        # WORKS
         flux_x = bc_1D(flux_x, field_x, par)
-
+     
         # Original flux_y line of code    
         flux_y = createFluxY(field)
             
@@ -277,21 +289,22 @@ while field.t < t_end:          # Loops from begginning of field to end
         if o == 1:
             # 1st order forward Euler:
             field = hyperbolic(field, flux_x, flux_y, par, dt)
-            
+                
             # relaxation operator:
             field = relax(field, par, dt, geostaticflag)
             # time update
             field.t = field.t + dt
-    
+            
+
         else:
             if o == 2:
                 # 2nd order predictor-corrector (Alcrudo & Garcia-Navarro 1993):
                 if iter % 2 == 1:
                     # book-keeping of previous field:
-                    # field_prev = field
                     field_prev = deep_copy(field, field_prev)
                     # predictor step:
                     field = hyperbolic(field, flux_x, flux_y, par, 0.5 * dt)
+                    
                 else:
                     # corrector step:
                     field = hyperbolic(field_prev, flux_x, flux_y, par, dt)
@@ -299,19 +312,22 @@ while field.t < t_end:          # Loops from begginning of field to end
                     field = relax(field, par, 0.5 * dt, geostaticflag)
                     # time update:
                     field.t = field.t + dt
-    
+
+
+
+
 
     iter = iter + 1
     
     # 206516 # 406516
-    if iter == 406516*4:
+    if iter == 4*406516:
         
         break
-    if titleCounter == 402: #102
+    if titleCounter == 166: #102
         break
 
 
-print(field.t)
+
 ############################# make gif
 print("\nSimulation complete!")
 
@@ -319,8 +335,7 @@ png_folder_path = images_flowprofile
 output_gif_path = videos_flowprofile + "/flowprofile.gif"
 gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
 
-
-'''png_folder_path = images_ucprofile
+png_folder_path = images_ucprofile
 output_gif_path = videos_ucprofile + "/ucprofile.gif"
 gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
 
@@ -328,12 +343,25 @@ png_folder_path = images_kfrprofile
 output_gif_path = videos_kfrprofile + "/kfrprofile.gif"
 gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
 
-png_folder_path = images_iacbchanges
+'''png_folder_path = images_iacbchanges
 output_gif_path = videos_iacbchanges + "/iacbchanges.gif"
 gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
 
 png_folder_path = images_flowprofilecontour
 output_gif_path = videos_flowprofilecontour + "/flowprofilecontour.gif"
 gifMaker.create_gif(png_folder_path, output_gif_path, duration= 150)'''
+
+png_folder_path = images_pressureprofile
+output_gif_path = videos_pressureprofile + "/pressureprofile.gif"
+gifMaker.create_gif(png_folder_path, output_gif_path, duration=150)
+
+
+gifMaker.create_combined_gif(
+    images_flowprofile,
+    images_ucprofile,
+    images_kfrprofile,
+    videos_flowprofile + "/combined_profiles.gif",
+    duration=150
+)
 
 print("GIFs saved!")
