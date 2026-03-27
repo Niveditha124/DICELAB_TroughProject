@@ -3,7 +3,7 @@ import numpy as np
 # solved implicitly with a backward Euler scheme (solution obtained
 # iteratively from the explicit estimate with a Newton scheme)
 
-def entrainment(field, par, dt):
+def entrainment(field,pfield, par, dt):
     # (vel) calculates the norm of the velcocity vector at each point in the flow field, where (u) and (v) are the horizontal and vertical components
     vel = ((field.u ** 2) + (field.v ** 2)) ** 0.5
     # direction vectors (ix) and (iy), repersent the horizontal and vertical components of the flow velocity
@@ -23,16 +23,13 @@ def entrainment(field, par, dt):
     SS = h * field.c_m
 
     # (Ri) calculates the explicit Richardson number, a dimensionless parameter used to predict turbulence within the flow
-    Ri = par.R * par.g * field.c_m * h / np.maximum(vel**2, (par.g*par.h_min))
     Ri = par.R * par.g * field.c_m * h / np.maximum(vel**2, par.g * par.h_min)
     # VEL is fine, so it must be c_m
     # the np.maximum() function ensures Richardson number is non-negative, and negates the possibilty of undefined behavior
     Ri = np.maximum(Ri, 0)
-    # acc derp af way of finding this
-    for x in Ri:
-        for i in x:
-            if i < 0:
-                print('negative Ri')
+   
+    if np.any(Ri < 0) == True:
+        print('negative Ri')
 
     # SOLVE FOR H_NEW (Iterative Newton Scheme, loop 10 times)
     # start with explicit estimate
@@ -42,11 +39,17 @@ def entrainment(field, par, dt):
     C3 = par.R * par.g * SS
 
     # iterate 10 times with Newton scheme
+    np.seterr(divide='ignore', invalid='ignore')
     for i in range(10):
-        np.seterr(divide='ignore', invalid='ignore')
         dhdt_new = C1 / (np.maximum(h_new, par.h_min) * (C2+C3*np.maximum(h_new, par.h_min)**2))
         h_new = h + dt * dhdt_new
-        np.seterr(divide='raise', invalid='raise')
+    np.seterr(divide='raise', invalid='raise')
+    
+    ####################### pressure variation on height
+    h_new[0,1:] = h_new[0,1:]*(pfield.p[0,0:-1]/pfield.p[0,1:])
+    #######################
+
+    
 
     h_new[np.isnan(h_new)] = 0
     h_new = np.maximum(h, h_new)
@@ -73,4 +76,6 @@ def entrainment(field, par, dt):
     newfield.k_m = k_new
 
 
+
     return newfield
+
